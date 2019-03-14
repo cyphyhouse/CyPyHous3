@@ -1,9 +1,10 @@
+'''Abstract thread class to handle broadcast and receive messages for an agent'''
+
 import threading
-import agentThread
-from abc import ABC,abstractmethod
+from abc import ABC, abstractmethod
 
 
-class commThread(ABC,threading.Thread):
+class commThread(ABC, threading.Thread):
 
     def __init__(self):
         super(commThread, self).__init__()
@@ -20,7 +21,7 @@ class commThread(ABC,threading.Thread):
         pass
 
     @abstractmethod
-    def write(self,message,IP):
+    def write(self, message, destination=None):
         pass
 
     @abstractmethod
