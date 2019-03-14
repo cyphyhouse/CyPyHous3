@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="027872dd-6a33-475c-a912-f941c52a11ec" name="Default Changelist" comment="initial commit`">
-      <change afterPath="$PROJECT_DIR$/src/Comms/commHandler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Comms/commThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Comms/commThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Comms/comms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Comms/comms.py" afterDir="false" />
-    </list>
+    <list default="true" id="027872dd-6a33-475c-a912-f941c52a11ec" name="Default Changelist" comment="initial commit`" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,11 +55,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/comms/comms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="54" column="69" selection-start-line="54" selection-start-column="69" selection-end-line="54" selection-end-column="69" />
+            <state relative-caret-position="397">
+              <caret line="54" column="66" selection-start-line="54" selection-start-column="66" selection-end-line="54" selection-end-column="66" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -72,11 +67,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/comms/commHandler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-214">
-              <caret line="24" column="17" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
+            <state relative-caret-position="146">
+              <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -87,11 +82,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/comms/comms_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-68">
+              <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -248,7 +240,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1552505170025</updated>
-      <workItem from="1552505171793" duration="25303000" />
+      <workItem from="1552505171793" duration="25894000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1552587578194</created>
@@ -261,7 +253,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25303000" />
+    <option name="totallyTimeSpent" value="25894000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -393,16 +385,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/comms/comms_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/comms/commThread.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -430,20 +412,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/comms/commHandler.py">
+    <entry file="file://$PROJECT_DIR$/src/comms/comms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-214">
-          <caret line="24" column="17" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
+        <state relative-caret-position="397">
+          <caret line="54" column="66" selection-start-line="54" selection-start-column="66" selection-end-line="54" selection-end-column="66" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/comms/comms.py">
+    <entry file="file://$PROJECT_DIR$/src/comms/comms_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="54" column="69" selection-start-line="54" selection-start-column="69" selection-end-line="54" selection-end-column="69" />
+        <state relative-caret-position="-68">
+          <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/comms/commHandler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="146">
+          <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>

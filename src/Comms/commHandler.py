@@ -21,12 +21,7 @@ class commHandler(commThread.commThread):
             try:
                 self.msocket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
                 self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                #self.msocket.setblocking(False)
-                #self.write()
-                #message = self.msocket.recvfrom(1024).decode('utf-8')
-                #print("here")
-                # msocket.sendto("test".encode('utf-8'),('255.255.255.255',bcastPort))
+                self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)]
                 err = False
             except socket.error:
                 err = True
@@ -50,22 +45,6 @@ class commHandler(commThread.commThread):
 
     def write(self):
         print("here")
-
         self.msocket.sendto(bytes("testing", "utf-8"),('127.0.0.1',self.bcastPort))
         self.stop()
 
-'''
-import socket
-
-UDP_IP = socket.gethostbyname(socket.gethostname())
-UDP_PORT = 5005
-
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-sock.bind((UDP_IP, UDP_PORT))
-
-while True:
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-    print ("received message:", data.decode('utf-8'))
-
-'''
