@@ -14,6 +14,8 @@ class agentThread(ABC,threading.Thread):
             self.name = super().name
         else:
             self.name = name
+        #self.daemon = True
+        self.start()
 
     def stop(self):
         self._stop_event.set()

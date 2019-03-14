@@ -23,5 +23,6 @@ class commThread(ABC,threading.Thread):
     def write(self,message,IP):
         pass
 
-
-
+    @abstractmethod
+    def run(self):
+        pass
