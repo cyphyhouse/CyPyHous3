@@ -7,7 +7,7 @@ class Quadcopter:
     def __init__(self, bot_name='bot1'):
         self.waypoint_count = 0
 
-        self.pub = rospy.Publisher('Waypoint_'+bot_name, PoseStamped)
+        self.pub = rospy.Publisher('Waypoint_'+bot_name, PoseStamped, queue_size=1)
         rospy.init_node('quad_wp_node', anonymous=True)
 
     def goTo(self, dest, wp_type=None):
@@ -16,6 +16,8 @@ class Quadcopter:
         else:
             if self.waypoint_count == 0:
                 frame_id = '0'
+            elif dest[2] <= 0:
+                frame_id = '2'
             else:
                 frame_id = '1'
 
