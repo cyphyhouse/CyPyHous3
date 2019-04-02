@@ -24,6 +24,7 @@ class agentThread(ABC, Thread):
 
     def stop(self):
         self._stop_event.set()
+        self.__gvh.stop()
 
     def stopped(self):
         return self._stop_event.is_set()

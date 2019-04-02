@@ -8,60 +8,86 @@ import dsm
 
 class TestApp(agentThread.agentThread):
 
-    def __init__(self,name,bcastqueue,barrier,dd,numbots = 1,locks = []):
-        super(TestApp, self).__init__(gvh(name, bcastqueue,numbots),dd,locks)
+    def __init__(self, name, bcastqueue, barrier, dd, numbots=1, locks=[]):
+        super(TestApp, self).__init__(gvh(name, bcastqueue, numbots), dd, locks)
         self.barrier = barrier
 
-
-
     def run(self):
-       # print("here")
-       lock1 = self.locks[0]
 
-       candidate = self.dd.get('candidate')
-       if candidate is None :
-            candidate = dsm.dsmvar('candidate', -1, -1, 'int', -1)
+        pid = self.id
+        numBots = self.gvh.participants
+        lock0 = self.locks[0]
+        lock1 = self.locks[1]
+        candidate = self.dd.get('candidate')
+        if candidate is None:
+            candidate = dsm.dsmvar('candidate', -1, 0, ('int', 'aw'), -1)
             self.dd.add(candidate)
 
-       numvoted = self.dd.get('numvoted')
-       if numvoted is None:
-           numvoted = dsm.dsmvar('numvoted',-1,0,'int',-1)
-           self.dd.add(numvoted)
+        numvoted = self.dd.get('numvoted')
+        if numvoted is None:
+            numvoted = dsm.dsmvar('numvoted', -1, 0, ('int', 'aw'), -1)
+            self.dd.add(numvoted)
 
-       leader = dsm.dsmvar('leader',-1,0,'int',-1)
-       voted = False
+        candidate = -1
+        numvoted = 0
+        voted = False
+        leader = None
+        while (not (self.stopped())):
 
-       while not(self.stopped()):
+            sleep(1)  # adding
+            if (self.dd.get("candidate") == None):
+                continue
 
-            sleep(1)
-            #self.gvh.comms.wake()
-            #self.gvh.commHandler.wake()
+            candidate = self.dd.get("candidate")
+            if ((not (voted) and (candidate <= pid))):
 
-            if not voted:
-                with lock1:
-                    if self.dd.get('candidate') <= self.id :
-                        self.dd.put('candidate',self.id,time.time())
-                    else:
-                        pass
-                    numvoted = self.dd.get('numvoted') + 1
-                    #print(self.id,numvoted)
-                    self.dd.put('numvoted',numvoted,time.time())
-                    #print(self.id, self.dd.get('numvoted'))
+                with lock0:
+
+                    candidate = pid
+                    self.dd.put("candidate", candidate, time.time())
+                    if (self.dd.get("numvoted") == None):
+                        continue
+
+                    numvoted = self.dd.get("numvoted")
+                    numvoted = (numvoted + 1)
+                    self.dd.put("numvoted", numvoted, time.time())
                     voted = True
-            else:
-                #print("here",self.id)
+
+            # ignoring
+            if (self.dd.get("candidate") == None):
+                continue
+
+            candidate = self.dd.get("candidate")
+            if ((not (voted) and (candidate > pid))):
+
                 with lock1:
-                    #print(self.id," has lock 1 with numVoted ",self.dd.get('numvoted'))
 
-                    if self.dd.get('numvoted') == self.gvh.participants:
-                    #if voted:
-                        leader = self.dd.get('candidate')
-                        #print("candidate: ",self.dd.get('candidate'))
-                        print("stopping",self.name)
-                        print('leader',leader)
-                        self.stop()
+                    if (self.dd.get("numvoted") == None):
+                        continue
+
+                    numvoted = self.dd.get("numvoted")
+                    numvoted = (numvoted + 1)
+                    self.dd.put("numvoted", numvoted, time.time())
+                    voted = True
+
+            # finalsum
+            if (self.dd.get("numvoted") == None):
+                continue
+
+            numvoted = self.dd.get("numvoted")
+            if ((numvoted == numBots)):
+
+                if (self.dd.get("candidate") == None):
+                    continue
+
+                candidate = self.dd.get("candidate")
+                leader = candidate
 
 
-            self.barrier.wait()
-            #print(list(self.gvh.comms.bcastqueue))
+
+
+
+
+
+
 

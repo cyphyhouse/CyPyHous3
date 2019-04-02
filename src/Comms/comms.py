@@ -18,18 +18,23 @@ class comms(commThread.commThread):
         retries = 0
         err = True
         self.msocket = None
-        while err and  retries < 15:
+        while err and retries < 15:
             try:
                 self.msocket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
                 self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)]
+                self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
                 err = False
+
             except socket.error:
                 err = True
                 retries += 1
 
     def run(self):
-        self.msocket.bind((self.myLocalIp, self.bcastPort))
+        try:
+            self.msocket.bind(('', self.bcastPort))
+        except:
+            print("passing this error")
+            pass
         n = 0
 
         while not (self.stopped()):
@@ -45,7 +50,6 @@ class comms(commThread.commThread):
     def setCommsHandler(self):
         pass
 
-
     def write(self,message):
-        self.msocket.sendto(bytes(message, "utf-8"),('192.168.1.32',self.bcastPort))
+        self.msocket.sendto(bytes(message, "utf-8"), ('192.168.1.255',self.bcastPort))
 

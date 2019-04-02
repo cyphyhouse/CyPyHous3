@@ -2,8 +2,9 @@ import agentThread
 import time
 from time import sleep
 from gvh import gvh
-from threading import Lock
+from threading import RLock,Barrier
 import dsm
+import motion
 
 
 class LineFormApp(agentThread.agentThread):
@@ -13,55 +14,49 @@ class LineFormApp(agentThread.agentThread):
         self.barrier = barrier
 
 
-
     def run(self):
        # print("here")
+       print(self.gvh.moat.target)
        lock1 = self.locks[0]
+       pid = self.gvh.pid()
 
-       candidate = self.dd.get('candidate')
-       if candidate is None :
-            candidate = dsm.dsmvar('candidate', -1, -1, 'int', -1)
-            self.dd.add(candidate)
+       pos = self.dd.get('pos',pid)
+       if pos is None:
+            pos = dsm.dsmvar('pos', pid, -1, ('int','ar'), -1)
+            self.dd.add(pos)
 
-       numvoted = self.dd.get('numvoted')
-       if numvoted is None:
-           numvoted = dsm.dsmvar('numvoted',-1,0,'int',-1)
-           self.dd.add(numvoted)
-
-       leader = dsm.dsmvar('leader',-1,0,'int',-1)
-       voted = False
 
        while not(self.stopped()):
+            #print("pid",pid)
 
             sleep(1)
-            #self.gvh.comms.wake()
-            #self.gvh.commHandler.wake()
 
-            if not voted:
-                with lock1:
-                    if self.dd.get('candidate') <= self.id :
-                        self.dd.put('candidate',self.id,time.time())
-                    else:
-                        pass
-                    numvoted = self.dd.get('numvoted') + 1
-                    #print(self.id,numvoted)
-                    self.dd.put('numvoted',numvoted,time.time())
-                    #print(self.id, self.dd.get('numvoted'))
-                    voted = True
+            if pid == 0 or pid == 3:
+                self.dd.put('pos',self.gvh.moat.state.position,time.time(),pid)
+                #print("testing",self.dd.get('pos',pid))
+                #print(list(self.dd.varmap.keys()))
+                #self.stop()
+                pass
+                #continue
             else:
-                #print("here",self.id)
+                #print(pid," requesting lock")
                 with lock1:
-                    #print(self.id," has lock 1 with numVoted ",self.dd.get('numvoted'))
+                    #print(pid," has lock")
+                    #print (self.dd)
+                    if self.dd.get('pos',pid+1) is None or self.dd.get('pos',pid-1) is None:
+                        #print("here")
+                        pass
+                    else:
+                        #print("herenow")
+                        pass
+                    self.dd.put('pos',self.gvh.moat.state.position,time.time(),pid)
 
-                    if self.dd.get('numvoted') == self.gvh.participants:
-                    #if voted:
-                        leader = self.dd.get('candidate')
-                        #print("candidate: ",self.dd.get('candidate'))
-                        print("stopping",self.name)
-                        print('leader',leader)
-                        self.stop()
 
-
+                #print(pid,"releasing lock")
+            #try:
+            print("here",pid)
             self.barrier.wait()
+            #except:
+            #    continue
             #print(list(self.gvh.comms.bcastqueue))
 

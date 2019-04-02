@@ -19,9 +19,9 @@ try:
 except socket.error:
     pass
 '''
-c = commHandler.commHandler()
-c.start()
-print("started handler")
+#c = commHandler.commHandler()
+#c.start()
+#print("started handler")
 c1 = comms.comms()
 c1.start()
 print("started comms")

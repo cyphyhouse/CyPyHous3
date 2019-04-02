@@ -13,7 +13,7 @@ class commHandler(commThread.commThread):
     def __init__(self):
         super(commHandler, self).__init__()
         self.bcastPort = 2562
-        self.myLocalIp = '127.0.0.1' #socket.gethostbyname(socket.gethostname())
+        self.myLocalIp = socket.gethostbyname(socket.gethostname())
         retries = 0
         err = True
         self.msocket = None
@@ -21,14 +21,17 @@ class commHandler(commThread.commThread):
             try:
                 self.msocket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
                 self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)]
+                self.msocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
                 err = False
             except socket.error:
                 err = True
                 retries += 1
 
     def run(self):
-        self.msocket.bind((self.myLocalIp, self.bcastPort))
+        try:
+            self.msocket.bind(('', self.bcastPort))
+        except:
+            pass
         while not (self.stopped()):
             #print("running")
             try:

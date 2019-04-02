@@ -1,7 +1,7 @@
 import threading,time
 from comms import comms
 from commHandler import commHandler
-
+import moat
 
 class gvh(list):
 
@@ -13,7 +13,12 @@ class gvh(list):
         self.__commHandler = commHandler()
         self.__comms.start()
         self.__commHandler.start()
+        self.__moat = moat.moat()
+        self.__moat.start()
 
+    @property
+    def moat(self):
+        return self.__moat
 
     @property
     def comms(self):
@@ -27,6 +32,11 @@ class gvh(list):
     def name(self):
         return self.__name
 
+    def pid(self):
+        import re
+        return int(re.sub(r'[a-zA-Z]', r'', self.name))
+
+
     @property
     def participants(self):
         return self.__participants
@@ -34,4 +44,10 @@ class gvh(list):
     @property
     def sim(self):
         return self.__sim
+
+    def stop(self):
+        self.__moat.stop()
+
+
+
 

@@ -4,7 +4,7 @@
 ============
 
 A simple example of an animated plot... In 3D!
-"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as p3
@@ -12,12 +12,11 @@ import matplotlib.animation as animation
 
 
 def Gen_RandLine(length, dims=2):
-    """
     Create a line using a random walk algorithm
 
     length is the number of points for the line.
     dims is the number of dimensions the line has.
-    """
+
     lineData = np.empty((dims, length))
     lineData[:, 0] = np.random.rand(dims)
     for index in range(1, length):
@@ -66,3 +65,15 @@ line_ani = animation.FuncAnimation(fig, update_lines, 30, fargs=(data, lines),
                                    interval=10, blit=True)
 
 plt.show()
+"""
+import matplotlib.pyplot as plt
+import mpl_toolkits.mplot3d.axes3d as p3
+import matplotlib.animation as animation
+import motion,point
+
+
+n = motion.motion(point.point(0,0))
+n.goto(point.point(20,20),2)
+n.start()
+
+

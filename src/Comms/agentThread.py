@@ -1,20 +1,15 @@
 #TODO: implement a safe-ish "stop"
 
 
-import threading
-from abc import ABC,abstractmethod
+from threading import Thread, Event
+from abc import ABC, abstractmethod
 
+class agentThread(ABC, Thread):
 
-class agentThread(ABC,threading.Thread):
-
-    def __init__(self,name=None):
-        super(agentThread,self).__init__()
-        self._stop_event = threading.Event()
-        if name is None:
-            self.name = super().name
-        else:
-            self.name = name
-        #self.daemon = True
+    def __init__(self,gvh):
+        super(agentThread, self).__init__()
+        self._stop_event = Event()
+        self.gvh = gvh
         self.start()
 
     def stop(self):
@@ -26,3 +21,4 @@ class agentThread(ABC,threading.Thread):
     @abstractmethod
     def run(self):
         pass
+
