@@ -1,3 +1,5 @@
+#comms and commhandler
+
 class dsmvar():
     def __init__(self,varname,owner,value,type,ts):
         self.varname = varname
@@ -16,7 +18,7 @@ class dsm():
         l = list(self.varmap.keys())
         v = varname.varname
         t = varname.type[1]
-        print(l,v,t)
+
         if v not in l and varname.type[1] is 'aw':
             self.varmap[v] = varname
         if v not in l and varname.type[1] is 'ar':
@@ -29,7 +31,7 @@ class dsm():
 
             self.varmap[v] = l1
         if v in l and t is 'ar':
-            print ("owner",varname.owner)
+            #print ("owner",varname.owner)
             self.varmap[v][varname.owner] = varname
 
 
