@@ -1,14 +1,26 @@
 import rospy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Pose
+from threading import Thread
+import math
+import numpy as np
 
 
-class Quadcopter:
+class Quadcopter(Thread):
 
-    def __init__(self, bot_name='bot1'):
+    def __init__(self, bot_num=1, bot_name='cyphyhousecopter'):
+        Thread.__init__(self)
         self.waypoint_count = 0
+        self.position = Pose()
+        self.heading = 0
 
-        self.pub = rospy.Publisher('Waypoint_'+bot_name, PoseStamped, queue_size=1)
         rospy.init_node('quad_wp_node', anonymous=True)
+        self.pub = rospy.Publisher('Waypoint_bot'+str(bot_num), PoseStamped, queue_size=1)
+        self.sub_vicon = rospy.Subscriber('/vrpn_client_node/'+bot_name+'/pose', PoseStamped, self._getVicon, queue_size=1)
+
+    def _getVicon(self, data):
+        self.position = data.pose.position
+        quat = data.pose.orientation
+        self.heading = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), quat.w**2 + quat.x**2 - quat.y**2 - quat.z**2)
 
     def goTo(self, dest, wp_type=None):
         if wp_type is not None:
@@ -31,12 +43,24 @@ class Quadcopter:
         self.waypoint_count += 1
         self.pub.publish(pose)
 
+    def getPosition(self):
+        return np.array([self.position.x, self.position.y, self.position.z, self.heading])
 
-class Car:
-    def __init__(self, bot_name='bot1'):
+    def run(self):
+        rospy.spin()
 
-        self.pub = rospy.Publisher('Waypoint_'+bot_name, PoseStamped)
+
+class Car(thread):
+    def __init__(self, bot_num=1, bot_name='f1_car'):
+        Thread.__init__(self)
+        self.position = Pose()
+
         rospy.init_node('car_wp_node', anonymous=True)
+        self.pub = rospy.Publisher('Waypoint_bot'+str(bot_num), PoseStamped)
+        self.sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon, queue_size=1)
+
+    def _getVicon(self, data):
+        self.position = data.pose.position
 
     def goTo(self, dest, wp_type=None):
         if wp_type is not None:
@@ -52,3 +76,9 @@ class Car:
         pose.pose.position.z = dest[2]
 
         self.pub.publish(pose)
+
+    def getPosition(self):
+        return np.array([self.position.x, self.position.y, self.position.z, self.heading])
+
+    def run(self):
+        rospy.spin()
