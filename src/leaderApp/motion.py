@@ -74,17 +74,8 @@ class motion(Thread):
         while not self.stopped():
             self.posupdate(dt)
             time.sleep(sleep)
-            ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
-            plt.show()
 
 
-
-    def animate(self):
-
-        xs = self.traj.x_traj
-        ys = self.traj.y_traj
-        self.draw.clear()
-        self.draw.plot(xs, ys)
 
     def goto(self,point,tolerance):
 

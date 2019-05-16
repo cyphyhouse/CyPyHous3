@@ -3,16 +3,16 @@ import socket
 import time
 
 class commHandler(commThread.commThread):
-
     def stop(self):
+        self.msocket.close()
         self._stop_event.set()
 
     def stopped(self):
         return self._stop_event.is_set()
 
-    def __init__(self):
+    def __init__(self,bcastPort):
         super(commHandler, self).__init__()
-        self.bcastPort = 2562
+        self.bcastPort = bcastPort
         self.myLocalIp = socket.gethostbyname(socket.gethostname())
         retries = 0
         err = True
@@ -31,6 +31,7 @@ class commHandler(commThread.commThread):
         try:
             self.msocket.bind(('', self.bcastPort))
         except:
+            "already bound or error binding socket"
             pass
         while not (self.stopped()):
             #print("running")

@@ -1,20 +1,23 @@
 import math
+import numpy as np
 import time
 from threading import Thread,Event
-from point import *
+from point import point
 from state import *
 
 
 class moat(Thread):
-    def __init__(self, pid, rd = 2,configfile = 'default'):
-
+    def __init__(self, pid, rd = 2, configfile = 'testfile',mode = 'Target',route = [],done =False):
         super(moat,self).__init__()
         self.__pid = pid
-        self.__state = state(pid,configfile)
+        self.state = state(pid,configfile)
         self.__rdist = rd
         self.__target = None
         self._stop_event = Event()
         self.__inmotion = False
+        self.route = route
+        self.mode = mode
+        self.done = done
 
     def stop(self):
         self._stop_event.set()
@@ -39,22 +42,6 @@ class moat(Thread):
         """
         self.__pid = pid
 
-    @property
-    def state(self):
-        """
-        getter method for state
-        :return:
-        """
-        return self.__state
-
-    @state.setter
-    def state(self, state):
-        """
-        setter method for state
-        :param pid:
-        :return:
-        """
-        self.__state = state
 
     @property
     def rdist(self):
@@ -80,21 +67,78 @@ class moat(Thread):
     def inmotion(self,inmotion):
         self.__inmotion = inmotion
 
-    def goto(self,pos):
-        speed = self.state.speed
-        xcomp = speed * math.cos(self.angleto(pos))
-        ycomp = speed * math.sin(self.angleto(pos))
-        if (pos.x - self.state.pos.x) * xcomp > 0 :
-            self.state.__xvel = xcomp
-        else:
-            self.state.__xvel = -1 * xcomp
 
-        if (pos.y - self.state.pos.y) * ycomp > 0 :
-            self.state.__yvel = ycomp
-        else:
-            self.state.__yvel = -1 * ycomp
+    def goto(self,pos,Kp_rho,Kp_alpha,Kp_beta,Kp_gamma,dt,ct):
+
+        """
+        rho is the distance between the robot and the goal position
+        alpha is the angle to the goal relative to the heading of the robot
+        beta is the angle between the robot's position and the goal position plus the goal angle
+        Kp_rho*rho and Kp_alpha*alpha drive the robot along a line towards the goal
+        Kp_beta*beta rotates the line so that it is parallel to the goal angle
+        """
+        x_start = self.state.pos.x
+        y_start = self.state.pos.y
+        z_start = self.state.pos.z
+        theta_start = self.state.pos.yaw
+        x = x_start
+        y = y_start
+        z = z_start
+        theta = theta_start
+        x_goal = pos.x
+        y_goal = pos.y
+        z_goal = pos.z
+        theta_goal = pos.yaw
+
+        x_diff = x_goal - x
+        y_diff = y_goal - y
+        z_diff = z_goal  - z
+
+        x_traj, y_traj, z_traj , t_traj = [], [], [],[]
+
+        rho = np.sqrt(x_diff ** 2 + y_diff ** 2)
+        z_diff = z_goal - z
+
+        while rho > 0.001 :
+            x_traj.append(x)
+            y_traj.append(y)
+            z_traj.append(z)
+            t_traj.append(ct)
+
+            x_diff = x_goal - x
+            y_diff = y_goal - y
+            z_diff = z_goal - z
 
 
+            vz = z_diff * Kp_gamma
+            if abs(z_diff) <= 0.02:
+                vz = 0
+
+            # Restrict alpha and beta (angle differences) to the range
+            # [-pi, pi] to prevent unstable behavior e.g. difference going
+            # from 0 rad to 2*pi rad with slight turn
+
+            rho = np.sqrt(x_diff ** 2 + y_diff ** 2)
+
+            alpha = (np.arctan2(y_diff, x_diff)
+                     - theta + np.pi) % (2 * np.pi) - np.pi
+            beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
+
+            v = Kp_rho * rho
+            w = Kp_alpha * alpha + Kp_beta * beta
+
+            if alpha > np.pi / 2 or alpha < -np.pi / 2:
+                v = -v
+
+            theta = theta + w * dt
+            x = x + v * np.cos(theta) * dt
+            y = y + v * np.sin(theta) * dt
+            z = z + vz * dt
+            self.state.pos = point.point(x,y,z,theta)
+            ct = ct + dt
+
+
+        return t_traj,x_traj,y_traj,z_traj,len(x_traj)
 
     def distanceTo(self,point1):
         return distancebetween(point1,self.state.pos)
@@ -111,21 +155,170 @@ class moat(Thread):
             return False
 
     def run(self):
+        Kp_rho = 9
+        Kp_alpha = 15
+        Kp_gamma = 10
+        Kp_beta = -3
+        dt = 0.01
+        ct = 0
+        x_traj = []
+        y_traj = []
+        t_traj = []
+        z_traj = []
+        path = []
+        xvelmax  = 5
+        xvelmin = 1.5
+        yvelmax = 5
+        yvelmin = 1.5
+
+        f = open("positions"+str(self.pid),'w')
+        g = open("routes"+str(self.pid),"w")
         while not self.stopped():
-            time.sleep(1)
-            if self.target is not None:
-                self.__inmotion = True
 
-            while self.inmotion:
-                time.sleep(1)
-                self.goto(self.target)
-                self.state.update()
-                if self.reached(self.target):
-                    self.__inmotion = False
-                    self.__target = None
+            time.sleep(0.001)
+
+            #print(self.pid,self.done)
+            if self.mode == 'Target':
+
+                if self.target is not None:
+                    if not self.inmotion:
+                        t, x, y, z, len1 = self.goto(self.target, Kp_rho, Kp_alpha, Kp_beta, Kp_gamma, dt, ct)
+                        t_traj.extend(t)
+                        x_traj.extend(x)
+                        y_traj.extend(y)
+                        z_traj.extend(z)
+                        #path.extend([(self.plots[0],self.plots[1]) for i in range(len1)])
+                else:
+                    #time.sleep(0.001)
+                    ct = ct+dt
+                    t_traj.append(ct)
+                    x_traj.append(self.state.pos.x)
+                    y_traj.append(self.state.pos.y)
+                    z_traj.append(self.state.pos.z)
+
+                    #path.append((self.plots[0],self.plots[1]))
+
+            elif self.mode == 'Timed':
+
+
+                self.state.pos.x = self.state.pos.x + self.state.xvel * dt
+                self.state.pos.y = self.state.pos.y + self.state.yvel * dt
+
+                self.state.xvel = self.state.xacc * dt + self.state.xvel
+                self.state.yvel = self.state.yacc * dt + self.state.yvel
+                if self.state.xvel <= xvelmin:
+                    if self.state.xacc < 0:
+                        self.state.xacc = 0
+                    self.state.xvel = xvelmin
+
+                if self.state.xvel >= xvelmax:
+                    if self.state.xacc > 0:
+                        self.state.xacc = 0
+                    self.state.xvel = xvelmax
+
+                if self.state.yvel <= yvelmin:
+                    if self.state.yacc < 0:
+                        self.state.yacc = 0
+                    self.state.yvel = yvelmin
+
+                if self.state.yvel >= yvelmax:
+                    if self.xacc > 0:
+                        self.xacc = 0
+                    self.state.yvel = yvelmax
 
 
 
+
+                #self.state.pos.z = self.state.pos.z + self.state.zvel * dt
+
+
+                ct = ct + dt
+                t_traj.append(ct)
+                x_traj.append(self.state.pos.x)
+                y_traj.append(self.state.pos.y)
+                z_traj.append(self.state.pos.z)
+                #path.extend([(self.plots[0], self.plots[1]) for i in range(len1)])
+
+
+
+            elif self.mode == 'Routed':
+                if not self.route == []:
+                    if not self.done:
+                        if not self.inmotion:
+                            if self.target is None:
+                                self.__target = self.route[0]
+                                #print("first",self.pid,"going to ",self.target)
+
+                                t, x, y,z, len1 = self.goto(self.target, Kp_rho, Kp_alpha, Kp_beta, Kp_gamma, dt, ct)
+                                #print(x,y,z)
+                                if len(self.route[1:]) > 0:
+
+                                    self.route = self.route[1:]
+                                else:
+                                    self.done = True
+                                t_traj.extend(t)
+                                x_traj.extend(x)
+                                y_traj.extend(y)
+                                z_traj.extend(z)
+                                ct = t_traj[-1]
+                                #path.extend([(self.plots[0], self.plots[1]) for i in range(len1)])
+
+
+                            else:
+                                t, x, y,z, len1 = self.goto(self.target, Kp_rho, Kp_alpha, Kp_beta, Kp_gamma, dt, ct)
+                                if len(self.route[1:]) > 0:
+
+                                    self.route = self.route[1:]
+                                else:
+                                    self.done = True
+                                t_traj.extend(t)
+                                x_traj.extend(x)
+                                y_traj.extend(y)
+                                z_traj.extend(z)
+                                ct = t_traj[-1]
+                                #path.extend([(self.plots[0], self.plots[1]) for i in range(len1)])
+
+
+                    else:
+                        self.done = False
+                        self.__target = self.route[0]
+                        t, x, y, z, len1 = self.goto(self.target, Kp_rho, Kp_alpha, Kp_beta, Kp_gamma, dt, ct)
+                        if len(self.route[1:]) > 0:
+                            self.route = self.route[1:]
+                        else:
+                            self.done = True
+                        t_traj.extend(t)
+                        x_traj.extend(x)
+                        y_traj.extend(y)
+                        z_traj.extend(z)
+                        ct = t_traj[-1]
+                        #path.extend([(self.plots[0],self.plots[1]) for i in range(len1)])
+
+
+
+
+
+                else:
+                    #time.sleep(0.001)
+
+                    ct = ct + dt
+                    t_traj.append(ct)
+                    x_traj.append(self.state.pos.x)
+                    y_traj.append(self.state.pos.y)
+                    z_traj.append(self.state.pos.z)
+
+                    #path.append((self.plots[0],self.plots[1]))
+
+
+
+        #print(self.pid,x_traj,y_traj)
+        traj_str = [str(i).replace(")","").replace("(","") for i in zip(t_traj,x_traj,y_traj,z_traj)]
+        a = [g.write(str(p[0])+";"+str(p[1])+"\n") for p in path]
+        for i in traj_str:
+            f.write(i+"\n")
+        f.close()
+        #f.write(str(t_traj) + "\n" + str(x_traj) + "\n"+ str(y_traj))
+        g.close()
 
 
 

@@ -82,6 +82,7 @@ class TestApp(agentThread.agentThread):
 
                 candidate = self.dd.get("candidate")
                 leader = candidate
+                print("leader is ",leader)
 
 
 

@@ -4,7 +4,7 @@ from threading import Thread, Event
 
 class AgentThread(ABC, Thread):
 
-    def __init__(self, gvh, dd=None, locks=[]):
+    def __init__(self, gvh, dd=None, locks=[],index = 0):
         """
         abstract object for each agent thread.
         :param gvh: the global variable holder. contains info about all other robots, motion automata, comms, etc
@@ -21,6 +21,7 @@ class AgentThread(ABC, Thread):
         self.__dd = dd
         self.__locks = locks
         self.start()
+
 
 
     @property

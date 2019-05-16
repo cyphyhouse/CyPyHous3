@@ -5,14 +5,15 @@ import socket
 class comms(commThread.commThread):
 
     def stop(self):
+        self.msocket.close()
         self._stop_event.set()
 
     def stopped(self):
         return self._stop_event.is_set()
 
-    def __init__(self):
+    def __init__(self,bcastPort):
         super(comms, self).__init__()
-        self.bcastPort = 2562
+        self.bcastPort = bcastPort
         self.myLocalIp = socket.gethostbyname(socket.gethostname())
 
         retries = 0
@@ -26,6 +27,7 @@ class comms(commThread.commThread):
                 err = False
 
             except socket.error:
+                print("socket error")
                 err = True
                 retries += 1
 
@@ -33,7 +35,7 @@ class comms(commThread.commThread):
         try:
             self.msocket.bind(('', self.bcastPort))
         except:
-            print("passing this error")
+            print("passing socket binding error on line 37")
             pass
         n = 0
 
@@ -44,7 +46,7 @@ class comms(commThread.commThread):
                 self.write(message)
                 n += 1
             except socket.error:
-                print("error here")
+                print("error with socket on line 46")
 
 
     def setCommsHandler(self):

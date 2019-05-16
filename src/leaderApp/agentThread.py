@@ -8,7 +8,6 @@ class agentThread(ABC, Thread):
     def __init__(self, gvh,dd = None,locks = []):
         super(agentThread, self).__init__()
         self.__gvh = gvh
-        #self.daemon = True
         self.numbots = gvh.participants
         self.name = gvh.name
         self.id = int(self.name.lstrip(ascii_letters))

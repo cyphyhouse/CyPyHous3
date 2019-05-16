@@ -1,9 +1,8 @@
-import math
-
+import math,numpy
 
 class point(list):
 
-    def __init__(self,x,y,name='A'):
+    def __init__(self,x,y,z = 0,yaw = numpy.deg2rad(0.0),name='A'):
         """
         point, possibly 3d
         :param x:
@@ -12,6 +11,8 @@ class point(list):
         """
         self.__x = x
         self.__y = y
+        self.__z = z
+        self.__yaw = yaw
         self.__name = name
 
 
@@ -25,12 +26,24 @@ class point(list):
         return self.__x
 
     @property
+    def z(self):
+        return self.__z
+
+    @property
     def y(self):
         """
         getter method for y
         :return:
         """
         return self.__y
+
+    @property
+    def yaw(self):
+        """
+        getter method for y
+        :return:
+        """
+        return self.__yaw
 
 
     @property
@@ -43,6 +56,8 @@ class point(list):
 
     def __repr__(self):
         z_str = ""
+        if self.z is not None:
+            z_str  = str(self.z)
         return ("position"+ " "+ str(self.name)+" " + str(self.x) + " "+ str(self.y) + z_str)
 
     @x.setter
@@ -91,13 +106,17 @@ class traj():
 
 
 def distancebetween(point1,point2):
-    return abs(math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2))
+    a =  abs(math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2))
+    #print(point1,point2,a)
+    return a
+
+
 
 def slope(point1,point2):
     if point1.x == point2.x:
         return 0
     else:
-        return math.atan((point1.y - point2.y)/(point1.x - point2.x))
+        return math.atan2((point1.y - point2.y),(point1.x - point2.x))
 
 
 

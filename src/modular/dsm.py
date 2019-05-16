@@ -28,8 +28,8 @@ class dsm():
                     l1.append(varname)
                 else:
                     l1.append(None)
-
             self.varmap[v] = l1
+
         if v in l and t is 'ar':
             #print ("owner",varname.owner)
             self.varmap[v][varname.owner] = varname
@@ -42,7 +42,6 @@ class dsm():
             if owner == -1:
                 if var == varname and ts >= self.varmap[var].ts:
                     if self.varmap[varname].type[1] is 'aw':
-                    #print("timestamp of update is ", ts, " and timestamp of old value is ", self.varmap[var].ts)
                         self.varmap[varname] = dsmvar(varname,self.varmap[varname].owner,value,self.varmap[varname].type,ts)
             else:
                 if var == varname and self.varmap[var][owner].ts <= ts:
@@ -50,7 +49,6 @@ class dsm():
 
 
     def get(self,varname,owner = -1):
-        #print(list(self.varmap.keys()))
         if owner == -1:
             if varname in list(self.varmap.keys()):
                 return self.varmap[varname].value
@@ -58,11 +56,17 @@ class dsm():
                 return None
         else:
             for var in list(self.varmap.keys()):
-                #print(var)
                 if var == varname:
                     if self.varmap[varname][owner] is not None:
-                   #print(self.varmap[varname][owner])
                         return self.varmap[varname][owner].value
 
             return None
 
+
+    def getallar(self,varname,numBots):
+        values = []
+        for var in list(self.varmap.keys()):
+            if var == varname:
+                for bot in range(numBots):
+                    values.append(self.varmap[varname][bot].value)
+        return values

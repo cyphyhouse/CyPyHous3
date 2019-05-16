@@ -1,21 +1,22 @@
 import re
-from MotionAutomaton import *
+from MotionAutomaton imporrm t *
 
 class gvh(list):
 
-    def __init__(self, name, configfile, participants=1, sim=True):
+    def __init__(self, name, configfile, participants=1, sim=True, mode = 'Target',index = 0):
         """
         Global Variable Holder keeps system specific information in the robot
         :param name: the robots name
         :param participants: all the other participants
         :param sim: whether this is a simulated gvh
         """
-        self.__name = name
+        self.__name = "robot"+str(name)
         self.__sim = sim
         self.__participants = participants
-        pid = int(re.sub(r'[a-zA-Z]', r'', name))
-        self.moat = moat(pid,4,configfile)
-        self.__pid = pid
+        #pid = int(re.sub(r'[a-zA-Z]', r'', name))
+        self.moat = moat(name,4,configfile,mode)
+        self.__pid = name
+        self.index = index
         self.moat.start()
 
 

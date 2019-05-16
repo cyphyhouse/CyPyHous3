@@ -2,7 +2,7 @@
 
 from threading import Thread, Event
 from abc import ABC, abstractmethod
-broadcast = '192.168.1.255'
+#broadcast = '192.168.1.255'
 
 class commThread(ABC, Thread):
     def __init__(self):
