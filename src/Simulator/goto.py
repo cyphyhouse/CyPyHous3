@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 
-
 import rospy
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
@@ -9,20 +8,24 @@ from geometry_msgs.msg import Point, Twist
 from math import atan2, sqrt
 from robot import Robot
 
+
 '''
     This class is used for moving multiple robots towards a specific point with physical controller
 '''
+
+
 class GoTo():
     '''
         Initiates robots
     '''
+
     def __init__(self):
         rospy.init_node('GoTo_test', anonymous=False)
         self.numberOfRobots = 2
-        self.robots = []        # Robot list
-        self.complete = []      # Indicator of completion of tasks
+        self.robots = []  # Robot list
+        self.complete = []  # Indicator of completion of tasks
         for i in range(self.numberOfRobots):
-            self.robots.append(Robot(i+1))
+            self.robots.append(Robot(i + 1))
             self.complete.append(0)
 
         # What to do if shut down
@@ -53,7 +56,7 @@ class GoTo():
                 diff_y = self.robots[i].goal.y - self.robots[i]._y
                 angle_to_goal = atan2(diff_y, diff_x)
                 # If distance to goal is small enough, DONE!
-                if sqrt(diff_x*diff_x + diff_y*diff_y) < 0.1:
+                if sqrt(diff_x * diff_x + diff_y * diff_y) < 0.1:
                     self.complete[i] = 1
                 # If orientation difference is too big, ROTATE!
                 elif abs(angle_to_goal - self.robots[i]._theta) > 0.2:
@@ -78,7 +81,8 @@ class GoTo():
         # sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
         rospy.sleep(1)
 
-if __name__ == '__main__': 
+
+if __name__ == '__main__':
     try:
         navigator = GoTo()
 
@@ -90,7 +94,7 @@ if __name__ == '__main__':
             rospy.loginfo("Yep, we made it!")
         else:
             rospy.loginfo("Something is wrong")
-            
+
         rospy.sleep(1)
     except:
         rospy.loginfo("User pressed  Ctrl-C, quit!")
