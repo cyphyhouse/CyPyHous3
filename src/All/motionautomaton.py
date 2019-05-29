@@ -20,8 +20,8 @@ class MotionAutomaton(Thread):
         self.__position = Pose()
 
         rospy.init_node('quad_wp_node', anonymous=True)
-        self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
-        self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
+        self.pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
+        self.sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
 
     @property
@@ -57,13 +57,6 @@ class MotionAutomaton(Thread):
         """
         self.__waypoint_count = wpc
 
-    @property
-    def pub(self):
-        """
-        getter method for publisher
-        :return:
-        """
-        return self.__pub
 
     def _getVicon(self, data: PoseStamped):  # -> NoReturn:
         """
@@ -96,8 +89,8 @@ class MotionAutomaton(Thread):
         pose.pose = dest
 
         self.waypoint_count += 1
-        print("about to publish",pose)
-        self.__pub.publish(pose)
+        print("about to publish")
+        self.pub.publish(pose)
 
     def run(self):
         """
