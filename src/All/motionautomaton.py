@@ -97,7 +97,7 @@ class MotionAutomaton(Thread):
 
         self.waypoint_count += 1
         print("about to publish",pose)
-        self.pub.publish(pose)
+        self.__pub.publish(pose)
 
     def run(self):
         """
