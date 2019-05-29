@@ -24,6 +24,14 @@ class MotionAutomaton(Thread):
         self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
 
+    @@property
+    def pub(self):
+        """
+        getter method for publisher
+        :return:
+        """
+        return self.__pub
+
     @property
     def position(self) -> Pose:
         """
@@ -90,7 +98,7 @@ class MotionAutomaton(Thread):
 
         self.waypoint_count += 1
         print("about to publish")
-        self.__pub.publish(pose)
+        self.pub.publish(pose)
 
     def run(self):
         """
