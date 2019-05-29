@@ -1,11 +1,9 @@
-from typing import NoReturn
-
+from message import *
 from receiver import *
 from sender import *
-from message import *
 
 
-class Commhandler(object):
+class CommHandler(object):
     """
     Communication handling thread. Has a receiver , which will receive all messages.
     We also have a sender class, with a send method.

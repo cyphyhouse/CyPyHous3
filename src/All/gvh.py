@@ -2,13 +2,14 @@ from typing import NoReturn
 from dsm import Dsm
 from motionautomaton import MotionAutomaton
 
+
 class Gvh(object):
     __participants: int
     __pid: int
     __dsm: Dsm
-    __moat:
+    __moat: MotionAutomaton
 
-    def __init__(self, pid: int, participants: int = 1, vtype: int):
+    def __init__(self, pid: int, participants: int = 1, bot_name: str = 'cyphyhousecopter'):
         """
         Global Variable Holder keeps system specific information in the robot
         :param name: the robots pid
@@ -17,7 +18,7 @@ class Gvh(object):
         self.__participants = participants
         self.__pid = pid
         self.__dsm = Dsm()
-
+        self.__moat = MotionAutomaton(pid, bot_name)
 
     @property
     def participants(self) -> NoReturn:

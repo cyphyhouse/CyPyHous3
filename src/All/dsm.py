@@ -3,136 +3,136 @@ from typing import Any, NoReturn
 
 
 class Dsm(object):
-    __varlist: dict
-    __symtab: dict
-    __typelist: dict
-    __sharelist: dict
+    __var_list: dict
+    __sym_tab: dict
+    __type_list: dict
+    __share_list: dict
 
     def __init__(self):
         """
         create empty dsm
         """
-        self.__symtab = {}
-        self.__varlist = {}
-        self.__typelist = {}
-        self.__sharelist = {}
+        self.__sym_tab = {}
+        self.__var_list = {}
+        self.__type_list = {}
+        self.__share_list = {}
 
     @property
-    def sharelist(self) -> dict:
+    def share_list(self) -> dict:
         """
         getter method for symbol table
         :return:
         """
-        return self.__sharelist
+        return self.__share_list
 
-    @sharelist.setter
-    def sharelist(self, sharelist: dict) -> NoReturn:
+    @share_list.setter
+    def share_list(self, share_list: dict) -> NoReturn:
         """
         sharing dictionary setter
-        :param sharelist:
+        :param share_list:
         :return:
         """
-        self.__sharelist = sharelist
+        self.__share_list = share_list
 
     @property
-    def symtab(self) -> dict:
+    def sym_tab(self) -> dict:
         """
         getter method for symbol table
         :return:
         """
-        return self.__symtab
+        return self.__sym_tab
 
-    @symtab.setter
-    def symtab(self, symtab: dict) -> NoReturn:
+    @sym_tab.setter
+    def sym_tab(self, sym_tab: dict) -> NoReturn:
         """
         symbol table setter
-        :param symtab:
+        :param sym_tab:
         :return:
         """
-        self.__symtab = symtab
+        self.__sym_tab = sym_tab
 
     @property
-    def varlist(self) -> dict:
+    def var_list(self) -> dict:
         """
         getter method for variable values
         :return:
         """
-        return self.__varlist
+        return self.__var_list
 
-    @varlist.setter
-    def varlist(self, varlist: dict) -> NoReturn:
+    @var_list.setter
+    def var_list(self, var_list: dict) -> NoReturn:
         """
         variable value table setter
-        :param varlist:
+        :param var_list:
         :return:
         """
-        self.__varlist = varlist
+        self.__var_list = var_list
 
     @property
-    def typelist(self) -> dict:
+    def type_list(self) -> dict:
         """
         getter method for variable types
         :return:
         """
-        return self.__typelist
+        return self.__type_list
 
-    @typelist.setter
-    def typelist(self, typelist: dict) -> NoReturn:
+    @type_list.setter
+    def type_list(self, type_list: dict) -> NoReturn:
         """
         variable type table setter
-        :param typelist:
+        :param type_list:
         :return:
         """
-        self.__typelist = typelist
+        self.__type_list = type_list
 
-    def mkawvar(self, dtype: enumerate, varname: str, val: Any = None) -> NoReturn:
+    def mk_aw_var(self, d_type: enumerate, var_name: str, val: Any = None) -> NoReturn:
         """
         Create allwrite variable
-        :param dtype: data type
-        :param varname: variable name
+        :param d_type: data type
+        :param var_name: variable name
         :param val: value possibly assigned during declaration
         :return:
         """
-        lastkey = len(list(self.varlist.keys()))
-        self.symtab[varname] = lastkey
-        self.typelist[lastkey] = dtype
-        self.varlist[lastkey] = val
-        self.sharelist[lastkey] = 'aw'
+        last_key = len(list(self.var_list.keys()))
+        self.sym_tab[var_name] = last_key
+        self.type_list[last_key] = d_type
+        self.var_list[last_key] = val
+        self.share_list[last_key] = 'aw'
 
-    def mkarvar(self, pid: int, numbots: int, dtype: enumerate, varname: str, val: Any = None):
+    def mk_ar_var(self, pid: int, numbots: int, d_type: enumerate, var_name: str, val: Any = None):
         """
         Create all read variables
         :param pid: declarating robot's pid
         :param numbots : number of robots
-        :param dtype: data type
-        :param varname: variable name
+        :param d_type: data type
+        :param var_name: variable name
         :param val: value possibly assigned during declaration
         :return:
         """
 
-        lastkey = len(list(self.varlist.keys()))
-        self.symtab[varname] = lastkey
-        self.typelist[lastkey] = dtype
-        valdict = {}
+        last_key = len(list(self.var_list.keys()))
+        self.sym_tab[var_name] = last_key
+        self.type_list[last_key] = d_type
+        val_dict = {}
         for i in range(0, numbots):
-            valdict[i] = None
-        valdict[pid] = val
-        self.varlist[lastkey] = valdict
-        self.sharelist[lastkey] = 'ar'
+            val_dict[i] = None
+        val_dict[pid] = val
+        self.var_list[last_key] = val_dict
+        self.share_list[last_key] = 'ar'
 
-    def update(self, pid: int, varname: str, val: Any) -> NoReturn:
+    def update(self, pid: int, var_name: str, val: Any) -> NoReturn:
         """
         update shared variable
         :param pid: int pid of updating
-        :param varname: variable name
+        :param var_name: variable name
         :param val: value to be updated to
         :return:
         """
         try:
-            key = self.symtab[varname]
-            if self.sharelist[key] == 'ar':
-                self.varlist[key][pid] = val
+            key = self.sym_tab[var_name]
+            if self.share_list[key] == 'ar':
+                self.var_list[key][pid] = val
             else:
-                self.varlist[key] = val
+                self.var_list[key] = val
         except KeyError:
             print("possible error : variable entry not found")

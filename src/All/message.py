@@ -10,31 +10,31 @@ class Message(object):
     __content: str
     __timestamp: float
 
-    def __init__(self, mtype: int, sender: int, content: str, ts: float):
-        self.__type = mtype
+    def __init__(self, m_type: int, sender: int, content: str, ts: float):
+        self.__type = m_type
         self.__sender = sender
         self.__content = content
         self.__timestamp = ts
 
     def __repr__(self):
-        return str(self.mtype) + "||" + str(self.sender) + "||" + str(self.content) + "||" + str(self.__timestamp)
+        return str(self.m_type) + "||" + str(self.sender) + "||" + str(self.content) + "||" + str(self.__timestamp)
 
     @property
-    def mtype(self) -> int:
+    def m_type(self) -> int:
         """
         getter method for message type
         :return:
         """
         return self.__type
 
-    @mtype.setter
-    def mtype(self, mtype: int) -> NoReturn:
+    @m_type.setter
+    def m_type(self, m_type: int) -> NoReturn:
         """
         setter method for message type
-        :param mtype:
+        :param m_type:
         :return:
         """
-        self.__type = mtype
+        self.__type = m_type
 
     @property
     def sender(self) -> int:
@@ -71,11 +71,11 @@ class Message(object):
         self.__content = content
 
 
-def toMsg(msgstr: str) -> Message:
+def to_msg(msg_str: str) -> Message:
     """
     function to parse a string to message
-    :param msgstr: message string representation
+    :param msg_str: message string representation
     :return:
     """
-    msgitems = msgstr.split("||")
-    return Message(int(msgitems[0]), int(msgitems[1]), msgitems[2], float(msgitems[3]))
+    msg_items = msg_str.split("||")
+    return Message(int(msg_items[0]), int(msg_items[1]), msg_items[2], float(msg_items[3]))

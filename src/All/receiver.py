@@ -1,6 +1,6 @@
 import socket, threading
 from typing import NoReturn
-from message import *
+from message import to_msg
 import msgpack
 
 
@@ -8,6 +8,7 @@ class Receiver(threading.Thread):
     __stop_event: threading.Event
     __ip: str
     __port: int
+
     """
     TODO: Merge with Sender potentially
     """
@@ -64,10 +65,9 @@ class Receiver(threading.Thread):
         self.__port = port
 
     def run(self):
-        serverSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serverSock.bind((self.ip, self.port))
+        server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_sock.bind((self.ip, self.port))
         while not self.stopped():
-            data, addr = serverSock.recvfrom(1024)
-            print("Message: ", toMsg(msgpack.unpackb(data).decode()).content)
-            #self.stop()
-        serverSock.close()
+            data, addr = server_sock.recvfrom(1024)
+            print("Message: ", to_msg(msgpack.unpackb(data).decode()).content)
+        server_sock.close()

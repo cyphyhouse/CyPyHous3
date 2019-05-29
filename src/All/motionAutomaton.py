@@ -1,11 +1,10 @@
-# from typing import NoReturn
+import threading
 
 import rospy
 from geometry_msgs.msg import PoseStamped, Pose
-from threading import Thread
 
 
-class MotionAutomaton(Thread):
+class MotionAutomaton(threading.Thread):
     """
     __waypoint_count: int
     __position: Pose
@@ -15,7 +14,7 @@ class MotionAutomaton(Thread):
     """
 
     def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter'):
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
         self.__waypoint_count = 0
         self.__position = Pose()
 

@@ -7,18 +7,19 @@ from gvh import Gvh
 
 class AgentThread(ABC, Thread):
 
-    def __init__(self, agentgvh: Gvh):
+    def __init__(self, agent_gvh: Gvh):
         __gvh: Gvh
         __pid: int
         __stop_event: Event
         __sleep_event: Event
+
         """
         abstract object for each agent thread.
         :param gvh: the global variable holder. Holds agent specific info and agent worldview
         """
         super(AgentThread, self).__init__()
-        self.__agentGvh = agentgvh
-        self.__pid = agentgvh.pid
+        self.__agent_gvh = agent_gvh
+        self.__pid = agent_gvh.pid
         self.__stop_event = Event()
         self.__sleep_event = Event()
 
@@ -28,31 +29,31 @@ class AgentThread(ABC, Thread):
         getter method for the number of agents in the system
         :return:
         """
-        return self.agentGvh.participants
+        return self.agent_gvh.participants
 
     @numAgents.setter
     def numAgents(self, numagents: int) -> NoReturn:
         """
         setter method for number of agents in the system . may not ever be used
         """
-        self.agentGvh.participants = numagents
+        self.agent_gvh.participants = numagents
 
     @property
-    def agentGvh(self) -> Gvh:
+    def agent_gvh(self) -> Gvh:
         """
         getter method for the gvh
         :return:
         """
-        return self.__agentGvh
+        return self.__agent_gvh
 
-    @agentGvh.setter
-    def agentGvh(self, agentgvh: Gvh) -> NoReturn:
+    @agent_gvh.setter
+    def agent_gvh(self, agent_gvh: Gvh) -> NoReturn:
         """
         This may be never used
-        :param agentGvh:
+        :param agent_gvh:
         :return:
         """
-        self.__agentgvh = agentgvh
+        self.__agent_gvh = agent_gvh
 
     @property
     def pid(self) -> int:
@@ -85,7 +86,7 @@ class AgentThread(ABC, Thread):
         """
         return self.__stop_event.is_set()
 
-    def sleep(self) -> bool:
+    def sleep(self) -> NoReturn:
         """
         allows sleeping
         :return:
