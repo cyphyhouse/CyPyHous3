@@ -20,8 +20,8 @@ class MotionAutomaton(Thread):
         self.__position = Pose()
 
         rospy.init_node('quad_wp_node', anonymous=True)
-        self.pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
-        self.sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
+        self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
+        self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
 
     @property
@@ -90,7 +90,7 @@ class MotionAutomaton(Thread):
 
         self.waypoint_count += 1
         print("about to publish")
-        self.pub.publish(pose)
+        self.__pub.publish(pose)
 
     def run(self):
         """
