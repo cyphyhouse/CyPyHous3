@@ -4,7 +4,7 @@ import motionautomaton
 
 from geometry_msgs.msg import Pose
 
-quad_m = motionautomaton.Motionautomaton()
+quad_m = motionautomaton.MotionAutomaton()
 
 dest1 = Pose()
 dest1.position.x, dest1.position.y,dest1.position.z = 1.,2.,3.

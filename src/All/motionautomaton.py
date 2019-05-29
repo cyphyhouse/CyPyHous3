@@ -1,4 +1,4 @@
-#from typing import NoReturn
+# from typing import NoReturn
 
 import rospy
 from geometry_msgs.msg import PoseStamped, Pose
@@ -33,7 +33,7 @@ class MotionAutomaton(Thread):
         return self.__position
 
     @position.setter
-    def position(self, pos: Pose): #-> NoReturn:
+    def position(self, pos: Pose):  # -> NoReturn:
         """
         setter method for position
         :param pos: position
@@ -50,7 +50,7 @@ class MotionAutomaton(Thread):
         return self.__waypoint_count
 
     @waypoint_count.setter
-    def waypoint_count(self, wpc: int): #-> NoReturn:
+    def waypoint_count(self, wpc: int):  # -> NoReturn:
         """
         setter method for an internal function
         :return:
@@ -65,7 +65,7 @@ class MotionAutomaton(Thread):
         """
         return self.__pub
 
-    def _getVicon(self, data: PoseStamped): #-> NoReturn:
+    def _getVicon(self, data: PoseStamped):  # -> NoReturn:
         """
         This is a callback function that updates the internal position and heading,
         :param data: posestamped message.
@@ -73,7 +73,7 @@ class MotionAutomaton(Thread):
         """
         self.position = data.pose
 
-    def goTo(self, dest: Pose, wp_type: int = None): #-> NoReturn:
+    def goTo(self, dest: Pose, wp_type: int = None):  # -> NoReturn:
         """
         takes a geometry message and uses on board controller to move to it.
         :param dest: destination position
