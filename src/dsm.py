@@ -17,7 +17,6 @@ class Dsm(object):
         self.__typelist = {}
         self.__sharelist = {}
 
-
     @property
     def sharelist(self) -> dict:
         """
@@ -34,7 +33,6 @@ class Dsm(object):
         :return:
         """
         self.__sharelist = sharelist
-
 
     @property
     def symtab(self) -> dict:
@@ -99,6 +97,7 @@ class Dsm(object):
         self.symtab[varname] = lastkey
         self.typelist[lastkey] = dtype
         self.varlist[lastkey] = val
+        self.sharelist[lastkey] = 'aw'
 
     def mkarvar(self, pid: int, numbots: int, dtype: enumerate, varname: str, val: Any = None):
         """
@@ -114,15 +113,26 @@ class Dsm(object):
         lastkey = len(list(self.varlist.keys()))
         self.symtab[varname] = lastkey
         self.typelist[lastkey] = dtype
-        valdict= {}
-        for i in range(0,numbots):
+        valdict = {}
+        for i in range(0, numbots):
             valdict[i] = None
         valdict[pid] = val
         self.varlist[lastkey] = valdict
+        self.sharelist[lastkey] = 'ar'
 
-
-
-
-
-
-
+    def update(self, pid: int, varname: str, val: Any) -> NoReturn:
+        """
+        update shared variable
+        :param pid: int pid of updating
+        :param varname: variable name
+        :param val: value to be updated to
+        :return:
+        """
+        try:
+            key = self.symtab[varname]
+            if self.sharelist[key] == 'ar':
+                self.varlist[key][pid] = val
+            else:
+                self.varlist[key] = val
+        except KeyError:
+            print("possible error : variable entry not found")

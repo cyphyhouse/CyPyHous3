@@ -17,4 +17,4 @@ class Motionautomaton(object):
         return its position from the positioning system
         :return:
         """
-        return 
+        return 0, 0
