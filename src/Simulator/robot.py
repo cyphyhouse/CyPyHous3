@@ -24,14 +24,16 @@ class Robot():
 
         # Set up subscriber and publisher
         my_number = "/robot" + str(number)
+        # Subscribing for position
         self.sub = rospy.Subscriber(my_number+"/ground_truth/state", Odometry, self.newPos)
+        # Publish to drive the robot
         self.pub = rospy.Publisher(my_number+"/cmd_vel_mux/input/navi", Twist, queue_size=10)
 
-        '''
-            This function is used for subscription to new odometry messages  
-            Args: msg - nav_msg for pose and quaternion
-            Returns: None
-        '''
+    '''
+        This function is used for subscription to new odometry messages  
+        Args: msg - nav_msg for pose and quaternion
+        Returns: None
+    '''
     def newPos(self, msg):
         # Update pose
         self._x = msg.pose.pose.position.x 

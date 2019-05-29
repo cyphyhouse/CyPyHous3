@@ -6,25 +6,26 @@ from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
 from logParser import parse
 
-Mode = 0
+Mode = 1
 
 
 def main():
     rospy.init_node('Move')
 
-    state_msg = ModelState()
-    state_msg.model_name = 'robot1'
+    robot1_msg = ModelState()
+    robot1_msg.model_name = 'robot1'
+
+    robot2_msg = ModelState()
+    robot2_msg.model_name = 'robot2'
 
     if Mode == 0:
-        state_msg.model_name = 'robot1'
-        move(state_msg, (0,0))
-
-        state_msg.model_name = 'robot2'
-        move(state_msg, (0,2))
+        move(robot1_msg, (0,0))
+        move(robot2_msg, (0,2))
     elif Mode == 1:
         path = parse()
-        for point in path:
-            move(state_msg, point)
+        for point1, point2 in path:
+            move(robot1_msg, point1)
+            move(robot2_msg, point2)
 
 
 def move(state_msg, pose):
