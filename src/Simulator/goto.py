@@ -86,8 +86,8 @@ if __name__ == '__main__':
     try:
         navigator = GoTo()
 
-        pos1 = {'x': 5, 'y': 7}
-        pos2 = {'x': -5, 'y': 7}
+        pos1 = {'x': -5, 'y': -7}
+        pos2 = {'x': 5, 'y': -7}
         success = navigator.goto([pos1, pos2])
 
         if success:
