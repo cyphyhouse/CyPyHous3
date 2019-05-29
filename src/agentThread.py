@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 from threading import Thread, Event
 from typing import NoReturn
 
-import gvh
+from gvh import Gvh
 
 
 class AgentThread(ABC, Thread):
 
-    def __init__(self, agentgvh: gvh.Gvh):
-        __gvh: gvh.Gvh
+    def __init__(self, agentgvh: Gvh):
+        __gvh: Gvh
         __pid: int
         __stop_event: Event
         __sleep_event: Event
@@ -38,7 +38,7 @@ class AgentThread(ABC, Thread):
         self.agentGvh.participants = numagents
 
     @property
-    def agentGvh(self) -> gvh.Gvh:
+    def agentGvh(self) -> Gvh:
         """
         getter method for the gvh
         :return:
@@ -46,7 +46,7 @@ class AgentThread(ABC, Thread):
         return self.__agentGvh
 
     @agentGvh.setter
-    def agentGvh(self, agentgvh: gvh.Gvh) -> NoReturn:
+    def agentGvh(self, agentgvh: Gvh) -> NoReturn:
         """
         This may be never used
         :param agentGvh:

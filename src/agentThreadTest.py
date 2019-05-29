@@ -14,7 +14,7 @@ class TestApp(AgentThread):
         while not self.stopped():
             print("executing agent", self.pid)
             if nround >= rounds:
-                self.stopped()
+                self.stop()
             nround += 1
 
 

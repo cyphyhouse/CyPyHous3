@@ -8,6 +8,9 @@ class Receiver(threading.Thread):
     __stop_event: threading.Event
     __ip: str
     __port: int
+    """
+    TODO: Merge with Sender potentially
+    """
 
     def __init__(self, ip: str, port: int):
         super(Receiver, self).__init__()
@@ -61,8 +64,6 @@ class Receiver(threading.Thread):
         self.__port = port
 
     def run(self):
-        #UDP_IP_ADDRESS = "127.0.0.1"
-        #UDP_PORT_NO = 6794
         serverSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         serverSock.bind((self.ip, self.port))
         while not self.stopped():

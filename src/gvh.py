@@ -6,7 +6,7 @@ class Gvh(object):
     __participants: int
     __pid: int
     __dsm: Dsm
-    __moat: MotionAutomaton
+    __moat: Motionautomaton
 
     def __init__(self, pid: int, participants: int = 1):
         """
