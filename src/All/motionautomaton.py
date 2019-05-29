@@ -6,10 +6,13 @@ from threading import Thread
 
 
 class MotionAutomaton(Thread):
+    """
     __waypoint_count: int
     __position: Pose
     __pub: rospy.Publisher
     __sub_vicon: rospy.Subscriber
+
+    """
 
     def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter'):
         Thread.__init__(self)

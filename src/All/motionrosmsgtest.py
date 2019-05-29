@@ -1,6 +1,7 @@
 # tests whether the goto function publishes the correct ros messages
 
 import motionautomaton
+
 from geometry_msgs.msg import Pose
 
 quad_m = motionautomaton.Motionautomaton()
