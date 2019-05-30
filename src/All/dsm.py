@@ -1,4 +1,3 @@
-# from message import Message
 from typing import Any, NoReturn
 
 
@@ -134,5 +133,38 @@ class Dsm(object):
                 self.var_list[key][pid] = val
             else:
                 self.var_list[key] = val
+        except KeyError:
+            print("possible error : variable entry not found")
+
+    def put(self, pid: int, var_name: str, val: Any) -> NoReturn:
+        """
+        update shared variable
+        :param pid: int pid of updating
+        :param var_name: variable name
+        :param val: value to be updated to
+        :return:
+        """
+        try:
+            key = self.sym_tab[var_name]
+            if self.share_list[key] == 'ar':
+                self.var_list[key][pid] = val
+            else:
+                self.var_list[key] = val
+        except KeyError:
+            print("possible error : variable entry not found")
+
+    def get(self, var_name: str, pid: int = 0) -> Any:
+        """
+        gets the shared variable value
+        :param var_name: variable name
+        :param pid: potentially an allread variable
+        :return: variable value
+        """
+        try:
+            key = self.sym_tab[var_name]
+            if self.share_list[key] == 'ar':
+                return self.var_list[key][pid]
+            else:
+                return self.var_list[key]
         except KeyError:
             print("possible error : variable entry not found")

@@ -24,15 +24,15 @@ class AgentThread(ABC, Thread):
         self.__sleep_event = Event()
 
     @property
-    def numAgents(self) -> int:
+    def num_agents(self) -> int:
         """
         getter method for the number of agents in the system
         :return:
         """
         return self.agent_gvh.participants
 
-    @numAgents.setter
-    def numAgents(self, numagents: int) -> NoReturn:
+    @num_agents.setter
+    def num_agents(self, numagents: int) -> NoReturn:
         """
         setter method for number of agents in the system . may not ever be used
         """

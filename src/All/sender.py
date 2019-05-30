@@ -1,9 +1,8 @@
-
-
-
 import socket
 from typing import NoReturn
+
 import msgpack
+
 
 class Sender(object):
     __ip: str
