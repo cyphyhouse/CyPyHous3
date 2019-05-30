@@ -22,7 +22,7 @@ class MotionAutomaton(threading.Thread):
         self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
         self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
-        time.sleep(0.1)
+        time.sleep(1)
 
     @property
     def pub(self):
@@ -81,7 +81,6 @@ class MotionAutomaton(threading.Thread):
         :param wp_type: to pick frameid for ros geometry message.
         :return:
         """
-        time.sleep(0.01)
         if wp_type is not None:
             frame_id = str(wp_type)
         else:
