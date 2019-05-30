@@ -22,6 +22,7 @@ class Gvh(object):
         self.__moat = motionAutomaton.MotionAutomaton(pid, bot_name)
         self.__moat.start()
 
+
     @property
     def moat(self) -> motionAutomaton.MotionAutomaton:
         """

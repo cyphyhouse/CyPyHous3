@@ -1,5 +1,5 @@
 import threading
-
+import time
 import rospy
 from geometry_msgs.msg import PoseStamped, Pose
 
@@ -22,6 +22,7 @@ class MotionAutomaton(threading.Thread):
         self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
         self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
+        time.sleep(0.1)
 
     @property
     def pub(self):
