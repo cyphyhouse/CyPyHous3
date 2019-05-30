@@ -1,13 +1,15 @@
+
 from typing import NoReturn
+
+import motionAutomaton
 from dsm import Dsm
-from motionautomaton import MotionAutomaton
 
 
 class Gvh(object):
     __participants: int
     __pid: int
     __dsm: Dsm
-    __moat: MotionAutomaton
+    __moat: motionAutomaton.MotionAutomaton
 
     def __init__(self, pid: int, participants: int = 1, bot_name: str = 'cyphyhousecopter'):
         """
@@ -18,7 +20,7 @@ class Gvh(object):
         self.__participants = participants
         self.__pid = pid
         self.__dsm = Dsm()
-        self.__moat = MotionAutomaton(pid, bot_name)
+        self.__moat = motionAutomaton.MotionAutomaton(pid, bot_name)
 
     @property
     def participants(self) -> NoReturn:
