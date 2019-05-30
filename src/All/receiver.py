@@ -1,5 +1,4 @@
 import socket, threading
-#from typing import NoReturn
 from message import to_msg
 import msgpack
 

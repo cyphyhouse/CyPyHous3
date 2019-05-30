@@ -81,6 +81,7 @@ class MotionAutomaton(threading.Thread):
         :param wp_type: to pick frameid for ros geometry message.
         :return:
         """
+        time.sleep(0.01)
         if wp_type is not None:
             frame_id = str(wp_type)
         else:

@@ -17,6 +17,7 @@ class BasicFollowApp(AgentThread):
         dest1.position.x, dest1.position.y, dest1.position.z = 0., 0., 1.
         land = Pose()
         land.position.x, land.position.y, land.position.z = 0., 0., 0.
+
         self.agent_gvh.moat.goTo(dest1)
         time.sleep(10)
         self.agent_gvh.moat.goTo(land)
