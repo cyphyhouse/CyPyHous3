@@ -2,10 +2,12 @@ from typing import Any  # , NoReturn
 
 
 class Dsm(object):
+    """
     __var_list: dict
     __sym_tab: dict
     __type_list: dict
     __share_list: dict
+    """
 
     def __init__(self):
         """
