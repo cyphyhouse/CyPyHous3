@@ -1,3 +1,3 @@
 import basicFollowApp
 
-basicFollowApp.BasicFollowApp(0,1)
+basicFollowApp.BasicFollowApp(1,1)

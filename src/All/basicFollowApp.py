@@ -14,11 +14,10 @@ class BasicFollowApp(AgentThread):
 
     def run(self):
         dest1 = Pose()
-        dest1.position.x, dest1.position.y, dest1.position.z = 1., 2., 3.
-
+        dest1.position.x, dest1.position.y, dest1.position.z = 0., 0., 1.
+        land = Pose()
+        land.position.x, land.position.y, land.position.z = 0., 0., 0.
         time.sleep(0.1)
         self.agent_gvh.moat.goTo(dest1)
-
-
-
-
+        time.sleep(0.1)
+        self.agent_gvh.moat.goTo(land)
