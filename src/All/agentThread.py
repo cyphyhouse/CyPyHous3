@@ -8,10 +8,12 @@ from gvh import Gvh
 class AgentThread(ABC, Thread):
 
     def __init__(self, agent_gvh: Gvh):
+        """
         __gvh: Gvh
         __pid: int
         __stop_event: Event
         __sleep_event: Event
+        """
 
         """
         abstract object for each agent thread.

@@ -5,9 +5,11 @@ import msgpack
 
 
 class Receiver(threading.Thread):
+    """
     __stop_event: threading.Event
     __ip: str
     __port: int
+    """
 
     """
     TODO: Merge with Sender potentially

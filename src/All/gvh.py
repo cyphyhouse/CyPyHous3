@@ -5,10 +5,12 @@ from dsm import Dsm
 
 
 class Gvh(object):
+    """
     __participants: int
     __pid: int
     __dsm: Dsm
     __moat: motionAutomaton.MotionAutomaton
+    """
 
     def __init__(self, pid: int, participants: int = 1, bot_name: str = 'cyphyhousecopter'):
         """
