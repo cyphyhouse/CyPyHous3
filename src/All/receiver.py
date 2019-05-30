@@ -1,5 +1,5 @@
 import socket, threading
-from typing import NoReturn
+#from typing import NoReturn
 from message import to_msg
 import msgpack
 
@@ -20,14 +20,14 @@ class Receiver(threading.Thread):
         self.__stop_event = threading.Event()
         self.start()
 
-    def stop(self) -> NoReturn:
+    def stop(self):  # -> NoReturn:
         """
          a flag to set to to safely exit the thread
         :return:
         """
         self.__stop_event.set()
 
-    def stopped(self) -> NoReturn:
+    def stopped(self):  # -> NoReturn:
         """
         set the stop flag
         :return:
@@ -43,7 +43,7 @@ class Receiver(threading.Thread):
         return self.__ip
 
     @ip.setter
-    def ip(self, ip: str) -> NoReturn:
+    def ip(self, ip: str):  # -> NoReturn:
         """
         setter method for ip
         """
@@ -58,7 +58,7 @@ class Receiver(threading.Thread):
         return self.__port
 
     @port.setter
-    def port(self, port: int) -> NoReturn:
+    def port(self, port: int):  # -> NoReturn:
         """
         setter method for ip
         """

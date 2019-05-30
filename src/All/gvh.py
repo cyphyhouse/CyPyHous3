@@ -32,7 +32,7 @@ class Gvh(object):
         return self.__moat
 
     @moat.setter
-    def moat(self, moat: motionAutomaton.MotionAutomaton) -> NoReturn:
+    def moat(self, moat: motionAutomaton.MotionAutomaton) : # -> NoReturn:
         """
         setter method for moAT
         :param moat: motionautomaton
@@ -41,7 +41,7 @@ class Gvh(object):
         self.__moat = moat
 
     @property
-    def participants(self) -> NoReturn:
+    def participants(self) : # -> NoReturn:
         """
         getter method for participants
         :return:
@@ -49,7 +49,7 @@ class Gvh(object):
         return self.__participants
 
     @participants.setter
-    def participants(self, participants: int) -> NoReturn:
+    def participants(self, participants: int) : # -> NoReturn:
         """
         setter method for participants
         :param name:
@@ -66,7 +66,7 @@ class Gvh(object):
         return self.__pid
 
     @pid.setter
-    def pid(self, pid: int) -> NoReturn:
+    def pid(self, pid: int) : # -> NoReturn:
         """
         setter method for pid
         :param name:

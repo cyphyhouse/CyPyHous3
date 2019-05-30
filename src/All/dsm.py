@@ -1,4 +1,4 @@
-from typing import Any, NoReturn
+from typing import Any  # , NoReturn
 
 
 class Dsm(object):
@@ -25,7 +25,7 @@ class Dsm(object):
         return self.__share_list
 
     @share_list.setter
-    def share_list(self, share_list: dict) -> NoReturn:
+    def share_list(self, share_list: dict):  # -> NoReturn:
         """
         sharing dictionary setter
         :param share_list:
@@ -42,7 +42,7 @@ class Dsm(object):
         return self.__sym_tab
 
     @sym_tab.setter
-    def sym_tab(self, sym_tab: dict) -> NoReturn:
+    def sym_tab(self, sym_tab: dict):  # -> NoReturn:
         """
         symbol table setter
         :param sym_tab:
@@ -59,7 +59,7 @@ class Dsm(object):
         return self.__var_list
 
     @var_list.setter
-    def var_list(self, var_list: dict) -> NoReturn:
+    def var_list(self, var_list: dict):  # -> NoReturn:
         """
         variable value table setter
         :param var_list:
@@ -76,7 +76,7 @@ class Dsm(object):
         return self.__type_list
 
     @type_list.setter
-    def type_list(self, type_list: dict) -> NoReturn:
+    def type_list(self, type_list: dict):  # -> NoReturn:
         """
         variable type table setter
         :param type_list:
@@ -84,7 +84,7 @@ class Dsm(object):
         """
         self.__type_list = type_list
 
-    def mk_aw_var(self, d_type: enumerate, var_name: str, val: Any = None) -> NoReturn:
+    def mk_aw_var(self, d_type: enumerate, var_name: str, val: Any = None):  # -> NoReturn:
         """
         Create allwrite variable
         :param d_type: data type
@@ -119,7 +119,7 @@ class Dsm(object):
         self.var_list[last_key] = val_dict
         self.share_list[last_key] = 'ar'
 
-    def update(self, pid: int, var_name: str, val: Any) -> NoReturn:
+    def update(self, pid: int, var_name: str, val: Any):  # -> NoReturn:
         """
         update shared variable
         :param pid: int pid of updating
@@ -136,7 +136,7 @@ class Dsm(object):
         except KeyError:
             print("possible error : variable entry not found")
 
-    def put(self, pid: int, var_name: str, val: Any) -> NoReturn:
+    def put(self, pid: int, var_name: str, val: Any):  # -> NoReturn:
         """
         update shared variable
         :param pid: int pid of updating

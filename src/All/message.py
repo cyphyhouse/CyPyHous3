@@ -28,7 +28,7 @@ class Message(object):
         return self.__type
 
     @m_type.setter
-    def m_type(self, m_type: int) -> NoReturn:
+    def m_type(self, m_type: int):  # -> NoReturn:
         """
         setter method for message type
         :param m_type:
@@ -45,7 +45,7 @@ class Message(object):
         return self.__sender
 
     @sender.setter
-    def sender(self, sender: int) -> NoReturn:
+    def sender(self, sender: int):  # -> NoReturn:
         """
         setter method for sender
         :param sender:
@@ -62,7 +62,7 @@ class Message(object):
         return self.__content
 
     @content.setter
-    def content(self, content: str) -> NoReturn:
+    def content(self, content: str):  # -> NoReturn:
         """
         setter method for content
         :param content:

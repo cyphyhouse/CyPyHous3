@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from threading import Thread, Event
-from typing import NoReturn
+#from typing import NoReturn
 
 from gvh import Gvh
 
@@ -32,7 +32,7 @@ class AgentThread(ABC, Thread):
         return self.agent_gvh.participants
 
     @num_agents.setter
-    def num_agents(self, numagents: int) -> NoReturn:
+    def num_agents(self, numagents: int) : #-> NoReturn:
         """
         setter method for number of agents in the system . may not ever be used
         """
@@ -47,7 +47,7 @@ class AgentThread(ABC, Thread):
         return self.__agent_gvh
 
     @agent_gvh.setter
-    def agent_gvh(self, agent_gvh: Gvh) -> NoReturn:
+    def agent_gvh(self, agent_gvh: Gvh) : #-> NoReturn:
         """
         This may be never used
         :param agent_gvh:
@@ -64,7 +64,7 @@ class AgentThread(ABC, Thread):
         return self.__pid
 
     @pid.setter
-    def pid(self, id: int) -> NoReturn:
+    def pid(self, id: int) : #-> NoReturn:
         """
         setter method for id
         :param id:
@@ -72,21 +72,21 @@ class AgentThread(ABC, Thread):
         """
         self.__id = id
 
-    def stop(self) -> NoReturn:
+    def stop(self) : #-> NoReturn:
         """
          a flag to set to to safely exit the thread
         :return:
         """
         self.__stop_event.set()
 
-    def stopped(self) -> NoReturn:
+    def stopped(self) : #-> NoReturn:
         """
         set the stop flag
         :return:
         """
         return self.__stop_event.is_set()
 
-    def sleep(self) -> NoReturn:
+    def sleep(self) : #-> NoReturn:
         """
         allows sleeping
         :return:
@@ -101,7 +101,7 @@ class AgentThread(ABC, Thread):
         return self.__sleep_event.is_set()
 
     @abstractmethod
-    def run(self) -> NoReturn:
+    def run(self) : #-> NoReturn:
         """
         needs to be implemented for any agenThread
         :return:
