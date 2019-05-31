@@ -10,9 +10,9 @@ class CommHandler(object):
     TODO: figure out design
     """
 
-    def __init__(self, ip: str, port: int, pid: int):
-        self.__receiver = Receiver(ip, port)
-        self.__sender = Sender(ip,port)
+    def __init__(self, ip: str, recv_port: int, snd_port: int, pid: int):
+        self.__receiver = Receiver(ip, recv_port)
+        self.__sender = Sender(ip, snd_port)
         self.__pid = pid
 
     @property
@@ -64,4 +64,3 @@ class CommHandler(object):
         :return:
         """
         self.sender.send(str(message))
-
