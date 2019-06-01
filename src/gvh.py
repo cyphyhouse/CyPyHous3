@@ -1,6 +1,5 @@
 # from typing import NoReturn
 
-import motionAutomaton
 from dsm import Dsm
 
 
@@ -21,8 +20,14 @@ class Gvh(object):
         self.__participants = participants
         self.__pid = pid
         self.__dsm = Dsm()
-        self.__moat = motionAutomaton.MotionAutomaton(pid, bot_name)
-        self.__moat.start()
+        try:
+            import motionAutomaton
+            self.__moat = motionAutomaton.MotionAutomaton(pid, bot_name)
+            self.__moat.start()
+        except ImportError:
+            print("maybe you dont have ros installed")
+            self.__moat = None
+
 
     @property
     def moat(self) -> motionAutomaton.MotionAutomaton:
