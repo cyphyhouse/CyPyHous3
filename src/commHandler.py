@@ -15,6 +15,8 @@ class CommHandler(object):
         self.__sender = Sender(ip, snd_port)
         self.__pid = pid
 
+        self.__receiver.start()
+
     @property
     def pid(self) -> int:
         """
@@ -63,4 +65,4 @@ class CommHandler(object):
         :param message: message
         :return:
         """
-        self.sender.send(str(message))
+        self.sender.send(message)

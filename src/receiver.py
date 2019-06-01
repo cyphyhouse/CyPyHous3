@@ -1,7 +1,6 @@
 import socket, threading
-from message import to_msg
+from src.message import to_msg
 import msgpack
-
 
 class Receiver(threading.Thread):
     """
@@ -19,7 +18,6 @@ class Receiver(threading.Thread):
         self.__ip = ip
         self.__port = port
         self.__stop_event = threading.Event()
-        self.start()
 
     def stop(self):  # -> NoReturn:
         """
@@ -65,10 +63,19 @@ class Receiver(threading.Thread):
         """
         self.__port = port
 
+    def recv(self):
+        server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_sock.bind((self.ip, self.port))
+        data, addr = server_sock.recvfrom(1024)
+        server_sock.close()
+        return to_msg(msgpack.unpackb(data).decode()).content
+
     def run(self):
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_sock.bind((self.ip, self.port))
         while not self.stopped():
             data, addr = server_sock.recvfrom(1024)
+            # TODO Writing to DSM instead of printing
             print("Message: ", to_msg(msgpack.unpackb(data).decode()).content)
+
         server_sock.close()

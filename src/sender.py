@@ -3,6 +3,7 @@ import socket
 
 import msgpack
 
+from src.message import Message
 
 class Sender(object):
     __ip: str
@@ -42,6 +43,7 @@ class Sender(object):
         """
         self.__port = port
 
-    def send(self, message: str) : # -> NoReturn:
+    def send(self, message: Message) : # -> NoReturn:
+        str_message = str(message)
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        clientSock.sendto(msgpack.packb(message), (self.ip, self.port))
+        clientSock.sendto(msgpack.packb(str_message), (self.ip, self.port))
