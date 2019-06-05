@@ -30,8 +30,8 @@ class CommHandlerTestApp(AgentThread):
         self.start()
 
     def run(self):
-        rounds: int = 3
-        n_round: int = 0
+        rounds = 3
+        n_round = 0
         while not self.stopped():
             print("executing agent", self.pid)
             self.comm_handler.send(Message(0, 0, "hello", time.time()))

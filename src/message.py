@@ -1,14 +1,15 @@
-from typing import NoReturn
+#from typing import NoReturn
 
 
 class Message(object):
     """
     Message class, we will have parse rules for different message types. A table lookup of parse functions.
-    """
+
     __type: int
     __sender: int
     __content: str
     __timestamp: float
+    """
 
     def __init__(self, m_type: int, sender: int, content: str, ts: float):
         self.__type = m_type
