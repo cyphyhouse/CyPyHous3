@@ -73,7 +73,9 @@ class Receiver(threading.Thread):
 
     def run(self):
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         server_sock.bind((self.ip, self.port))
+
         while not self.stopped():
             print("trying to receive")
             data, addr = server_sock.recvfrom(1024)

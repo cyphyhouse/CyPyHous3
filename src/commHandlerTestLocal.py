@@ -40,4 +40,4 @@ class CommHandlerTestApp(AgentThread):
             n_round += 1
 
 
-a = CommHandlerTestApp(0,1,'127.0.0.1',3001,3002)
+a = CommHandlerTestApp(0,1,'127.0.0.1',1004,5005)

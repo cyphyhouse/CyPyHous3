@@ -1,9 +1,10 @@
 import socket
-#from typing import NoReturn
+# from typing import NoReturn
 
 import msgpack
 
 from message import Message
+
 
 class Sender(object):
     """
@@ -25,7 +26,7 @@ class Sender(object):
         return self.__ip
 
     @ip.setter
-    def ip(self, ip: str) : # -> NoReturn:
+    def ip(self, ip: str):  # -> NoReturn:
         """
         setter method for ip
         """
@@ -40,14 +41,18 @@ class Sender(object):
         return self.__port
 
     @port.setter
-    def port(self, port: int) : # -> NoReturn:
+    def port(self, port: int):  # -> NoReturn:
         """
         setter method for port
         """
         self.__port = port
 
-    def send(self, message: Message) : # -> NoReturn:
+    def send(self, message: Message):  # -> NoReturn:
         str_message = str(message)
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        clientSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+
         print("sending")
         clientSock.sendto(msgpack.packb(str_message), (self.__broadcast_ip, self.port))
