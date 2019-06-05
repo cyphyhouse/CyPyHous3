@@ -14,7 +14,6 @@ class CommHandler(object):
         self.__receiver = Receiver(ip, recv_port)
         self.__sender = Sender(ip, snd_port)
         self.__pid = pid
-
         self.__receiver.start()
 
     @property
@@ -34,7 +33,7 @@ class CommHandler(object):
         return self.__sender
 
     @sender.setter
-    def sender(self, sender: Sender) -> NoReturn:
+    def sender(self, sender: Sender) -> None:
         """
         setter method for sender
         :param sender:
@@ -51,7 +50,7 @@ class CommHandler(object):
         return self.__receiver
 
     @receiver.setter
-    def receiver(self, receiver: Receiver) -> NoReturn:
+    def receiver(self, receiver: Receiver) -> None:
         """
         setter method for receiver
         :param receiver:
@@ -59,7 +58,7 @@ class CommHandler(object):
         """
         self.__receiver = receiver
 
-    def send(self, message: Message) -> NoReturn:
+    def send(self, message: Message) -> None:
         """
         sending message using the sender object
         :param message: message

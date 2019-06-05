@@ -3,11 +3,12 @@ from threading import Thread, Event
 #from typing import NoReturn
 
 from gvh import Gvh
+from commHandler import CommHandler
 
 
 class AgentThread(ABC, Thread):
 
-    def __init__(self, agent_gvh: Gvh):
+    def __init__(self, agent_gvh: Gvh, comm_handler: CommHandler):
         """
         __gvh: Gvh
         __pid: int
@@ -21,6 +22,7 @@ class AgentThread(ABC, Thread):
         """
         super(AgentThread, self).__init__()
         self.__agent_gvh = agent_gvh
+        self.__comm_handler = comm_handler
         self.__pid = agent_gvh.pid
         self.__stop_event = Event()
         self.__sleep_event = Event()
@@ -39,6 +41,23 @@ class AgentThread(ABC, Thread):
         setter method for number of agents in the system . may not ever be used
         """
         self.agent_gvh.participants = numagents
+
+    @property
+    def comm_handler(self) -> CommHandler:
+        """
+        getter method for the commhandler
+        :return:
+        """
+        return self.__comm_handler
+
+    @comm_handler.setter
+    def comm_handler(self, ch: CommHandler) : #-> NoReturn:
+        """
+        This may be never used
+        :param ch:
+        :return:
+        """
+        self.__comm_handler = ch
 
     @property
     def agent_gvh(self) -> Gvh:

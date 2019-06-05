@@ -3,13 +3,16 @@ import socket
 
 import msgpack
 
-from src.message import Message
+from message import Message
 
 class Sender(object):
+    """
     __ip: str
     __port: int
+    """
 
     def __init__(self, ip: str, port: int):
+        self.__broadcast_ip = '192.168.1.255'
         self.__ip = ip
         self.__port = port
 
@@ -46,4 +49,5 @@ class Sender(object):
     def send(self, message: Message) : # -> NoReturn:
         str_message = str(message)
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        clientSock.sendto(msgpack.packb(str_message), (self.ip, self.port))
+        print("sending")
+        clientSock.sendto(msgpack.packb(str_message), (self.__broadcast_ip, self.port))

@@ -1,5 +1,5 @@
 # from typing import NoReturn
-
+from typing import Any
 from dsm import Dsm
 
 
@@ -30,7 +30,7 @@ class Gvh(object):
 
 
     @property
-    def moat(self) -> motionAutomaton.MotionAutomaton:
+    def moat(self) -> Any:
         """
         getter method for motionAutomaton
         :return:
@@ -38,7 +38,7 @@ class Gvh(object):
         return self.__moat
 
     @moat.setter
-    def moat(self, moat: motionAutomaton.MotionAutomaton):  # -> NoReturn:
+    def moat(self, moat: Any):  # -> NoReturn:
         """
         setter method for moAT
         :param moat: motionautomaton

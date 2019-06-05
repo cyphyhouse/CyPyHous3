@@ -1,6 +1,7 @@
 import socket, threading
-from src.message import to_msg
+from message import to_msg
 import msgpack
+
 
 class Receiver(threading.Thread):
     """
@@ -74,6 +75,7 @@ class Receiver(threading.Thread):
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_sock.bind((self.ip, self.port))
         while not self.stopped():
+            print("trying to receive")
             data, addr = server_sock.recvfrom(1024)
             # TODO Writing to DSM instead of printing
             print("Message: ", to_msg(msgpack.unpackb(data).decode()).content)

@@ -6,6 +6,10 @@ from gvh import Gvh
 class TestApp(AgentThread):
 
     def __init__(self, pid: int, num_bots: int):
+        """
+        :type pid:int
+        :type num_bots: int
+        """
         super(TestApp, self).__init__(Gvh(pid, num_bots))
         self.start()
 
