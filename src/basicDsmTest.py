@@ -21,7 +21,7 @@ class BasicDsmTest(AgentThread):
 
         while not (self.stopped()):
             print("running", self.pid)
-            self.comm_handler.send(update_create(datatypes.dtypes.INT,self.pid, 'x', 1, time.time()))
+            self.comm_handler.send(update_create(datatypes.dtypes.INT,self.pid, 'x', 2, time.time()))
             self.comm_handler.send(update_create(datatypes.dtypes.BOOL,self.pid, 'y', True, time.time()))
 
             time.sleep(1)
@@ -33,4 +33,4 @@ class BasicDsmTest(AgentThread):
 
 
 
-a = BasicDsmTest(0, 1)
+a = BasicDsmTest(0, 2)
