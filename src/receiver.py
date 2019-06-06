@@ -93,7 +93,7 @@ class Receiver(threading.Thread):
             data, addr = server_sock.recvfrom(1024)
             # TODO Writing to DSM instead of printing
             msg = to_msg(msgpack.unpackb(data).decode())
-            print(msg.sender)
+            print("my pid",self.agent_gvh.pid, "msg from", msg.sender)
             messageHandler.message_handler[msg.m_type](msg,self.agent_gvh)
 
 
