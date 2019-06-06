@@ -33,4 +33,4 @@ class BasicDsmTest(AgentThread):
 
 
 
-a = BasicDsmTest(0, 2)
+a = BasicDsmTest(1, 2)
