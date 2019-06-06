@@ -99,9 +99,13 @@ class MotionAutomaton(threading.Thread):
         self.waypoint_count += 1
         self.pub.publish(pose)
 
+    def stop(self):
+        rospy.signal_shutdown("rospy shutdown: end of program reached")
+
     def run(self):
         """
         calls the spin function to check for new vicon data
         :return:
         """
         rospy.spin()
+        print("ros stopped")

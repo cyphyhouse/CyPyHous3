@@ -101,6 +101,8 @@ class AgentThread(ABC, Thread):
         """
         self.comm_handler.receiver.stop()
         print("stopping agent thread")
+        if self.agent_gvh.moat is not None:
+            self.agent_gvh.moat.stop()
         self.__stop_event.set()
 
     def stopped(self) : #-> NoReturn:
