@@ -20,12 +20,9 @@ class BasicDsmTest(AgentThread):
         nrounds = 0
 
         while not (self.stopped()):
-            print("running", self.pid)
             self.comm_handler.send(update_create(datatypes.dtypes.INT,self.pid, 'x', 2, time.time()))
             self.comm_handler.send(update_create(datatypes.dtypes.BOOL,self.pid, 'y', True, time.time()))
-
             time.sleep(1)
-            print(self.pid," has ",self.agent_gvh.agent_dsm.var_list)
             nrounds += 1
             if nrounds >= rounds:
                 self.stop()

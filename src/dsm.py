@@ -136,7 +136,6 @@ class Dsm(object):
             if self.share_list[key] == 'ar':
                 self.__var_list[key][pid] = val
             else:
-                print("updating",val)
                 self.__var_list[key] = val
         except KeyError:
             print("possible error : variable entry not found")
