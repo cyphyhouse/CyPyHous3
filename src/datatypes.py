@@ -1,9 +1,5 @@
 from enum import Enum
-try:
-    import rospy
-    from geometry_msgs.msg import PoseStamped, Pose
-except ImportError:
-    print("maybe you don't have ros")
+
 
 class dtypes(Enum):
 
@@ -11,13 +7,6 @@ class dtypes(Enum):
     FLOAT = type(float(0))
     BOOL = type(True)
     STR = type("lol")
-    try:
-        POS = type(Pose())
-    except :
-        print("maybe you don't have ros installed")
-
-
-
 
 
 
