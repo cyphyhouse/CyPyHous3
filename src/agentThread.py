@@ -23,6 +23,7 @@ class AgentThread(ABC, Thread):
         super(AgentThread, self).__init__()
         self.__agent_gvh = agent_gvh
         self.__comm_handler = comm_handler
+        self.__comm_handler.receiver.agent_gvh = self.__agent_gvh
         self.__pid = agent_gvh.pid
         self.__stop_event = Event()
         self.__sleep_event = Event()
@@ -98,6 +99,8 @@ class AgentThread(ABC, Thread):
          a flag to set to to safely exit the thread
         :return:
         """
+        self.comm_handler.receiver.stop()
+        print("stopping agent thread")
         self.__stop_event.set()
 
     def stopped(self) : #-> NoReturn:

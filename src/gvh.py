@@ -1,5 +1,5 @@
 # from typing import NoReturn
-from typing import Any
+import typing
 from dsm import Dsm
 
 
@@ -28,9 +28,8 @@ class Gvh(object):
             print("maybe you dont have ros installed")
             self.__moat = None
 
-
     @property
-    def moat(self) -> Any:
+    def moat(self) -> typing.Any:
         """
         getter method for motionAutomaton
         :return:
@@ -38,7 +37,7 @@ class Gvh(object):
         return self.__moat
 
     @moat.setter
-    def moat(self, moat: Any):  # -> NoReturn:
+    def moat(self, moat: typing.Any) -> None:  # -> NoReturn:
         """
         setter method for moAT
         :param moat: motionautomaton
@@ -47,7 +46,7 @@ class Gvh(object):
         self.__moat = moat
 
     @property
-    def participants(self):  # -> NoReturn:
+    def participants(self) -> int:  # -> NoReturn:
         """
         getter method for participants
         :return:
@@ -55,7 +54,7 @@ class Gvh(object):
         return self.__participants
 
     @participants.setter
-    def participants(self, participants: int):  # -> NoReturn:
+    def participants(self, participants: int) -> None:  # -> NoReturn:
         """
         setter method for participants
         :param name:
@@ -72,7 +71,7 @@ class Gvh(object):
         return self.__pid
 
     @pid.setter
-    def pid(self, pid: int):  # -> NoReturn:
+    def pid(self, pid: int) -> None:  # -> NoReturn:
         """
         setter method for pid
         :param name:
@@ -89,10 +88,24 @@ class Gvh(object):
         return self.__dsm
 
     @agent_dsm.setter
-    def agent_dsm(self, my_dsm: Dsm):
+    def agent_dsm(self, my_dsm: Dsm) -> None:
         """
         setter method for dsm
         :param mydsm:
         :return:
         """
         self.__dsm = my_dsm
+
+    def mk_var(self, var_scope, var_type, var_name, var_value=None) -> None:
+        """
+        method to create variable type in dsm
+        :param var_scope: scope of variable
+        :param var_type: variable type
+        :param var_name: name
+        :param var_value: value
+        :return: nothing
+        """
+        if var_scope == 'ar':
+            self.agent_dsm.mk_ar_var(self.pid, self.participants, var_type, var_name, var_value)
+        elif var_scope == 'aw':
+            self.agent_dsm.mk_aw_var(var_type, var_name, var_value)

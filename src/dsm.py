@@ -1,6 +1,7 @@
 from typing import Any  # , NoReturn
 import datatypes
 
+
 class Dsm(object):
     """
     __var_list: dict
@@ -27,7 +28,7 @@ class Dsm(object):
         return self.__share_list
 
     @share_list.setter
-    def share_list(self, share_list: dict):  # -> NoReturn:
+    def share_list(self, share_list: dict) -> None:
         """
         sharing dictionary setter
         :param share_list:
@@ -44,7 +45,7 @@ class Dsm(object):
         return self.__sym_tab
 
     @sym_tab.setter
-    def sym_tab(self, sym_tab: dict):  # -> NoReturn:
+    def sym_tab(self, sym_tab: dict) -> None:
         """
         symbol table setter
         :param sym_tab:
@@ -61,7 +62,7 @@ class Dsm(object):
         return self.__var_list
 
     @var_list.setter
-    def var_list(self, var_list: dict):  # -> NoReturn:
+    def var_list(self, var_list: dict) -> None:
         """
         variable value table setter
         :param var_list:
@@ -78,7 +79,7 @@ class Dsm(object):
         return self.__type_list
 
     @type_list.setter
-    def type_list(self, type_list: dict):  # -> NoReturn:
+    def type_list(self, type_list: dict) -> None:
         """
         variable type table setter
         :param type_list:
@@ -86,7 +87,7 @@ class Dsm(object):
         """
         self.__type_list = type_list
 
-    def mk_aw_var(self, d_type: datatypes.dtypes , var_name: str, val: Any = None):  # -> NoReturn:
+    def mk_aw_var(self, d_type: datatypes.dtypes, var_name: str, val: Any = None) -> None:
         """
         Create allwrite variable
         :type d_type: type
@@ -96,12 +97,12 @@ class Dsm(object):
         :return:
         """
         last_key = len(list(self.var_list.keys()))
-        self.sym_tab[var_name] = last_key
-        self.type_list[last_key] = d_type
-        self.var_list[last_key] = val
-        self.share_list[last_key] = 'aw'
+        self.__sym_tab[var_name] = last_key
+        self.__type_list[last_key] = d_type
+        self.__var_list[last_key] = val
+        self.__share_list[last_key] = 'aw'
 
-    def mk_ar_var(self, pid: int, numbots: int, d_type: datatypes.dtypes , var_name: str, val: Any = None):
+    def mk_ar_var(self, pid: int, numbots: int, d_type: datatypes.dtypes, var_name: str, val: Any = None):
         """
         Create all read variables
         :param pid: declarating robot's pid
@@ -113,17 +114,17 @@ class Dsm(object):
         """
 
         last_key = len(list(self.var_list.keys()))
-        self.sym_tab[var_name] = last_key
-        self.type_list[last_key] = d_type
+        self.__sym_tab[var_name] = last_key
+        self.__type_list[last_key] = d_type
         val_dict = {}
         for i in range(0, numbots):
             val_dict[i] = None
         val_dict[pid] = val
-        self.var_list[last_key] = val_dict
-        self.share_list[last_key] = 'ar'
+        self.__var_list[last_key] = val_dict
+        self.__share_list[last_key] = 'ar'
 
-    def update(self, pid: int, var_name: str, val: Any):  # -> NoReturn:
-        """
+    def put(self, pid: int, var_name: str, val: Any) -> None:
+        """;
         update shared variable
         :param pid: int pid of updating
         :param var_name: variable name
@@ -133,26 +134,10 @@ class Dsm(object):
         try:
             key = self.sym_tab[var_name]
             if self.share_list[key] == 'ar':
-                self.var_list[key][pid] = val
+                self.__var_list[key][pid] = val
             else:
-                self.var_list[key] = val
-        except KeyError:
-            print("possible error : variable entry not found")
-
-    def put(self, pid: int, var_name: str, val: Any):  # -> NoReturn:
-        """
-        update shared variable
-        :param pid: int pid of updating
-        :param var_name: variable name
-        :param val: value to be updated to
-        :return:
-        """
-        try:
-            key = self.sym_tab[var_name]
-            if self.share_list[key] == 'ar':
-                self.var_list[key][pid] = val
-            else:
-                self.var_list[key] = val
+                print("updating",val)
+                self.__var_list[key] = val
         except KeyError:
             print("possible error : variable entry not found")
 

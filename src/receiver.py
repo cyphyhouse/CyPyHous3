@@ -1,6 +1,8 @@
 import socket, threading
 from message import to_msg
 import msgpack
+import messageHandler
+from gvh import Gvh
 
 
 class Receiver(threading.Thread):
@@ -16,15 +18,18 @@ class Receiver(threading.Thread):
 
     def __init__(self, ip: str, port: int):
         super(Receiver, self).__init__()
+        self.__agent_gvh = Gvh(0)
         self.__ip = ip
         self.__port = port
         self.__stop_event = threading.Event()
+
 
     def stop(self):  # -> NoReturn:
         """
          a flag to set to to safely exit the thread
         :return:
         """
+        print("stopping receiver")
         self.__stop_event.set()
 
     def stopped(self):  # -> NoReturn:
@@ -33,6 +38,14 @@ class Receiver(threading.Thread):
         :return:
         """
         return self.__stop_event.is_set()
+
+    @property
+    def agent_gvh(self):
+        return self.__agent_gvh
+
+    @agent_gvh.setter
+    def agent_gvh(self, agent_gvh:Gvh):
+        self.__agent_gvh = agent_gvh
 
     @property
     def ip(self) -> str:
@@ -77,9 +90,12 @@ class Receiver(threading.Thread):
         server_sock.bind((self.ip, self.port))
 
         while not self.stopped():
-            print("trying to receive")
             data, addr = server_sock.recvfrom(1024)
             # TODO Writing to DSM instead of printing
-            print("Message: ", to_msg(msgpack.unpackb(data).decode()).content)
+            msg = to_msg(msgpack.unpackb(data).decode())
+            messageHandler.message_handler[msg.m_type](msg,self.agent_gvh)
 
+
+            #print("Message: ", to_msg(msgpack.unpackb(data).decode()).content)
+        print("here")
         server_sock.close()

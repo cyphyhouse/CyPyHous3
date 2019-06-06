@@ -5,3 +5,5 @@ class dtypes(Enum):
     FLOAT = type(float(0))
     BOOL = type(True)
     STR = type("lol")
+
+
