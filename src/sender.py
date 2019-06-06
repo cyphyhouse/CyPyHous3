@@ -51,6 +51,5 @@ class Sender(object):
         str_message = str(message)
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         clientSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        print("braodcasting")
-        clientSock.sendto(msgpack.packb(str_message), ("<broadcast>", self.port))
+        clientSock.sendto(msgpack.packb(str_message), ("192.168.1.255", self.port))
         #clientSock.sendto(msgpack.packb(str_message), (self.ip, self.port))
