@@ -9,7 +9,7 @@ from messageHandler import update_create
 
 class BasicDsmTest(AgentThread):
 
-    def __init__(self, pid: int, num_bots: int, ip: str = '127.0.0.1', port: int = 3291):
+    def __init__(self, pid: int, num_bots: int, ip: str = '', port: int = 3291):
         super(BasicDsmTest, self).__init__(Gvh(pid, num_bots), CommHandler(ip, port, port, pid))
         self.start()
 
@@ -29,8 +29,5 @@ class BasicDsmTest(AgentThread):
             nrounds += 1
             if nrounds >= rounds:
                 self.stop()
-
-
-
 
 a = BasicDsmTest(1, 2)
