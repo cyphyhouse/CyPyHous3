@@ -27,4 +27,4 @@ class BasicDsmTest(AgentThread):
             if nrounds >= rounds:
                 self.stop()
 
-a = BasicDsmTest(0, 2)
+a = BasicDsmTest(1, 2)
