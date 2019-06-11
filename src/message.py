@@ -1,5 +1,5 @@
 #from typing import NoReturn
-
+import typing
 class Message(object):
     """
     Message class, we will have parse rules for different message types. A table lookup of parse functions.
@@ -8,7 +8,7 @@ class Message(object):
     __content: str
     __timestamp: float
     """
-    def __init__(self, m_type: int, sender: int, content: str, ts: float):
+    def __init__(self, m_type: int, sender: int, content: typing.Any, ts: float):
         self.__type = m_type
         self.__sender = sender
         self.__content = content
@@ -60,7 +60,7 @@ class Message(object):
         return self.__content
 
     @content.setter
-    def content(self, content: str):  # -> NoReturn:
+    def content(self, content: typing.Any):  # -> NoReturn:
         """
         setter method for content
         :param content:

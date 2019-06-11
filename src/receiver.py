@@ -1,8 +1,11 @@
-import socket, threading
-from message import to_msg
+import socket
+import threading
+
 import msgpack
+
 import messageHandler
 from gvh import Gvh
+from message import to_msg
 
 
 class Receiver(threading.Thread):
@@ -40,10 +43,19 @@ class Receiver(threading.Thread):
 
     @property
     def agent_gvh(self):
+        """
+
+        :return:
+        """
         return self.__agent_gvh
 
     @agent_gvh.setter
     def agent_gvh(self, agent_gvh: Gvh):
+        """
+
+        :param agent_gvh:
+        :return:
+        """
         self.__agent_gvh = agent_gvh
 
     @property
@@ -77,6 +89,10 @@ class Receiver(threading.Thread):
         self.__port = port
 
     def recv(self):
+        """
+
+        :return:
+        """
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_sock.bind((self.ip, self.port))
         data, addr = server_sock.recvfrom(1024)
@@ -84,6 +100,10 @@ class Receiver(threading.Thread):
         return to_msg(msgpack.unpackb(data).decode()).content
 
     def run(self):
+        """
+
+        :return:
+        """
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         server_sock.bind((self.ip, self.port))

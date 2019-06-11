@@ -38,10 +38,19 @@ class AgentThread(ABC, Thread):
 
     @property
     def is_leader(self) -> bool:
+        """
+
+        :return: whether the agent is the leader
+        """
         return self.__is_leader
 
     @is_leader.setter
     def is_leader(self, val: bool) -> None:
+        """
+
+        :param val:
+        :return:
+        """
         self.__is_leader = val
 
     @property
@@ -171,7 +180,7 @@ class AgentThread(ABC, Thread):
         key = self.agent_gvh.agent_dsm.sym_tab[var_name]
         vartype = self.agent_gvh.agent_dsm.type_list[key]
         msg = messageHandler.update_create(vartype, pid, var_name, val, time.time())
-        self.agent_gvh.agent_dsm.put(pid,var_name,val)
+        self.agent_gvh.agent_dsm.put(pid, var_name, val)
         self.comm_handler.send(msg)
 
     def has_mutex(self, var_name: str) -> bool:
@@ -182,7 +191,7 @@ class AgentThread(ABC, Thread):
         """
         return self.agent_gvh.has_mutex(var_name)
 
-    def request_mutex(self, var_name:str) -> None:
+    def request_mutex(self, var_name: str) -> None:
         """
 
         :param var_name:
@@ -191,8 +200,7 @@ class AgentThread(ABC, Thread):
         msg = messageHandler.mutex_request_create(var_name, self.pid, time.time())
         self.send(msg)
 
-
-    def release_mutex(self, var_name:str) -> None:
+    def release_mutex(self, var_name: str) -> None:
         """
 
         :param var_name:
@@ -201,12 +209,14 @@ class AgentThread(ABC, Thread):
         msg = messageHandler.mutex_release_create(var_name, self.pid, time.time())
         self.send(msg)
 
-
     def flush_msgs(self):
+        """
+        send messages held in gvh list
+        :return:
+        """
         msg_list = self.agent_gvh.msg_list
         self.agent_gvh.msg_list = []
         self.comm_handler.flush_msgs(msg_list)
-
 
     @abstractmethod
     def run(self) -> None:

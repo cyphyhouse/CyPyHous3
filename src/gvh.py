@@ -195,4 +195,9 @@ class Gvh(object):
         return False
 
     def add_msg(self, msg: message.Message) -> None:
+        """
+        add message to list
+        :param msg:
+        :return:
+        """
         self.msg_list.append(msg)
