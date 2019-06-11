@@ -1,6 +1,4 @@
 import socket
-# from typing import NoReturn
-
 import msgpack
 
 from message import Message
@@ -16,6 +14,8 @@ class Sender(object):
         self.__broadcast_ip = '192.168.1.255'
         self.__ip = ip
         self.__port = port
+
+
 
     @property
     def ip(self) -> str:
@@ -52,4 +52,6 @@ class Sender(object):
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         clientSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         clientSock.sendto(msgpack.packb(str_message), ("192.168.1.255", self.port))
-        #clientSock.sendto(msgpack.packb(str_message), (self.ip, self.port))
+        clientSock.sendto(msgpack.packb(str_message), (self.ip, self.port))
+
+

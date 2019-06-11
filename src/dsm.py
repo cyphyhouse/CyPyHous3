@@ -1,5 +1,7 @@
 from typing import Any  # , NoReturn
 import datatypes
+import time
+from messageHandler import  *
 
 
 class Dsm(object):
@@ -87,7 +89,7 @@ class Dsm(object):
         """
         self.__type_list = type_list
 
-    def mk_aw_var(self, d_type: datatypes.dtypes, var_name: str, val: Any = None) -> None:
+    def mk_aw_var(self, d_type: type, var_name: str, val: Any = None) -> None:
         """
         Create allwrite variable
         :type d_type: type
@@ -102,7 +104,7 @@ class Dsm(object):
         self.__var_list[last_key] = val
         self.__share_list[last_key] = 'aw'
 
-    def mk_ar_var(self, pid: int, numbots: int, d_type: datatypes.dtypes, var_name: str, val: Any = None):
+    def mk_ar_var(self, pid: int, numbots: int, d_type: type, var_name: str, val: Any = None):
         """
         Create all read variables
         :param pid: declarating robot's pid
@@ -131,6 +133,7 @@ class Dsm(object):
         :param val: value to be updated to
         :return:
         """
+
         try:
             key = self.sym_tab[var_name]
             if self.share_list[key] == 'ar':

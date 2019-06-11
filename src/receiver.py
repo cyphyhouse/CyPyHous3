@@ -18,11 +18,10 @@ class Receiver(threading.Thread):
 
     def __init__(self, ip: str, port: int):
         super(Receiver, self).__init__()
-        self.__agent_gvh = Gvh(0)
+        self.__agent_gvh = None
         self.__ip = ip
         self.__port = port
         self.__stop_event = threading.Event()
-
 
     def stop(self):  # -> NoReturn:
         """
@@ -44,7 +43,7 @@ class Receiver(threading.Thread):
         return self.__agent_gvh
 
     @agent_gvh.setter
-    def agent_gvh(self, agent_gvh:Gvh):
+    def agent_gvh(self, agent_gvh: Gvh):
         self.__agent_gvh = agent_gvh
 
     @property
@@ -88,15 +87,13 @@ class Receiver(threading.Thread):
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         server_sock.bind((self.ip, self.port))
+        server_sock.settimeout(2)
 
         while not self.stopped():
-            data, addr = server_sock.recvfrom(1024)
-            # TODO Writing to DSM instead of printing
-            msg = to_msg(msgpack.unpackb(data).decode())
-            print("my pid",self.agent_gvh.pid, "msg from", msg.sender)
-            messageHandler.message_handler[msg.m_type](msg,self.agent_gvh)
-
-
-            #print("Message: ", to_msg(msgpack.unpackb(data).decode()).content)
-        print("here")
+            try:
+                data, addr = server_sock.recvfrom(1024)
+                msg = to_msg(msgpack.unpackb(data).decode())
+                messageHandler.message_handler[msg.m_type](msg, self.agent_gvh)
+            except socket.timeout:
+                pass
         server_sock.close()

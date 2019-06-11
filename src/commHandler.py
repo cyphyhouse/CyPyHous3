@@ -65,3 +65,12 @@ class CommHandler(object):
         :return:
         """
         self.sender.send(message)
+
+    def flush_msgs(self, msg_list: list) -> None:
+        """
+
+        :param msg_list:
+        :return:
+        """
+        for msg in msg_list:
+            self.sender.send(msg)
