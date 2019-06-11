@@ -171,6 +171,7 @@ class AgentThread(ABC, Thread):
         key = self.agent_gvh.agent_dsm.sym_tab[var_name]
         vartype = self.agent_gvh.agent_dsm.type_list[key]
         msg = messageHandler.update_create(vartype, pid, var_name, val, time.time())
+        self.agent_gvh.agent_dsm.put(pid,var_name,val)
         self.comm_handler.send(msg)
 
     def has_mutex(self, var_name: str) -> bool:

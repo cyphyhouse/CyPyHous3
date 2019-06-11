@@ -6,9 +6,9 @@ from gvh import Gvh
 
 class BasicDsmTest(AgentThread):
 
-    def __init__(self, pid: int, num_bots: int, ip: str = '', port: int = 3291):
+    def __init__(self, pid: int, num_bots: int, ip: str = '', rport: int = 3291, sport :int = 3292):
         agent_gvh = Gvh(pid, num_bots)
-        super(BasicDsmTest, self).__init__(agent_gvh, CommHandler(ip, port, port, pid))
+        super(BasicDsmTest, self).__init__(agent_gvh, CommHandler(ip, rport, sport, pid))
         self.start()
 
     def run(self):
@@ -43,4 +43,5 @@ class BasicDsmTest(AgentThread):
 
 
 
-a = BasicDsmTest(0,2)
+a = BasicDsmTest(0,2,"",3293,3292)
+b = BasicDsmTest(1,2,"",3292,3293)
