@@ -2,7 +2,6 @@ import time
 from agentThread import AgentThread
 from commHandler import CommHandler
 from gvh import Gvh
-from messageHandler import update_create
 
 
 class BasicDsmTest(AgentThread):
@@ -18,14 +17,23 @@ class BasicDsmTest(AgentThread):
 
         rounds = 5
         nrounds = 0
+        requested_mutex = False
 
         while not (self.stopped()):
             self.flush_msgs()
-            self.request_mutex('x')
+            if not requested_mutex:
+                print("requesting")
+                requested_mutex = True
+                self.request_mutex('x')
+            else:
+                if not self.has_mutex('x'):
+                    pass
+                else:
+                    self.put(self.pid, 'x', 2)
+                    self.put(self.pid, 'y', True)
+                    self.release_mutex('x')
+                    requested_mutex = False
 
-            self.put(self.pid, 'x', 2)
-            self.put(self.pid, 'y', True)
-            self.release_mutex('x')
             print(self.pid, self.agent_gvh.agent_dsm.var_list)
 
             time.sleep(1)
@@ -35,3 +43,4 @@ class BasicDsmTest(AgentThread):
 
 
 
+a = BasicDsmTest(0,2)
