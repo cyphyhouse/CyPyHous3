@@ -22,7 +22,6 @@ class BasicDsmTest(AgentThread):
         while not (self.stopped()):
             self.flush_msgs()
             if not requested_mutex:
-                print("requesting")
                 requested_mutex = True
                 self.request_mutex('x')
             else:
@@ -33,8 +32,6 @@ class BasicDsmTest(AgentThread):
                     self.put(self.pid, 'y', True)
                     self.release_mutex('x')
                     requested_mutex = False
-
-            print(self.pid, self.agent_gvh.agent_dsm.var_list)
 
             time.sleep(1)
             nrounds += 1

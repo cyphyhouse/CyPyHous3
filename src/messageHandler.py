@@ -83,7 +83,6 @@ def mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     var_name, grantee = msg.content.split(",")
     index = agent_gvh.get_mutex_index(var_name)
     agent_gvh.mutex_list[index].mutex_holder = agent_gvh.pid
-    print("granting mutex to", agent_gvh.pid)
     pass
 
 
@@ -132,7 +131,6 @@ def update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     :param agent_gvh:
     :return:
     """
-    print("from",msg.sender,"my pid", agent_gvh.pid, msg)
     if 0 < msg.m_type <= 2:
         var_name, value = msg.content.split(",")
         agent_gvh.agent_dsm.put(msg.sender, var_name, update_type[msg.m_type](value))
