@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+'''
+    Use ros messages to drive drones
+    Involves physics
+
+'''
+
 import rospy
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
+"""
+    Move according to a log file
+    Doesn't involve physics
 
+"""
 import rospy
 import rospkg
 from gazebo_msgs.msg import ModelState
