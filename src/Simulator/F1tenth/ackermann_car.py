@@ -30,14 +30,15 @@ class Car():
         rospy.spin()
 
     def set_throttle(self, data):
-        if not self.goal_sent:
-            self.goal_sent = True
-            rospy.loginfo("Send goal!")
-            self.pub_goal = rospy.Publisher("/car_goal/goal", PointStamped, queue_size=1)
-            goal = PointStamped()
-            goal.point.x = 10
-            goal.point.y = -10
-            self.pub_goal.publish(goal)
+        # if not self.goal_sent:
+        self.goal_sent = True
+        rospy.loginfo("Send goal!")
+        pub_goal = rospy.Publisher("/car_goal/goal", PointStamped, queue_size=1)
+        goal = PointStamped()
+        goal.point.x = 10
+        goal.point.y = -10
+        goal.header.frame_id = "1"
+        pub_goal.publish(goal)
 
         rospy.loginfo("Command received!")
         throttle = data.drive.speed/0.1
