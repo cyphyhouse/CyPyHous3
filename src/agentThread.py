@@ -225,3 +225,16 @@ class AgentThread(ABC, Thread):
         :return:
         """
         pass
+
+    def grant_available_mutexes(self):
+        if self.agent_gvh.is_leader:
+            for m in self.agent_gvh.mutex_list:
+                if m.mutex_holder is None:
+                    if len(m.requests) is not 0:
+                        msg = messageHandler.mutex_grant_create(m.var_name, m.requests[0], self.pid, time.time())
+                        m.mutex_holder = m.requests[0]
+                        m.requests = m.requests[1:]
+                        self.comm_handler.send(msg)
+
+
+

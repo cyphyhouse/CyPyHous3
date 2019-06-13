@@ -71,6 +71,7 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
             agent_gvh.mutex_list[i].requests.append(requester)
 
     else:
+        print("no such variable yet")
         pass
 
 

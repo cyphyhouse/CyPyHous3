@@ -1,4 +1,5 @@
 import time
+
 from agentThread import AgentThread
 from commHandler import CommHandler
 from gvh import Gvh
@@ -6,7 +7,7 @@ from gvh import Gvh
 
 class BasicDsmTest1(AgentThread):
 
-    def __init__(self, pid: int, num_bots: int, ip: str = '', rport: int = 3292, sport :int = 3292):
+    def __init__(self, pid: int, num_bots: int, ip: str = '', rport: int = 3292, sport: int = 3292):
         agent_gvh = Gvh(pid, num_bots)
         super(BasicDsmTest1, self).__init__(agent_gvh, CommHandler(ip, rport, sport, pid))
         self.start()
@@ -29,8 +30,8 @@ class BasicDsmTest1(AgentThread):
                     pass
                 else:
                     x = self.agent_gvh.agent_dsm.get('x')
-                    print(x, self.pid,nrounds)
-                    self.put(self.pid, 'x', x+self.pid)
+                    print(x, self.pid, nrounds)
+                    self.put(self.pid, 'x', x + self.pid)
                     self.release_mutex('x')
                     requested_mutex = False
 
@@ -40,6 +41,4 @@ class BasicDsmTest1(AgentThread):
                 self.stop()
 
 
-
-a = BasicDsmTest1(0,2,"",3292,3293)
-b = BasicDsmTest1(1,2,"",3293,3292)
+a = BasicDsmTest1(0, 2, "", 3292, 3292)
