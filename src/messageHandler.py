@@ -93,7 +93,7 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
             agent_gvh.add_msg(msg)
         else:
         '''
-
+        print(agent_gvh.mutex_list[i].requests)
         agent_gvh.mutex_list[i].requests.append(requester)
 
     else:
@@ -123,6 +123,7 @@ def mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     varname = msg.content
     i = agent_gvh.get_mutex_index(varname)
     if agent_gvh.is_leader:
+        print("mutex released by", msg.sender)
         if agent_gvh.mutex_list[i].mutex_holder == msg.sender:
             if not agent_gvh.mutex_list[i].requests == []:
                 holder = agent_gvh.mutex_list[i].requests[0]
