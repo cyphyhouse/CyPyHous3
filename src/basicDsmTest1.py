@@ -13,6 +13,7 @@ class BasicDsmTest1(AgentThread):
         self.start()
 
     def run(self):
+
         self.mk_var('aw', int, 'x', 0)
         self.mk_var('aw', bool, 'y', False)
 
@@ -21,6 +22,7 @@ class BasicDsmTest1(AgentThread):
         requested_mutex = False
 
         while not (self.stopped()):
+
             self.flush_msgs()
             if not requested_mutex:
                 requested_mutex = True
