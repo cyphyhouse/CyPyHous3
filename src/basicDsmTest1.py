@@ -35,14 +35,14 @@ class BasicDsmTest1(AgentThread):
                     else:
                         print(self.pid, "has mutex at round", nrounds)
                         x = self.agent_gvh.agent_dsm.get('x')
-                        print(x, self.pid, nrounds)
-                        self.put(self.pid, 'x', x + self.pid)
+                        #print(x, self.pid, nrounds)
+                        self.put(self.pid, 'x', x + self.pid + 1)
                         self.release_mutex('x')
                         requested_mutex = False
 
-                time.sleep(1)
                 nrounds += 1
                 if nrounds >= rounds:
+                    print(" x is ", self.agent_gvh.agent_dsm.get('x'))
                     self.stop()
                 msg = messageHandler.round_update_create(self.pid,time.time())
                 self.send(msg)
