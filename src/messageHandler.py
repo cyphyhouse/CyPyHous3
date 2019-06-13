@@ -83,8 +83,8 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     var_name = msg.content
     requester = msg.sender
     i = agent_gvh.get_mutex_index(var_name)
-    holder = agent_gvh.mutex_list[i].mutex_holder
-    requests = agent_gvh.mutex_list[i].requests
+    #holder = agent_gvh.mutex_list[i].mutex_holder
+    #requests = agent_gvh.mutex_list[i].requests
     if agent_gvh.is_leader:
         '''
         if requests == [] and holder is None:
