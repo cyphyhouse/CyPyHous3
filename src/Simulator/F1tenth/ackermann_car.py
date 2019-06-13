@@ -36,7 +36,7 @@ class Car():
         pub_goal = rospy.Publisher("/car_goal/goal", PointStamped, queue_size=1)
         goal = PointStamped()
         goal.point.x = 10
-        goal.point.y = -10
+        goal.point.y = 20
         goal.header.frame_id = "1"
         pub_goal.publish(goal)
 

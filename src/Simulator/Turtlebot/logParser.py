@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 def parse():
-    f = open("log.txt", "r")
+    f = open("log3.txt", "r")
     lines = f.readlines()
     path = []
     for x in lines:
