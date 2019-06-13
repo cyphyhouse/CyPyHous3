@@ -35,7 +35,6 @@ class BasicDsmTest1(AgentThread):
                     else:
                         print(self.pid, "has mutex at round", nrounds)
                         x = self.agent_gvh.agent_dsm.get('x')
-                        #print(x, self.pid, nrounds)
                         self.put(self.pid, 'x', x + self.pid + 1)
                         self.release_mutex('x')
                         requested_mutex = False

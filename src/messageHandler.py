@@ -86,12 +86,15 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     holder = agent_gvh.mutex_list[i].mutex_holder
     requests = agent_gvh.mutex_list[i].requests
     if agent_gvh.is_leader:
+        '''
         if requests == [] and holder is None:
             agent_gvh.mutex_list[i].mutex_holder = requester
             msg = mutex_grant_create(var_name, requester, agent_gvh.pid, time.time())
             agent_gvh.add_msg(msg)
         else:
-            agent_gvh.mutex_list[i].requests.append(requester)
+        '''
+
+        agent_gvh.mutex_list[i].requests.append(requester)
 
     else:
         pass
