@@ -2,6 +2,7 @@ import time
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 from typing import Any
+import signal
 
 import message
 import messageHandler
@@ -35,6 +36,8 @@ class AgentThread(ABC, Thread):
             self.__is_leader = False
         self.__stop_event = Event()
         self.__sleep_event = Event()
+        
+        signal.signal(signal.SIGINT, self.signal_handler)
 
     @property
     def is_leader(self) -> bool:
@@ -225,6 +228,9 @@ class AgentThread(ABC, Thread):
         :return:
         """
         pass
+        
+    def signal_handler(self, sig, frame):
+        self.stop()
 
     def grant_available_mutexes(self):
         if self.agent_gvh.is_leader:
