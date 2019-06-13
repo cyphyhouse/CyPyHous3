@@ -22,12 +22,13 @@ class BasicDsmTest1(AgentThread):
         requested_mutex = False
 
         while not (self.stopped()):
-
+            self.grant_available_mutexes()
             self.flush_msgs()
             if not requested_mutex:
                 requested_mutex = True
                 self.request_mutex('x')
             else:
+                print(self.pid, "has mutex at round", nrounds)
                 if not self.has_mutex('x'):
                     pass
                 else:
@@ -43,4 +44,4 @@ class BasicDsmTest1(AgentThread):
                 self.stop()
 
 
-a = BasicDsmTest1(0, 2, "", 3292, 3292)
+a = BasicDsmTest1(0, 3, "", 3292, 3292)
