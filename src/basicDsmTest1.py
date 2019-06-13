@@ -3,7 +3,7 @@ import time
 from agentThread import AgentThread
 from commHandler import CommHandler
 from gvh import Gvh
-
+import messageHandler
 
 class BasicDsmTest1(AgentThread):
 
@@ -23,25 +23,29 @@ class BasicDsmTest1(AgentThread):
 
         while not (self.stopped()):
             self.grant_available_mutexes()
-            self.flush_msgs()
-            if not requested_mutex:
-                requested_mutex = True
-                self.request_mutex('x')
-            else:
-                print(self.pid, "has mutex at round", nrounds)
-                if not self.has_mutex('x'):
-                    pass
+            if self.agent_gvh.start_round:
+                self.agent_gvh.start_round = False
+                self.flush_msgs()
+                if not requested_mutex:
+                    requested_mutex = True
+                    self.request_mutex('x')
                 else:
-                    x = self.agent_gvh.agent_dsm.get('x')
-                    print(x, self.pid, nrounds)
-                    self.put(self.pid, 'x', x + self.pid)
-                    self.release_mutex('x')
-                    requested_mutex = False
+                    if not self.has_mutex('x'):
+                        pass
+                    else:
+                        print(self.pid, "has mutex at round", nrounds)
+                        x = self.agent_gvh.agent_dsm.get('x')
+                        print(x, self.pid, nrounds)
+                        self.put(self.pid, 'x', x + self.pid)
+                        self.release_mutex('x')
+                        requested_mutex = False
 
-            time.sleep(1)
-            nrounds += 1
-            if nrounds >= rounds:
-                self.stop()
+                time.sleep(1)
+                nrounds += 1
+                if nrounds >= rounds:
+                    self.stop()
+                msg = messageHandler.round_update_create(self.pid,time.time())
+                self.send(msg)
 
 
 a = BasicDsmTest1(0, 3, "", 3292, 3292)

@@ -13,6 +13,29 @@ def update_compound_create(data_type: tuple, pid: int, var: str, value: Any, ts:
     pass
 
 
+def round_update_create(pid:int, ts: float) -> message.Message:
+    """
+    creates an end of round message to let other agents know i have reached my end
+    :param ts:
+    :return:
+    """
+    return message.Message(6, pid, "", ts)
+
+
+def round_update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
+    """
+    update number of agents reaching barrier
+    :param msg:
+    :param agent_gvh:
+    :return:
+    """
+    if msg.sender not in agent_gvh.finished:
+        agent_gvh.finished.append(msg.sender)
+    if len(agent_gvh.finished) == agent_gvh.participants - 1:
+        agent_gvh.start_round = True
+        agent_gvh.finished = []
+
+
 def mutex_request_create(var_name: str, pid: int, ts: float) -> message.Message:
     """
     create mutex request
@@ -151,3 +174,4 @@ message_handler[2] = update_handle
 message_handler[3] = mutex_request_handle
 message_handler[4] = mutex_grant_handle
 message_handler[5] = mutex_release_handle
+message_handler[6] = round_update_handle

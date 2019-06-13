@@ -25,6 +25,9 @@ class Gvh(object):
         self.__pid = pid
         self.__dsm = Dsm()
         self.__msg_list = []
+        self.__finished = [] # for barrier sync
+        self.__start_round = True
+
 
         if pid == 0:
             self.__is_leader = True
@@ -37,6 +40,24 @@ class Gvh(object):
         except ImportError:
             print("maybe you dont have ros installed")
             self.__moat = None
+
+
+    @property
+    def finished(self) -> list:
+        return  self.__finished
+
+    @finished.setter
+    def finished(self, finished:list) -> None :
+        self.__finished = finished
+
+    @property
+    def start_round(self) -> bool:
+        return self.__start_round
+
+    @start_round.setter
+    def start_round(self, start_round: bool) -> None:
+        self.__start_round = start_round
+
 
     @property
     def msg_list(self) -> list:
