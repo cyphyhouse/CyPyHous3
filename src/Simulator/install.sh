@@ -1,0 +1,48 @@
+#!/bin/bash
+
+cd ~
+sudo apt install python3-pip
+# Setup your sources.list
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+
+# Set up your keys
+sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+
+# Installation
+## First, make sure your Debian package index is up-to-date: 
+sudo apt-get update
+## Install ROS Kinetic Desktop Full: ROS, rqt, rviz, robot-generic libraries, 2D/3D simulators, navigation and 2D/3D perception 
+sudo apt-get install ros-kinetic-desktop-full
+
+# Initialize rosdep
+sudo rosdep init
+rosdep update
+
+# Environment setup
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+# Install Gazebo
+curl -sSL http://get.gazebosim.org | sh
+echo "export SVGA_VGPU10=0" >> ~/.bashrc
+source ~/.bashrc
+
+# Prepare dependencies for catkin_make
+cd ~/catkin_ws3
+find ./ -type f -exec sed -i -e "s/mjiang24/$USER/g" {} \;
+pip3 install catkin_pkg
+pip3 install numpy
+pip3 install empy
+sudo apt-get install ros-kinetic-geographic-msgs
+sudo apt-get install ros-kinetic-ros-control ros-kinetic-ros-controllers
+sudo apt-get install ros-kinetic-ackermann-msgs
+sudo apt-get install python3-yaml
+sudo apt-get install python3-catkin-pkg-modules
+sudo apt-get install python3-rospkg-modules
+
+# Build 
+catkin_make
+
+# Environment setup
+echo "source ~/catkin_ws3/devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
