@@ -8,6 +8,7 @@ class MotionAutomaton(threading.Thread):
     """
     __waypoint_count: int
     __position: Pose
+    __reached: bool
     __pub: rospy.Publisher
     __sub_vicon: rospy.Subscriber
 
@@ -17,11 +18,13 @@ class MotionAutomaton(threading.Thread):
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
         self.__position = Pose()
+        self.__reached = False
 
         rospy.init_node('quad_wp_node', anonymous=True)
         self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
         self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
+        self.__sub_reached = rospy.Subscriber('/Reached', String, self._reachedCB, queue_size=1)
         time.sleep(1)
 
     @property
@@ -65,6 +68,31 @@ class MotionAutomaton(threading.Thread):
         """
         self.__waypoint_count = wpc
 
+    @property
+    def reached(self) -> bool:
+        """
+        getter method for reached"
+        :return:
+        """
+        return self.__reached
+
+    @position.setter
+    def reached(self, r: bool):  # -> NoReturn:
+        """
+        setter method for reached
+        :param r: bool
+        :return:
+        """
+        self.__reached = r
+
+    def _reachedCB(self, data: String):  # -> NoReturn:
+        """
+        This is a callback function that updates the internal Reached state
+        :param data: String message
+        :return: None
+        """
+        if data.lower() == 'true':
+            self.reached = True
 
     def _getVicon(self, data: PoseStamped):  # -> NoReturn:
         """
@@ -95,6 +123,8 @@ class MotionAutomaton(threading.Thread):
         pose.header.stamp = rospy.Time.now()
         pose.header.frame_id = frame_id
         pose.pose = dest
+
+        self.reached = False
 
         self.waypoint_count += 1
         self.pub.publish(pose)
