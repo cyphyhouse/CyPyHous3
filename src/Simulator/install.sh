@@ -27,6 +27,11 @@ curl -sSL http://get.gazebosim.org | sh
 echo "export SVGA_VGPU10=0" >> ~/.bashrc
 source ~/.bashrc
 
+# Download the catkin workspace
+cd ~
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1gMsuEJ0Dsz1ptXX_5-Vps8Rh5Ds-UT0B' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1gMsuEJ0Dsz1ptXX_5-Vps8Rh5Ds-UT0B" -O catkin_ws3.zip && rm -rf /tmp/cookies.txt
+unzip catkin_ws3.zip
+
 # Prepare dependencies for catkin_make
 cd ~/catkin_ws3
 find ./ -type f -exec sed -i -e "s/mjiang24/$USER/g" {} \;
