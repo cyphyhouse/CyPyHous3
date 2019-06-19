@@ -44,6 +44,7 @@ sudo apt-get install ros-kinetic-ackermann-msgs
 sudo apt-get install python3-yaml
 sudo apt-get install python3-catkin-pkg-modules
 sudo apt-get install python3-rospkg-modules
+sudo apt-get install ros-kinetic-tf2-bullet
 
 # Build 
 catkin_make
