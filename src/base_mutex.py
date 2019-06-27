@@ -133,8 +133,8 @@ class BaseMutex(Mutex):
         :return:
         """
         if self.mutex_holder is None and len(self.mutex_request_list) is not 0:
-
             agent_id = self.mutex_request_list[0][0]
+            print("granting mutex to",agent_id)
             self.__mutex_holder = agent_id
             self.__mutex_request_list = self.mutex_request_list[1:]
             msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, time.time())

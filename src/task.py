@@ -64,8 +64,6 @@ class AgentCreation(AgentThread):
 
             time.sleep(0.1)
 
-
-
             try:
 
                 if not self.agent_gvh.mutex_handler.has_mutex(a.mutex_id):

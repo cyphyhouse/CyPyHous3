@@ -50,7 +50,6 @@ class BaseMutexHandler(Thread):
         return None
 
     def grant_available_mutexes(self):
-
         if self.leader:
             for i in range(len(self.mutexes)):
                 #print(self.mutexes[i].mutex_request_list)
@@ -60,9 +59,7 @@ class BaseMutexHandler(Thread):
 
     def has_mutex(self, mutex_id):
         i = self.find_mutex_index(mutex_id)
-
         if i is not None:
-
             if self.mutexes[i].mutex_holder == self.pid:
                 return True
         return False
