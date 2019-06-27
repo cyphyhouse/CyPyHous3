@@ -124,7 +124,7 @@ class BaseMutex(Mutex):
             for port in self.ip_port_list:
                 send(msg, "", port)
         else:
-            send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+            send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
 
     def grant_mutex(self) -> None:
         """
@@ -141,7 +141,7 @@ class BaseMutex(Mutex):
                 for port in self.ip_port_list:
                     send(msg, "", port)
             else:
-                send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+                send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
         else:
             pass
 
@@ -151,4 +151,4 @@ class BaseMutex(Mutex):
             for port in self.ip_port_list:
                 send(msg, "", port)
         else:
-            send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+            send(msg, '192.168.1.255', self.agent_comm_handler.r_port)

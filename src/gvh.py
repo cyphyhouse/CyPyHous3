@@ -128,7 +128,7 @@ class Gvh(object):
             msg = dsm_update_create(self.pid, var, var.owner, time.time())
             for port in self.__port_list:
                 send(msg, "", port)
-                send(msg, "<broadcast>", port)
+                send(msg, "192.168.1.255", port)
 
     @property
     def port_list(self):
@@ -320,7 +320,7 @@ class Gvh(object):
             # print("sending out msg", self.pid)
             for port in self.__port_list:
                 send(msg, "", port)
-                send(msg, "<broadcast>", port)
+                send(msg, "192.168.1.255", port)
         self.msg_list = []
 
 
