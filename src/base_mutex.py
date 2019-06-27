@@ -122,7 +122,7 @@ class BaseMutex(Mutex):
         msg = mutex_request_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
-                send(msg, "", port)
+                send(msg, '192.168.1.255', port)
         else:
             send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
 
@@ -139,7 +139,7 @@ class BaseMutex(Mutex):
             msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, time.time())
             if self.ip_port_list is not []:
                 for port in self.ip_port_list:
-                    send(msg, "", port)
+                    send(msg, '192.168.1.255', port)
             else:
                 send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
         else:
@@ -149,6 +149,6 @@ class BaseMutex(Mutex):
         msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
-                send(msg, "", port)
+                send(msg, '192.168.1.255', port)
         else:
             send(msg, '192.168.1.255', self.agent_comm_handler.r_port)

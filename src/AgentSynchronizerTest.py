@@ -35,7 +35,6 @@ class AgentCreation(AgentThread):
                 msg = round_update_create(self.pid(), self.agent_gvh.synchronizer.round_num, time.time())
 
                 for port in self.agent_gvh.synchronizer.ip_port_list:
-                    send(msg,"",port)
                     send(msg,"192.168.1.255",port)
                 self.agent_gvh.add_msg(msg)
                 self.agent_gvh.flush_msgs()
@@ -52,7 +51,6 @@ class AgentCreation(AgentThread):
                 if self.agent_gvh.synchronizer.round_num < 10:
                     msg = round_update_create(self.pid(), self.agent_gvh.synchronizer.round_num, time.time())
                     for port in self.agent_gvh.synchronizer.ip_port_list:
-                        send(msg,"",port)
                         send(msg,"192.168.1.255",port)
                     self.agent_gvh.add_msg(msg)
                     self.agent_gvh.flush_msgs()
