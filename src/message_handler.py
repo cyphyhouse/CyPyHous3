@@ -18,7 +18,7 @@ def round_update_create(pid: int, round_num: int, ts: float) -> message.Message:
     return message.Message(pid, 0, round_num, ts)
 
 
-def mutex_request_create(mutex_id: int, pid: int, ts: float) -> message.Message:
+def mutex_request_create(mutex_id: int, req_num:int,  pid: int, ts: float) -> message.Message:
     """
     create mutex request
     :param mutex_id: variable to create mutex request for
@@ -26,7 +26,7 @@ def mutex_request_create(mutex_id: int, pid: int, ts: float) -> message.Message:
     :param ts: time stamp
     :return: mutex request message
     """
-    message_contents = mutex_id
+    message_contents = (mutex_id,req_num)
     return message.Message(pid, 1, message_contents, ts)
 
 
@@ -77,11 +77,11 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     :param agent_gvh: my gvh
     :return: nothing
     """
-    mutex_id = msg.content
+    mutex_id,req_num = msg.content
     requester = msg.sender
     if agent_gvh.is_leader:
         print("got mutex request from ",msg.sender)
-        agent_gvh.mutex_handler.add_request(mutex_id, requester)
+        agent_gvh.mutex_handler.add_request(mutex_id, requester, req_num)
     else:
         pass
 

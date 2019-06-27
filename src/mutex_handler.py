@@ -34,11 +34,12 @@ class BaseMutexHandler(Thread):
     def add_mutex(self, mutex):
         self.mutexes.append(mutex)
 
-    def add_request(self, index: int, pid: int):
+    def add_request(self, index: int, pid: int, req_num:int):
         #print("adding request from",pid)
         i = self.find_mutex_index(index)
         if i is not None:
-            self.mutexes[i].mutex_request_list.append(pid)
+            if (pid, req_num) not in self.mutexes[i].mutex_request_list:
+                self.mutexes[i].mutex_request_list.append((pid,req_num))
         else:
             pass
 

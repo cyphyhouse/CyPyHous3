@@ -45,7 +45,7 @@ class AgentCreation(AgentThread):
         self.agent_comm_handler.agent_gvh = self.agent_gvh
         self.agent_gvh.synchronizer = basic_synchronizer.BasicSynchronizer(pid, participants, [2000])
 
-        self.rounds = 3
+        self.rounds = 10
         self.start()
 
     def run(self):
@@ -53,36 +53,39 @@ class AgentCreation(AgentThread):
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
-        requested = False
         a.agent_comm_handler = self.agent_comm_handler
+        req_num = 0
         while not self.stopped():
             time.sleep(0.1)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
 
             time.sleep(0.1)
+            tasks = self.agent_gvh.get('tasks')
+            if all(task.assigned for task in tasks):
+                self.stop()
+                continue
+
 
             try:
-                if not requested:
-                    a.request_mutex()
-                    requested = True
-                else:
 
-                    if self.agent_gvh.mutex_handler.has_mutex(a.mutex_id):
-                        tasks = self.agent_gvh.get('tasks')
-                        for task in tasks:
-                            if not task.assigned:
-                                task.assigned = True
-                                task.assigned_to = self.pid()
-                                print("assigned task", task.id, "to ", self.pid())
-                                break
-                        self.agent_gvh.put('tasks', tasks)
-                        time.sleep(0.4)
-                        self.rounds -= 1
-                        requested = False
-                        a.release_mutex()
-                    else:
-                        continue
+                if not self.agent_gvh.mutex_handler.has_mutex(a.mutex_id):
+                    a.request_mutex(req_num)
+                else:
+                    tasks = self.agent_gvh.get('tasks')
+                    for task in tasks:
+                        if not task.assigned:
+                            task.assigned = True
+                            task.assigned_to = self.pid()
+                            print("assigned task", task.id, "to ", self.pid())
+                            break
+                    self.agent_gvh.put('tasks', tasks)
+                    time.sleep(0.4)
+                    self.rounds -= 1
+                    requested = False
+                    req_num = req_num+1
+                    a.release_mutex()
+
 
                 if self.rounds <= 0:
                     if not self.agent_gvh.is_leader:

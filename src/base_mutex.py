@@ -114,12 +114,13 @@ class BaseMutex(Mutex):
         """
         self.__agent_comm_handler = agent_comm_handler
 
-    def request_mutex(self) -> None:
+    def request_mutex(self, req_num:int) -> None:
         """
         method to request mutex
+        :param req_num: request number
         :return:
         """
-        msg = mutex_request_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
+        msg = mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
                 send(msg, '192.168.1.255', port)
@@ -133,7 +134,7 @@ class BaseMutex(Mutex):
         """
         if self.mutex_holder is None and len(self.mutex_request_list) is not 0:
 
-            agent_id = self.mutex_request_list[0]
+            agent_id = self.mutex_request_list[0][0]
             self.__mutex_holder = agent_id
             self.__mutex_request_list = self.mutex_request_list[1:]
             msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, time.time())
