@@ -80,6 +80,7 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     mutex_id = msg.content
     requester = msg.sender
     if agent_gvh.is_leader:
+        print("got mutex request from ",msg.sender)
         agent_gvh.mutex_handler.add_request(mutex_id, requester)
     else:
         pass
