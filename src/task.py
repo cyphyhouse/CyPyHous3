@@ -34,7 +34,7 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        agent_gvh.port_list = [2000, 2001, 2002]
+        agent_gvh.port_list = [2000]
         if pid == 0:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
@@ -43,7 +43,7 @@ class AgentCreation(AgentThread):
         super(AgentCreation, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
-        self.agent_gvh.synchronizer = basic_synchronizer.BasicSynchronizer(pid, participants, [2000, 2001, 2002])
+        self.agent_gvh.synchronizer = basic_synchronizer.BasicSynchronizer(pid, participants, [2000])
 
         self.rounds = 3
         self.start()
@@ -51,7 +51,7 @@ class AgentCreation(AgentThread):
     def run(self):
         tasks = [Task((0, 1), 1, False, None), Task((0, 0), 2, False, None)]
         self.agent_gvh.create_aw_var('tasks', list, tasks)
-        a = BaseMutex(1, [2000, 2001, 2002])
+        a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
         requested = False
         a.agent_comm_handler = self.agent_comm_handler
@@ -96,6 +96,5 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-b = AgentCreation(1, 3, "", 2001)
-c = AgentCreation(2, 3, "", 2002)
 a = AgentCreation(0, 3, "", 2000)
+
