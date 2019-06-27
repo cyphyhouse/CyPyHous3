@@ -35,7 +35,7 @@ class AgentCreation(AgentThread):
         """
         agent_gvh = Gvh(pid, participants)
         agent_gvh.port_list = [2000]
-        if pid == 2:
+        if pid == 0:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
@@ -100,5 +100,5 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-a = AgentCreation(0, 2, "", 2000)
+a = AgentCreation(0, 1, "", 2000)
 

@@ -21,6 +21,7 @@ class AgentCreation(AgentThread):
         :param participants:
         :param r_port:
         """
+
         agent_gvh = Gvh(pid, participants)
         agent_gvh.port_list = [2000]
         if pid == 0:
@@ -38,7 +39,7 @@ class AgentCreation(AgentThread):
         self.start()
 
     def run(self):
-        testvar = 3
+
         self.agent_gvh.create_aw_var('x',int,3)
         self.agent_gvh.create_ar_var('y',int,4)
         self.agent_gvh.put('y',4,self.pid())
