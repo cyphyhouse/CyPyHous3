@@ -72,11 +72,11 @@ class AgentCreation(AgentThread):
                     a.request_mutex(req_num)
                 else:
                     tasks = self.agent_gvh.get('tasks')
-                    for task in tasks:
-                        if not task.assigned:
-                            task.assigned = True
-                            task.assigned_to = self.pid()
-                            print("assigned task", task.id, "to ", self.pid())
+                    for i in range(len(tasks)):
+                        if not tasks[i].assigned:
+                            tasks[i].assigned = True
+                            tasks[i].assigned_to = self.pid()
+                            print("assigned task", tasks[i].id, "to ", self.pid())
                             self.agent_gvh.put('tasks', tasks)
                             a.release_mutex()
                             break
