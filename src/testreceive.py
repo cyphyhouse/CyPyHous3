@@ -116,9 +116,12 @@ class CommHandler(Thread):
                 msg = pickle.loads(data)
                 print(msg)
             except OSError:
+                print("here")
                 self.stop()
         receiver_socket.close()
 
 
 class CommTimeoutError(Exception):
     pass
+
+a = CommHandler("",2000)
