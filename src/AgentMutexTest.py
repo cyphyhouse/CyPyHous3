@@ -88,7 +88,7 @@ class AgentCreation(AgentThread):
                         print("the value of x is",self.agent_gvh.get('x'),"for agent", self.pid())
                         print("the value of y is", self.agent_gvh.get('y'),"for agent",self.pid())
 
-                if not self.agent_comm_handler.is_alive():
+                if not self.agent_gvh.is_alive:
                     print("requested",requests,"granted",grants,self.pid())
                     self.stop()
 

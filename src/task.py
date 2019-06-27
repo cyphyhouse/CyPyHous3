@@ -35,7 +35,7 @@ class AgentCreation(AgentThread):
         """
         agent_gvh = Gvh(pid, participants)
         agent_gvh.port_list = [2000]
-        if pid == 0:
+        if pid == 1:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
@@ -49,22 +49,21 @@ class AgentCreation(AgentThread):
         self.start()
 
     def run(self):
-        tasks = [Task((0, 1), 1, False, None), Task((0, 0), 2, False, None)]
+        tasks = [Task((0, 1), 1, False, None), Task((0, 0), 2, False, None),
+                 Task((0, 1), 3, False, None), Task((0, 0), 4, False, None),
+                 Task((0, 1), 5, False, None), Task((0, 0), 6, False, None)]
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
         a.agent_comm_handler = self.agent_comm_handler
         req_num = 0
         while not self.stopped():
-            time.sleep(0.1)
+            time.sleep(0.6)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
 
             time.sleep(0.1)
-            tasks = self.agent_gvh.get('tasks')
-            if all(task.assigned for task in tasks):
-                self.stop()
-                continue
+
 
 
             try:
@@ -73,18 +72,22 @@ class AgentCreation(AgentThread):
                     a.request_mutex(req_num)
                 else:
                     tasks = self.agent_gvh.get('tasks')
+
                     for task in tasks:
                         if not task.assigned:
                             task.assigned = True
                             task.assigned_to = self.pid()
                             print("assigned task", task.id, "to ", self.pid())
+                            self.agent_gvh.put('tasks', tasks)
                             break
-                    self.agent_gvh.put('tasks', tasks)
                     time.sleep(0.4)
                     self.rounds -= 1
                     requested = False
                     req_num = req_num+1
                     a.release_mutex()
+                    if all(task.assigned for task in tasks):
+                        self.stop()
+                        continue
 
 
                 if self.rounds <= 0:
@@ -99,5 +102,5 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-a = AgentCreation(0, 1, "", 2000)
+a = AgentCreation(0, 3, "", 2000)
 
