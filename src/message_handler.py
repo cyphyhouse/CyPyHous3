@@ -30,7 +30,7 @@ def mutex_request_create(mutex_id: int, req_num:int,  pid: int, ts: float) -> me
     return message.Message(pid, 1, message_contents, ts)
 
 
-def mutex_grant_create(mutex_id: int, agent_id: int, pid: int, ts: float) -> message.Message:
+def mutex_grant_create(mutex_id: int, agent_id: int, pid: int, mutexnum:int, ts: float) -> message.Message:
     """
     grant mutex message creation
     :param mutex_id: variable to grant mutex on
@@ -39,7 +39,7 @@ def mutex_grant_create(mutex_id: int, agent_id: int, pid: int, ts: float) -> mes
     :param ts: timestamp
     :return: mutex grant message
     """
-    message_contents = (mutex_id, agent_id)
+    message_contents = (mutex_id, agent_id, mutexnum)
     return message.Message(pid, 2, message_contents, ts)
 
 
@@ -93,9 +93,10 @@ def mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     :param agent_gvh: my gvh
     :return: nothing
     """
-    mutex_id, grantee = msg.content
+    mutex_id, grantee,mutexnum = msg.content
     index = agent_gvh.mutex_handler.find_mutex_index(mutex_id)
     agent_gvh.mutex_handler.mutexes[index].mutex_holder = grantee
+    print(mutexnum," granted to",grantee)
     pass
 
 
