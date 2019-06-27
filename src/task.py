@@ -35,7 +35,7 @@ class AgentCreation(AgentThread):
         """
         agent_gvh = Gvh(pid, participants)
         agent_gvh.port_list = [2000]
-        if pid == 1:
+        if pid == 2:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
@@ -65,12 +65,11 @@ class AgentCreation(AgentThread):
             time.sleep(0.1)
 
             try:
-
-                if not self.agent_gvh.mutex_handler.has_mutex(a.mutex_id):
+                test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
+                if not test:
                     a.request_mutex(req_num)
                 else:
                     tasks = self.agent_gvh.get('tasks')
-
                     for task in tasks:
                         if not task.assigned:
                             task.assigned = True
@@ -92,7 +91,7 @@ class AgentCreation(AgentThread):
                     if not self.agent_gvh.is_leader:
                         self.stop()
 
-                if not self.agent_comm_handler.is_alive():
+                if not self.agent_gvh.is_alive:
                     self.stop()
 
             except CommTimeoutError:
@@ -100,5 +99,5 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-a = AgentCreation(0, 3, "", 2000)
+a = AgentCreation(0, 2, "", 2000)
 
