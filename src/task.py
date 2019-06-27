@@ -66,6 +66,7 @@ class AgentCreation(AgentThread):
             time.sleep(0.1)
 
             try:
+
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
                 if not test:
                     a.request_mutex(req_num)
@@ -77,12 +78,11 @@ class AgentCreation(AgentThread):
                             task.assigned_to = self.pid()
                             print("assigned task", task.id, "to ", self.pid())
                             self.agent_gvh.put('tasks', tasks)
+                            a.release_mutex()
                             break
                     time.sleep(0.4)
                     self.rounds -= 1
-                    requested = False
                     req_num = req_num+1
-                    a.release_mutex()
                     if all(task.assigned for task in tasks):
                         self.stop()
                         continue
@@ -100,5 +100,5 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-a = AgentCreation(0, 1, "", 2000)
+a = AgentCreation(0, 3, "", 2000)
 

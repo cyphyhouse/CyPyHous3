@@ -20,7 +20,7 @@ class CommHandler(Thread):
     __retries : retries
     """
 
-    def __init__(self, ip: str, r_port: int, agent_gvh=None, timeout: float = 1000.0, retries: int = RETRY_VAL):
+    def __init__(self, ip: str, r_port: int, agent_gvh=None, timeout: float = 100.0, retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:
@@ -132,6 +132,7 @@ class CommHandler(Thread):
         except OSError:
             print("perhaps already created socket")
 
+
         while not self.stopped():
             try:
                 data, addr = receiver_socket.recvfrom(4096)
@@ -139,6 +140,10 @@ class CommHandler(Thread):
                 self.agent_gvh.add_recv_msg(msg)
             except OSError:
                 self.stop()
+            except socket.timeout:
+                print("timed out:")
+                self.stop()
+
         receiver_socket.close()
 
     def handle_msgs(self) -> None:
