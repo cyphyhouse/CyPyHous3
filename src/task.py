@@ -86,6 +86,7 @@ class AgentCreation(AgentThread):
                     a.request_mutex(req_num)
                     print("requesting")
                 else:
+                    print("have mutex at", time.time())
                     tasks = self.agent_gvh.get('tasks')
                     for i in range(len(tasks)):
                         if not tasks[i].assigned:
