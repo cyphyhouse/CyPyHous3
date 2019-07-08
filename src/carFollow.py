@@ -45,13 +45,13 @@ class BasicFollowApp(AgentThread):
 
 
             if tries == 1:
-                self.agent_gvh.moat.goTo(dest1)
+                self.agent_gvh.moat.goTo(dest1,1)
                 #self.agent_gvh.moat.follow_path([dest1])
                 time.sleep(20)
                 tries = 2
                 continue
             if tries == 2:
-                self.agent_gvh.moat.goTo(dest2)
+                self.agent_gvh.moat.goTo(dest2,1)
 
                 #self.agent_gvh.moat.follow_path([dest2])
                 tries = 3
