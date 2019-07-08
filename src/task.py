@@ -67,13 +67,15 @@ class AgentCreation(AgentThread):
             time.sleep(0.6)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
+            mytask = None
 
             time.sleep(0.1)
-            if not self.agent_gvh.moat.reached:
-                print("doing this like an idiot")
-                continue
+
 
             try:
+                if mytask is not None and not self.agent_gvh.moat.reached:
+                    continue
+
 
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
                 if not test:
@@ -87,6 +89,7 @@ class AgentCreation(AgentThread):
                             tasks[i].assigned = True
                             tasks[i].assigned_to = self.pid()
                             print("assigned task", tasks[i].id, "to ", self.pid())
+                            mytask = tasks[i]
                             self.agent_gvh.put('tasks', tasks)
                             self.agent_gvh.moat.goTo(tasks[i].location)
                             a.release_mutex()
