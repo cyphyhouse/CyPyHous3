@@ -24,9 +24,9 @@ class BasicFollowApp(AgentThread):
 
 
         dest1 = Pose()
-        dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
+        dest1.position.x, dest1.position.y, dest1.position.z = 2., 1., 0.
         dest2 = Pose()
-        dest2.position.x, dest2.position.y, dest2.position.z = 1., 1., 0.
+        dest2.position.x, dest2.position.y, dest2.position.z = -1., -1., 0.
 
         #dest1 = vec(0.0,1.0,0.0)
         #dest2 = vec(1.0,1.0,0.0)
@@ -50,7 +50,7 @@ class BasicFollowApp(AgentThread):
                                       self.agent_gvh.moat.position.position.y], [dest1.position.x, dest1.position.y]).Planning()
                 self.agent_gvh.moat.follow_path(path1)
                 #self.agent_gvh.moat.follow_path([dest1])
-                time.sleep(20)
+                time.sleep(10)
                 tries = 2
                 continue
             if tries == 2:
