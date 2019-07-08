@@ -52,6 +52,6 @@ class BasicFollowApp(AgentThread):
                 self.stop()
                 continue
 
-carFollow(0,1)
+BasicFollowApp(0,1)
 
 
