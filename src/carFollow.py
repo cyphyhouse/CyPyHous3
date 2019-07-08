@@ -3,6 +3,9 @@ from gvh import Gvh
 import time
 from rrt_star import vec
 import motionAutomaton
+import rospy
+from geometry_msgs.msg import PoseStamped, Pose
+from std_msgs.msg import String
 
 class BasicFollowApp(AgentThread):
 
@@ -19,13 +22,13 @@ class BasicFollowApp(AgentThread):
 
         tries = 1
 
-        #dest1 = Pose()
-        #dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
-        #land = Pose()
-        #land.position.x, land.position.y, land.position.z = 0., 0., 0.
+        dest1 = Pose()
+        dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
+        dest2 = Pose()
+        dest2.position.x, land.position.y, land.position.z = 1., 1., 0.
 
-        dest1 = vec(0.0,1.0,0.0)
-        dest2 = vec(1.0,1.0,0.0)
+        #dest1 = vec(0.0,1.0,0.0)
+        #dest2 = vec(1.0,1.0,0.0)
         while not self.stopped():
 
 
@@ -42,12 +45,15 @@ class BasicFollowApp(AgentThread):
 
 
             if tries == 1:
-                self.agent_gvh.moat.follow_path([dest1])
+                self.agent_gvh.moat.goTo(dest1)
+                #self.agent_gvh.moat.follow_path([dest1])
                 time.sleep(20)
                 tries = 2
                 continue
             if tries == 2:
-                self.agent_gvh.moat.follow_path([dest2])
+                self.agent_gvh.moat.goTo(dest2)
+
+                #self.agent_gvh.moat.follow_path([dest2])
                 tries = 3
                 self.stop()
                 continue
