@@ -16,14 +16,14 @@ class MotionAutomaton(threading.Thread):
 
     """
 
-    def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter'):
+    def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size = 1):
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
         self.__position = Pose()
         self.__reached = False
 
         rospy.init_node('quad_wp_node', anonymous=True)
-        self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=1)
+        self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=queue_size)
         self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
         self.__sub_reached = rospy.Subscriber('/Reached', String, self._getReached, queue_size=1)

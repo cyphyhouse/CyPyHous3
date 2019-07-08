@@ -2,11 +2,14 @@ from agentThread import AgentThread
 from gvh import Gvh
 import time
 from rrt_star import vec
+import motionAutomaton
 
 class BasicFollowApp(AgentThread):
 
     def __init__(self, pid: int, num_bots: int):
-        super(BasicFollowApp, self).__init__(Gvh(pid, num_bots))
+        agent_gvh = Gvh(pid, num_bots)
+        agent_gvh.moat = motionAutomaton.MotionAutomaton(pid, 'f1car',10 )
+        super(BasicFollowApp, self).__init__(agent_gvh,None)
         self.start()
 
     def run(self):
@@ -24,6 +27,7 @@ class BasicFollowApp(AgentThread):
         dest1 = vec(0.0,1.0,0.0)
         dest2 = vec(0.0,1.0,1.0)
         while not self.stopped():
+
             time.sleep(2.0)
 
 
@@ -48,5 +52,6 @@ class BasicFollowApp(AgentThread):
                 self.stop()
                 continue
 
+carFollow(0,1)
 
 
