@@ -97,6 +97,7 @@ class AgentCreation(AgentThread):
                             tasks[i].assigned_to = self.pid()
                             print("assigned task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
+                            print("just assigned mytask",mytask)
                             self.agent_gvh.put('tasks', tasks)
                             self.agent_gvh.moat.goTo(tasks[i].location)
                             a.release_mutex()
