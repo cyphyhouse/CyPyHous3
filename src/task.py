@@ -56,7 +56,7 @@ class AgentCreation(AgentThread):
         b = Pose()
         b.position.x, b.position.y , b.position.z = 1.0, 1.0, 1.0
 
-        tasks = [Task(a, 1, False, None)]
+        tasks = [Task(b, 1, False, None)]
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
@@ -87,10 +87,11 @@ class AgentCreation(AgentThread):
                             tasks[i].assigned_to = self.pid()
                             print("assigned task", tasks[i].id, "to ", self.pid())
                             self.agent_gvh.put('tasks', tasks)
+                            self.agent_gvh.moat.goTo(tasks[i].location)
                             a.release_mutex()
                             break
 
-                    self.agent_gvh.moat.goTo(tasks[i].location)
+
 
                     time.sleep(0.4)
                     self.rounds -= 1
