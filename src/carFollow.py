@@ -25,7 +25,7 @@ class BasicFollowApp(AgentThread):
         dest1 = Pose()
         dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
         dest2 = Pose()
-        dest2.position.x, land.position.y, land.position.z = 1., 1., 0.
+        dest2.position.x, dest2.position.y, dest2.position.z = 1., 1., 0.
 
         #dest1 = vec(0.0,1.0,0.0)
         #dest2 = vec(1.0,1.0,0.0)
