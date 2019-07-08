@@ -221,30 +221,6 @@ class RRT(object):
 
         return True  # safe
 
-#This function should be in the motion automaton - unfinished
-def follow_path(self,path) -> None:
-    """
-    Follow paths in CyPhyHouse by sending goTo message to vehicle
-    """
-    # Initialize list of waypoints
-    wp_list = []
-    for point in path:
-        point = point.topoint()
-        wp = Pose()
-        wp.position.x = point[0]
-        wp.position.y = point[1]
-        wp.position.z = point[2]
-        wp_list.append(wp)
-    for wp in wp_list[:-1]:
-        self.__motionautomaton.goTo(wp, 0)
-    self.__motionautomaton.goTo(wp_list[-1], 1)
-
-    if path is None:
-        print("Cannot find path...")
-    else:
-        print("Found path!")
-        print(path)
-
 class vec(object):
     def __init__(self, x, y , z):
         self.x = x

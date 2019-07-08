@@ -131,6 +131,23 @@ class MotionAutomaton(threading.Thread):
         self.waypoint_count += 1
         self.pub.publish(pose)
 
+    def follow_path(self, path) -> None:
+        """
+        Follow paths in CyPhyHouse by sending goTo message to vehicle
+        """
+        # Initialize list of waypoints
+        wp_list = []
+        for point in path:
+            point = point.topoint()
+            wp = Pose()
+            wp.position.x = point[0]
+            wp.position.y = point[1]
+            wp.position.z = point[2]
+            wp_list.append(wp)
+        for wp in wp_list[:-1]:
+            self.goTo(wp, 0)
+        self.goTo(wp_list[-1], 1)
+
     def run(self):
         """
         calls the spin function to check for new vicon data
