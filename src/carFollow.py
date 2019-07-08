@@ -27,6 +27,8 @@ class BasicFollowApp(AgentThread):
         dest1.position.x, dest1.position.y, dest1.position.z = 2., 1., 0.
         dest2 = Pose()
         dest2.position.x, dest2.position.y, dest2.position.z = -1., -1., 0.
+        dest3 = Pose()
+        dest3.position.x, dest3.position.y, dest3.position.z = 1., 2., 0.
 
         #dest1 = vec(0.0,1.0,0.0)
         #dest2 = vec(1.0,1.0,0.0)
@@ -50,7 +52,7 @@ class BasicFollowApp(AgentThread):
                                       self.agent_gvh.moat.position.position.y], [dest1.position.x, dest1.position.y]).Planning()
                 self.agent_gvh.moat.follow_path(path1)
                 #self.agent_gvh.moat.follow_path([dest1])
-                time.sleep(10)
+                time.sleep(5)
                 tries = 2
                 continue
             if tries == 2:
@@ -58,7 +60,18 @@ class BasicFollowApp(AgentThread):
                                       self.agent_gvh.moat.position.position.y], [dest2.position.x, dest2.position.y]).Planning()
                 self.agent_gvh.moat.follow_path(path2)
                 #self.agent_gvh.moat.follow_path([dest2])
+
                 tries = 3
+                time.sleep(5)
+                continue
+            if tries == 3:
+                path3 = rrt_star.RRT([self.agent_gvh.moat.position.position.x,
+                                      self.agent_gvh.moat.position.position.y],
+                                     [dest3.position.x, dest3.position.y]).Planning()
+                self.agent_gvh.moat.follow_path(path3)
+                # self.agent_gvh.moat.follow_path([dest2])
+                tries = 4
+                time.sleep(5)
                 self.stop()
                 continue
 
