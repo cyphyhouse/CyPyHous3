@@ -28,7 +28,6 @@ class BasicFollowApp(AgentThread):
         dest2 = vec(1.0,1.0,0.0)
         while not self.stopped():
 
-            time.sleep(200.0)
 
 
 
@@ -44,6 +43,7 @@ class BasicFollowApp(AgentThread):
 
             if tries == 1:
                 self.agent_gvh.moat.follow_path([dest1])
+                time.sleep(20)
                 tries = 2
                 continue
             if tries == 2:
