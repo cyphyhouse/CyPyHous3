@@ -54,7 +54,7 @@ class AgentCreation(AgentThread):
 
     def run(self):
         b = Pose()
-        b.x, b.y , b.z = 1.0, 1.0, 1.0
+        b.position.x, b.position.y , b.position.z = 1.0, 1.0, 1.0
 
         tasks = [Task(a, 1, False, None)]
         self.agent_gvh.create_aw_var('tasks', list, tasks)
