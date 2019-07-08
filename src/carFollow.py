@@ -58,6 +58,6 @@ class BasicFollowApp(AgentThread):
                 self.stop()
                 continue
 
-BasicFollowApp(0,1)
+BasicFollowApp(1,1)
 
 
