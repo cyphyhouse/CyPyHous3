@@ -70,6 +70,7 @@ class AgentCreation(AgentThread):
 
             time.sleep(0.1)
             if not self.agent_gvh.moat.reached:
+                print("doing this like an idiot")
                 continue
 
             try:
