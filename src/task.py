@@ -81,6 +81,7 @@ class AgentCreation(AgentThread):
 
 
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
+                print("has mutex is",test)
                 if not test:
                     print(req_num)
                     a.request_mutex(req_num)
