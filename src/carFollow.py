@@ -2,7 +2,7 @@ from agentThread import AgentThread
 from geometry_msgs.msg import Pose
 from gvh import Gvh
 import time
-
+from rrt_star import vec
 
 class BasicFollowApp(AgentThread):
 
@@ -17,10 +17,13 @@ class BasicFollowApp(AgentThread):
 
         tries = 1
 
-        dest1 = Pose()
-        dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
-        land = Pose()
-        land.position.x, land.position.y, land.position.z = 0., 0., 0.
+        #dest1 = Pose()
+        #dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
+        #land = Pose()
+        #land.position.x, land.position.y, land.position.z = 0., 0., 0.
+
+        dest1 = vec(0.0,1.0,0.0)
+        dest2 = vec(0.0,1.0,1.0)
         while not self.stopped():
             time.sleep(1.0)
 
@@ -41,7 +44,7 @@ class BasicFollowApp(AgentThread):
                 tries = 2
                 continue
             if tries == 2:
-                self.agent_gvh.moat.follow_path(land)
+                self.agent_gvh.moat.follow_path([dest2])
                 tries = 3
                 self.stop()
                 continue
