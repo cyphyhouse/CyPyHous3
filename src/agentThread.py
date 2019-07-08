@@ -79,8 +79,9 @@ class AgentThread(ABC, Thread):
         if self.agent_gvh.mutex_handler is not None:
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
-        if not self.agent_comm_handler.stopped():
-            self.agent_comm_handler.stop()
+        if self.agent_comm_handler is not None:
+            if not self.agent_comm_handler.stopped():
+                self.agent_comm_handler.stop()
         self.__stop_event.set()
         print("stopped", self.pid())
 
