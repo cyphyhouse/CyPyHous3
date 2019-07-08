@@ -25,10 +25,10 @@ class BasicFollowApp(AgentThread):
         #land.position.x, land.position.y, land.position.z = 0., 0., 0.
 
         dest1 = vec(0.0,1.0,0.0)
-        dest2 = vec(0.0,1.0,1.0)
+        dest2 = vec(1.0,1.0,0.0)
         while not self.stopped():
 
-            time.sleep(2.0)
+            time.sleep(200.0)
 
 
 
