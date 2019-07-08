@@ -73,6 +73,7 @@ class AgentCreation(AgentThread):
 
 
             try:
+                print("mytask is", mytask)
                 if mytask is not None and not self.agent_gvh.moat.reached:
                     print("reached what i am going to", self.agent_gvh.moat.reached)
                     continue
