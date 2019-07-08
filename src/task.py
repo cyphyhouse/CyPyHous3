@@ -104,8 +104,14 @@ class AgentCreation(AgentThread):
                     self.rounds -= 1
                     req_num = req_num+1
                     if all(task.assigned for task in tasks):
-                        self.stop()
-                        continue
+                        if mytask is None:
+                            self.stop()
+                            continue
+                        elif mytask is not None and self.agent_gvh.moat.reached:
+                            self.stop()
+                            continue
+                        else:
+                            continue
 
                 if self.rounds <= 0:
                     if not self.agent_gvh.is_leader:
