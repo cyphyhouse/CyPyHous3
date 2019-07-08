@@ -46,16 +46,16 @@ class BasicFollowApp(AgentThread):
 
 
             if tries == 1:
-                path1 = rrt_star.RRT([self.agent_gvh.moat.position.x,
-                                      self.agent_gvh.moat.position.y], [dest1.position.x, dest1.position.y]).Planning()
+                path1 = rrt_star.RRT([self.agent_gvh.moat.position.position.x,
+                                      self.agent_gvh.moat.position.position.y], [dest1.position.x, dest1.position.y]).Planning()
                 self.agent_gvh.moat.follow_path(path1)
                 #self.agent_gvh.moat.follow_path([dest1])
                 time.sleep(20)
                 tries = 2
                 continue
             if tries == 2:
-                path2 = rrt_star.RRT([self.agent_gvh.moat.position.x,
-                                      self.agent_gvh.moat.position.y], [dest2.position.x, dest2.position.y]).Planning()
+                path2 = rrt_star.RRT([self.agent_gvh.moat.position.position.x,
+                                      self.agent_gvh.moat.position.position.y], [dest2.position.x, dest2.position.y]).Planning()
                 self.agent_gvh.moat.follow_path(path2)
                 #self.agent_gvh.moat.follow_path([dest2])
                 tries = 3
