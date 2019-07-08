@@ -1,5 +1,4 @@
 from agentThread import AgentThread
-from geometry_msgs.msg import Pose
 from gvh import Gvh
 import time
 from rrt_star import vec
