@@ -62,12 +62,12 @@ class AgentCreation(AgentThread):
         self.agent_gvh.mutex_handler.add_mutex(a)
         a.agent_comm_handler = self.agent_comm_handler
         req_num = 0
+        mytask = None
 
         while not self.stopped():
             time.sleep(0.6)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
-            mytask = None
 
             time.sleep(0.1)
 
