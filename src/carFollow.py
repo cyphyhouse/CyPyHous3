@@ -1,7 +1,7 @@
 from agentThread import AgentThread
 from gvh import Gvh
 import time
-from rrt_star import vec
+import rrt_star
 import motionAutomaton
 import rospy
 from geometry_msgs.msg import PoseStamped, Pose
@@ -21,6 +21,7 @@ class BasicFollowApp(AgentThread):
         # pos land = new pos(0.,0.,0.)
 
         tries = 1
+
 
         dest1 = Pose()
         dest1.position.x, dest1.position.y, dest1.position.z = 0., 1., 0.
@@ -45,14 +46,17 @@ class BasicFollowApp(AgentThread):
 
 
             if tries == 1:
-                self.agent_gvh.moat.goTo(dest1,1)
+                path1 = rrt_star.RRT([self.agent_gvh.moat.position.x,
+                                      self.agent_gvh.moat.position.y], [dest1.position.x, dest1.position.y]).Planning()
+                self.agent_gvh.moat.follow_path(path1)
                 #self.agent_gvh.moat.follow_path([dest1])
                 time.sleep(20)
                 tries = 2
                 continue
             if tries == 2:
-                self.agent_gvh.moat.goTo(dest2,1)
-
+                path2 = rrt_star.RRT([self.agent_gvh.moat.position.x,
+                                      self.agent_gvh.moat.position.y], [dest2.position.x, dest2.position.y]).Planning()
+                self.agent_gvh.moat.follow_path(path2)
                 #self.agent_gvh.moat.follow_path([dest2])
                 tries = 3
                 self.stop()
