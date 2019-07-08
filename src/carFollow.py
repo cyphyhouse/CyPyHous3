@@ -24,7 +24,7 @@ class BasicFollowApp(AgentThread):
         dest1 = vec(0.0,1.0,0.0)
         dest2 = vec(0.0,1.0,1.0)
         while not self.stopped():
-            time.sleep(1.0)
+            time.sleep(2.0)
 
 
 
