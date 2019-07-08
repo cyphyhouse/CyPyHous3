@@ -84,6 +84,10 @@ class AgentThread(ABC, Thread):
         self.__stop_event.set()
         print("stopped", self.pid())
 
+    def initialize_vars(self, varlist):
+        pass
+
+
     def stopped(self) -> bool:
         """
         set the stop flag

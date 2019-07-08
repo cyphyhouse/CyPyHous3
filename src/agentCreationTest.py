@@ -22,7 +22,8 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        agent_comm_handler = CommHandler(receiver_ip, r_port)
+        agent_comm_handler = CommHandler(receiver_ip, r_port, agent_gvh, 1 )
+        #agent_comm_handler.agent_gvh = agent_gvh
         super(AgentCreation, self).__init__(agent_gvh, agent_comm_handler)
         self.start()
 

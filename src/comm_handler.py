@@ -134,6 +134,7 @@ class CommHandler(Thread):
 
 
         while not self.stopped():
+
             try:
                 data, addr = receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
@@ -141,7 +142,7 @@ class CommHandler(Thread):
             except OSError:
                 self.stop()
             except socket.timeout:
-                print("timed out:")
+                print("timed out")
                 self.stop()
 
         receiver_socket.close()
