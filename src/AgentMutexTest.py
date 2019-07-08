@@ -1,11 +1,11 @@
 import time
 
-from agentThread import AgentThread,send
+import basic_synchronizer
+from agentThread import AgentThread
 from base_mutex import BaseMutex
 from comm_handler import CommHandler, CommTimeoutError
 from gvh import Gvh
 from mutex_handler import BaseMutexHandler
-import basic_synchronizer
 
 
 class AgentCreation(AgentThread):
@@ -40,11 +40,11 @@ class AgentCreation(AgentThread):
 
     def run(self):
 
-        self.agent_gvh.create_aw_var('x',int,3)
-        self.agent_gvh.create_ar_var('y',int,4)
-        self.agent_gvh.put('y',4,self.pid())
+        self.agent_gvh.create_aw_var('x', int, 3)
+        self.agent_gvh.create_ar_var('y', int, 4)
+        self.agent_gvh.put('y', 4, self.pid())
 
-        requests, grants = 0,0
+        requests, grants = 0, 0
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
         requested = False
@@ -63,7 +63,7 @@ class AgentCreation(AgentThread):
                 if not requested:
                     a.request_mutex()
                     requested = True
-                    requests+= 1
+                    requests += 1
                 else:
                     if self.agent_gvh.mutex_handler.has_mutex(a.mutex_id):
 
@@ -77,20 +77,20 @@ class AgentCreation(AgentThread):
                         grants += 1
                         time.sleep(0.4)
                         a.release_mutex()
-                        self.rounds-= 1
+                        self.rounds -= 1
                         requested = False
 
-                if self.rounds <= 0 :
-                    print("requested",requests,"granted",grants,self.pid())
-                    if not self.agent_gvh.is_leader:
+                if self.rounds <= 0:
 
+                    print("requested", requests, "granted", grants, self.pid())
+
+                    if not self.agent_gvh.is_leader:
                         self.stop()
-                        print("the value of test variable is",testvar,"for agent",self.pid())
-                        print("the value of x is",self.agent_gvh.get('x'),"for agent", self.pid())
-                        print("the value of y is", self.agent_gvh.get('y'),"for agent",self.pid())
+                        print("the value of x is", self.agent_gvh.get('x'), "for agent", self.pid())
+                        print("the value of y is", self.agent_gvh.get('y'), "for agent", self.pid())
 
                 if not self.agent_gvh.is_alive:
-                    print("requested",requests,"granted",grants,self.pid())
+                    print("requested", requests, "granted", grants, self.pid())
                     self.stop()
 
             except CommTimeoutError:
@@ -100,4 +100,3 @@ class AgentCreation(AgentThread):
 
 
 a = AgentCreation(0, 3, "", 2000)
-

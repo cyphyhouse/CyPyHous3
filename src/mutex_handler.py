@@ -37,7 +37,7 @@ class BaseMutexHandler(Thread):
         self.mutexnums.append(0)
 
     def add_request(self, index: int, pid: int, req_num:int):
-        #print("adding request from",pid)
+        print("adding request from",pid)
         i = self.find_mutex_index(index)
         if i is not None:
             if (pid, req_num) not in self.mutexes[i].mutex_request_list:
@@ -57,7 +57,7 @@ class BaseMutexHandler(Thread):
                 #print(self.mutexes[i].mutex_request_list)
                 if self.mutexes[i].mutex_holder is None:
                     #print("mutex available, granting")
-                    print(self.mutexnums[i])
+                    #print(self.mutexnums[i])
                     self.mutexnums[i] += 1
                     self.mutexes[i].grant_mutex(mutexnums[i])
 
@@ -66,6 +66,7 @@ class BaseMutexHandler(Thread):
         if i is not None:
             if self.mutexes[i].mutex_holder == self.pid:
                 return True
+
         return False
 
 

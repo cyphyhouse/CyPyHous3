@@ -6,7 +6,10 @@ from base_mutex import BaseMutex
 from comm_handler import CommHandler, CommTimeoutError
 from gvh import Gvh
 from mutex_handler import BaseMutexHandler
-
+import motionAutomaton
+import rospy
+from geometry_msgs.msg import PoseStamped, Pose
+from std_msgs.msg import String
 
 class Task(object):
 
@@ -39,19 +42,21 @@ class AgentCreation(AgentThread):
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
-        agent_comm_handler = CommHandler(receiver_ip, r_port)
+        agent_comm_handler = CommHandler(receiver_ip,r_port,agent_gvh,10)
         super(AgentCreation, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
         self.agent_gvh.synchronizer = basic_synchronizer.BasicSynchronizer(pid, participants, [2000])
+        self.agent_gvh.moat = motionAutomaton.MotionAutomaton(self.agent_gvh.pid, self.agent_gvh.bot_name)
 
         self.rounds = 10
         self.start()
 
     def run(self):
-        tasks = [Task((0, 1), 1, False, None), Task((0, 0), 2, False, None),
-                 Task((0, 1), 3, False, None), Task((0, 0), 4, False, None),
-                 Task((0, 1), 5, False, None), Task((0, 0), 6, False, None)]
+        b = Pose()
+        b.x, b.y , b.z = 1.0, 1.0, 1.0
+
+        tasks = [Task(a, 1, False, None)]
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
@@ -64,12 +69,16 @@ class AgentCreation(AgentThread):
             self.agent_comm_handler.handle_msgs()
 
             time.sleep(0.1)
+            if not self.agent_gvh.moat.reached:
+                continue
 
             try:
 
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
                 if not test:
+                    print(req_num)
                     a.request_mutex(req_num)
+                    print("requesting")
                 else:
                     tasks = self.agent_gvh.get('tasks')
                     for i in range(len(tasks)):
@@ -80,13 +89,15 @@ class AgentCreation(AgentThread):
                             self.agent_gvh.put('tasks', tasks)
                             a.release_mutex()
                             break
+
+                    self.agent_gvh.moat.goTo(tasks[i].location)
+
                     time.sleep(0.4)
                     self.rounds -= 1
                     req_num = req_num+1
                     if all(task.assigned for task in tasks):
                         self.stop()
                         continue
-
 
                 if self.rounds <= 0:
                     if not self.agent_gvh.is_leader:
@@ -100,5 +111,5 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-a = AgentCreation(0, 3, "", 2000)
+a = AgentCreation(0, 1, "", 2000)
 

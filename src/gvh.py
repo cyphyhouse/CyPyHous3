@@ -2,7 +2,6 @@ import pickle
 import socket
 import time
 from typing import Union
-
 from dsm import dsmvar
 from message import Message
 from mutex_handler import BaseMutexHandler
@@ -27,7 +26,7 @@ class Gvh(object):
 
     """
 
-    def __init__(self, pid: int, participants: int, mutex_handler=None):
+    def __init__(self, pid: int, participants: int, bot_name: str = 'cyphyhousecopter', mutex_handler=None):
         """
         init method for global variable holder object
         :param pid: integer pid
@@ -38,6 +37,7 @@ class Gvh(object):
         self.msg_seq_num = 0
         self.__pid = pid
         self.__participants = participants
+        self.__bot_name = bot_name
         self.__msg_list = []
         self.__recv_msg_list = []
         self.__port_list = []
@@ -48,6 +48,38 @@ class Gvh(object):
         self.__dsm = None
         self.__synchronizer = None
         self.__mutex_handler = mutex_handler
+        self.__moat = None
+
+    def start_moat(self):
+        try:
+            self.moat.start()
+        except:
+            print("error starting motion automaton, maybe you don't have ros")
+
+    @property
+    def bot_name(self):
+        return self.__bot_name
+
+    @bot_name.setter
+    def bot_name(self, bot_name):
+        self.__bot_name = bot_name
+
+    @property
+    def moat(self) :
+        """
+        getter method for motionAutomaton
+        :return:
+        """
+        return self.__moat
+
+    @moat.setter
+    def moat(self, moat):  # -> NoReturn:
+        """
+        setter method for moAT
+        :param moat: motionautomaton
+        :return:
+        """
+        self.__moat = moat
 
     @property
     def dsm(self) -> list:

@@ -124,6 +124,7 @@ class BaseMutex(Mutex):
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
                 send(msg, '192.168.1.255', port)
+                send(msg, "", port)
         else:
             send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
 
@@ -140,6 +141,7 @@ class BaseMutex(Mutex):
             if self.ip_port_list is not []:
                 for port in self.ip_port_list:
                     send(msg, '192.168.1.255', port)
+                    send(msg, "", port)
             else:
                 send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
         else:
@@ -150,5 +152,6 @@ class BaseMutex(Mutex):
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
                 send(msg, '192.168.1.255', port)
+                send(msg, "", port)
         else:
             send(msg, '192.168.1.255', self.agent_comm_handler.r_port)

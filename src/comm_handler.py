@@ -141,7 +141,7 @@ class CommHandler(Thread):
             except OSError:
                 self.stop()
             except socket.timeout:
-                print("timed out:")
+                print("timed out")
                 self.stop()
 
         receiver_socket.close()
