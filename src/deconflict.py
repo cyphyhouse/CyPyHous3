@@ -81,11 +81,31 @@ def dist3D(l1:seg, l2:seg, tol = 0.000001):
     dP = plus(w, minus(vec(sc * u.x, sc * u.y, sc* u.z), vec(tc * v.x, tc * v.y, tc * v.z)))
     return norm(dP)
 
-a = vec (1,0,0)
-b = vec(0,0,0)
+
+def isclose(l1,l2,tolerance):
+    if dist3D(l1,l2) < tolerance:
+        return True
+    return False
+
+def path_is_close(l1,l2, tolerance):
+    for path_seg_1 in l1:
+        for path_seg_2 in l2:
+            if isclose(path_seg_1,path_seg_2,tolerance):
+                return True
+    return False
+
+def clear_path(paths, proposed_path):
+    for path in paths:
+        if path_is_close(path, proposed_path):
+            return False
+    return True
+
+
+a = vec (0,0,1)
+b = vec(1,1,1)
 c = seg(a,b)
-d = vec(0 ,1,0)
-e = vec(1,1, 0)
+d = vec(0 ,4,1)
+e = vec(2,2, 1)
 f = seg(d,e)
 print(dist3D(c,f))
 
