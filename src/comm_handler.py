@@ -136,11 +136,9 @@ class CommHandler(Thread):
         while not self.stopped():
 
             try:
-                print("running")
                 data, addr = receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
-                print("received")
             except OSError:
                 self.stop()
             except socket.timeout:
