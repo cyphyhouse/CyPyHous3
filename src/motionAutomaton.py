@@ -1,5 +1,6 @@
 import threading
 import time
+
 import rospy
 from geometry_msgs.msg import PoseStamped, Pose
 from std_msgs.msg import String
@@ -94,7 +95,7 @@ class MotionAutomaton(threading.Thread):
         """
         self.position = data.pose
 
-    def _getReached(self, data: String): # -> NoReturn:
+    def _getReached(self, data: String):  # -> NoReturn:
         """
         This is a callback function that updates the internal Reached state
         :param data: String message
