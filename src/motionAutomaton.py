@@ -95,7 +95,7 @@ class MotionAutomaton(threading.Thread):
         """
         self.position = data.pose
 
-    def _getReached(self, data: String):  # -> NoReturn:
+    def _getReached(self, data: str):  # -> NoReturn:
         """
         This is a callback function that updates the internal Reached state
         :param data: String message
