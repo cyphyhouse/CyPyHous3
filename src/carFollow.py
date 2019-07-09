@@ -11,7 +11,7 @@ class BasicFollowApp(AgentThread):
 
     def __init__(self, pid: int, num_bots: int):
         agent_gvh = Gvh(pid, num_bots)
-        agent_gvh.moat = motionAutomaton.MotionAutomaton(pid, 'f1car', 10)
+        agent_gvh.moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'hotdec_car', 10)
         super(BasicFollowApp, self).__init__(agent_gvh, None)
         self.start()
 
