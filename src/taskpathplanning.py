@@ -40,7 +40,7 @@ class AgentCreation(AgentThread):
         moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'hotdec_car', 10)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
-        if pid == 0:
+        if pid == 1:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
