@@ -49,7 +49,6 @@ class AgentCreation(AgentThread):
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
         self.agent_gvh.synchronizer = basic_synchronizer.BasicSynchronizer(pid, participants, [2000])
-        self.agent_gvh.moat = motionAutomaton.MotionAutomaton(self.agent_gvh.pid, self.agent_gvh.bot_name)
 
         self.rounds = 10
         self.start()
