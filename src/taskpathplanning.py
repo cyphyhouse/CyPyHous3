@@ -104,7 +104,7 @@ class AgentCreation(AgentThread):
                             # print("just assigned mytask", mytask)
                             self.agent_gvh.put('tasks', tasks)
                             #self.agent_gvh.moat.follow_path(testroute)
-                            #self.agent_gvh.moat.goTo(tasks[i].location)
+                            self.agent_gvh.moat.goTo(tasks[i].location)
                             a.release_mutex()
                             break
 
