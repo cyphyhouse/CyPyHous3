@@ -37,8 +37,9 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        agent_gvh.moat = motionAutomaton.MotionAutomaton(pid, 'f1car',10 )
-        agent_gvh.moat.planner = rrt_star.RRT
+        moat = motionAutomaton.MotionAutomaton(pid, 'f1car',10 )
+        moat.planner = rrt_star.RRT
+        agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
         if pid == 0:
             agent_gvh.is_leader = True
