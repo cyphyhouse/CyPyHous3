@@ -37,7 +37,7 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'f1car',10 )
+        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'f1car', 10)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
         if pid == 0:
@@ -62,7 +62,6 @@ class AgentCreation(AgentThread):
         route = []
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         self.agent_gvh.create_ar_var('route', list, route)
-
 
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
@@ -105,8 +104,8 @@ class AgentCreation(AgentThread):
                             print(testroute)
                             # print("just assigned mytask", mytask)
                             self.agent_gvh.put('tasks', tasks)
-                            #self.agent_gvh.moat.follow_path(testroute)
-                            self.agent_gvh.moat.goTo(tasks[i].location)
+                            self.agent_gvh.moat.follow_path(testroute)
+                            # self.agent_gvh.moat.goTo(tasks[i].location)
                             a.release_mutex()
                             break
 
