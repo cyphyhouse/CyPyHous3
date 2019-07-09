@@ -55,6 +55,7 @@ class AgentCreation(AgentThread):
         self.start()
 
     def run(self):
+        print(rrt_star.RRT)
         b = Pose()
         b.position.x, b.position.y, b.position.z = 1.0, 1.0, 0.0
         c = Pose()
