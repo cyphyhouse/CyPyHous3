@@ -123,6 +123,11 @@ class Gvh(object):
         if self.__dsm is None:
             self.__dsm = []
         self.__dsm.append(a)
+        msg = dsm_update_create(self.pid, a, a.owner, time.time())
+        for port in self.__port_list:
+            send(msg, "", port)
+            send(msg, "192.168.1.255", port)
+
 
     def get(self, varname: str, pid: int = -1) -> Union[int, bool, float, list, object, tuple]:
         """

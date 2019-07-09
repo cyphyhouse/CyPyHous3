@@ -75,13 +75,15 @@ class dsmvar(object):
         self.__value = value
 
     def get_val(self, pid = -1):
-        if type(self.value) is list:
+        #if type(self.value) is list:
+        if self.owner is not 0:
             return self.__value[pid]
         else:
             return self.value
 
     def set_val(self,value, pid = -1):
-        if type(self.value) is list:
+        #if type(self.value) is list:
+        if self.owner is not 0:
             self.__value[pid]=value
         else:
             self.value = value

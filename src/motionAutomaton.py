@@ -16,11 +16,13 @@ class MotionAutomaton(threading.Thread):
 
     """
 
-    def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size = 1):
+    def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1):
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
         self.__position = Pose()
         self.__reached = False
+        self.__path = []
+        self.__planner = None
 
         rospy.init_node('quad_wp_node', anonymous=True)
         self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=queue_size)
@@ -28,6 +30,25 @@ class MotionAutomaton(threading.Thread):
                                             queue_size=1)
         self.__sub_reached = rospy.Subscriber('/Reached', String, self._getReached, queue_size=1)
         time.sleep(1)
+
+    @property
+    def planner(self):
+        return self.__planner
+
+    @planner.setter
+    def planner(self, planner):
+        self.__planner = planner
+
+    @property
+    def path(self):
+        if self.__path is not []:
+            return self.__path
+        else:
+            return self.position
+
+    @path.setter
+    def path(self, path):
+        self.__path = path
 
     @property
     def pub(self):
@@ -148,6 +169,15 @@ class MotionAutomaton(threading.Thread):
         for wp in wp_list[:-1]:
             self.goTo(wp, 0)
         self.goTo(wp_list[-1], 1)
+
+    def find_path(self, goal_point):
+        if self.planner is not None:
+            path = self.planner([self.position.position.x,
+                                 self.position.position.y], [goal_point.position.x, goal_point.position.y]).Planning()
+            return path
+
+        else:
+            return [[goal_point.position.x, goal_point.position.y]]
 
     def run(self):
         """

@@ -2,6 +2,7 @@ import time
 
 import basic_synchronizer
 import motionAutomaton
+import rrt_star
 from agentThread import AgentThread
 from base_mutex import BaseMutex
 from comm_handler import CommHandler, CommTimeoutError
@@ -36,6 +37,7 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
+        agent_gvh.moat.planner = rrt_star.RRT
         agent_gvh.port_list = [2000]
         if pid == 0:
             agent_gvh.is_leader = True
@@ -56,7 +58,11 @@ class AgentCreation(AgentThread):
         b.position.x, b.position.y, b.position.z = 1.0, 1.0, 1.0
 
         tasks = [Task(b, 1, False, None)]
+        route = []
         self.agent_gvh.create_aw_var('tasks', list, tasks)
+        self.agent_gvh.create_ar_var('route', list, route)
+
+
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
         a.agent_comm_handler = self.agent_comm_handler
@@ -71,9 +77,7 @@ class AgentCreation(AgentThread):
             time.sleep(0.1)
 
             try:
-                print("mytask is", mytask)
                 if mytask is not None and not self.agent_gvh.moat.reached:
-                    print("reached what i am going to", self.agent_gvh.moat.reached)
                     continue
                 elif mytask is not None and self.agent_gvh.moat.reached:
                     mytask = None
