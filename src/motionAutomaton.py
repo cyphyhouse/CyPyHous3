@@ -124,7 +124,7 @@ class MotionAutomaton(threading.Thread):
         :return: None
         """
         print(type(data))
-        a = data.upper()
+        a = str(data).upper()
         print(a)
         if a == 'TRUE':
             self.reached = True
