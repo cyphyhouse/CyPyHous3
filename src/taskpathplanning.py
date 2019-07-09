@@ -37,7 +37,7 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'hotdec_car', 10)
+        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT(), pid, 'hotdec_car', 10)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
         if pid == 1:
