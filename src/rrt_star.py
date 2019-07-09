@@ -29,7 +29,10 @@ class RRT(object):
     def __init__(self):
         pass
 
-    def plan(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
+    def __repr__(self):
+        return "oye"
+
+    def plan(self,start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
              expandDis: float = 0.25, goalSampleRate: int = 200, maxIter: int = 500):
         """
         Setting Parameters
@@ -40,6 +43,7 @@ class RRT(object):
         randArea: Random sampling bounds [min,max]
 
         """
+        print(self)
         # self.__motionautomaton = motionautomaton
         print(start, goal)
         self.start = Node(start[0], start[1])
