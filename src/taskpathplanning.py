@@ -38,7 +38,7 @@ class AgentCreation(AgentThread):
         """
         agent_gvh = Gvh(pid, participants)
         moat = motionAutomaton.MotionAutomaton(pid, 'f1car',10 )
-        moat.planner = rrt_star.RRT
+        moat.planner = 1 #rrt_star.RRT
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
         if pid == 0:
