@@ -102,8 +102,7 @@ class AgentCreation(AgentThread):
                             # print("assigned task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
                             print("planner is", self.agent_gvh.moat.planner)
-                            self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
-                        self.agent_gvh.moat.position.position.y], [mytask.location.position.x, mytask.location.position.y])
+                            self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,self.agent_gvh.moat.position.position.y], [mytask.location.position.x, mytask.location.position.y])
                             testroute = self.agent_gvh.moat.planner.Planning()
 
                             print(testroute)
