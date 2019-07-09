@@ -21,20 +21,16 @@ class Node():
         self.cost = 0.0
         self.parent = None
 
-    def tovec(self):
-        return vec(self.x, self.y, 0)
-
 
 class RRT(object):
     """
     Class for RRT* Planning
     """
-
     def __init__(self):
         pass
 
     def plan(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
-             expandDis: float = 0.16, goalSampleRate: int = 200, maxIter: int = 500):
+             expandDis: float = 0.25, goalSampleRate: int = 200, maxIter: int = 500):
         """
         Setting Parameters
 
@@ -359,3 +355,4 @@ d = vec(0 ,4,1)
 e = vec(2,2, 1)
 f = seg(d,e)
 print(dist3D(c,f))'''
+
