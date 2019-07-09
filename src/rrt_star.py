@@ -31,7 +31,7 @@ class RRT(object):
 
 
     def plan(self,start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
-             expandDis: float = 0.16, goalSampleRate: int = 200, maxIter: int = 500):
+             expandDis: float = 0.55555, goalSampleRate: int = 200, maxIter: int = 500):
         """
         Setting Parameters
 
