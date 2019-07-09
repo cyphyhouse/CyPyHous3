@@ -23,6 +23,7 @@ class MotionAutomaton(threading.Thread):
         self.__reached = False
         self.__path = []
         self.__planner = planner
+        print("set planner to ",planner, self.__planner)
 
         rospy.init_node('quad_wp_node', anonymous=True)
         self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=queue_size)
