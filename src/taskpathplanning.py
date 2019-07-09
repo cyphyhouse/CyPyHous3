@@ -138,4 +138,4 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-a = AgentCreation(0, 1, "", 2000)
+a = AgentCreation(1, 1, "", 2000)
