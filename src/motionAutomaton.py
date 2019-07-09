@@ -124,11 +124,9 @@ class MotionAutomaton(threading.Thread):
         :return: None
         """
         a = str(data).upper()
-        if a == 'TRUE':
-            print(a)
+        if 'TRUE' in a:
             self.reached = True
-        else:
-            print(a)
+
 
     def goTo(self, dest: Pose, wp_type: int = None):  # -> NoReturn:
         """
