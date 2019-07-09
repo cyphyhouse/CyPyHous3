@@ -99,7 +99,7 @@ class AgentCreation(AgentThread):
                             tasks[i].assigned_to = self.pid()
                             # print("assigned task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
-                            print(self.agent_gvh.moat.planner)
+                            print(self.agent_gvh.moat)
                             testroute = self.agent_gvh.moat.find_path(mytask.location)
 
                             print(testroute)
