@@ -16,13 +16,13 @@ class MotionAutomaton(threading.Thread):
 
     """
 
-    def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1):
+    def __init__(self, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1, planner = None):
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
         self.__position = Pose()
         self.__reached = False
         self.__path = []
-        self.__planner = None
+        self.__planner = planner
 
         rospy.init_node('quad_wp_node', anonymous=True)
         self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=queue_size)
@@ -36,8 +36,8 @@ class MotionAutomaton(threading.Thread):
         return self.__planner
 
     @planner.setter
-    def planner(self, planner):
-        self.__planner = planner
+    def planner(self, p):
+        self.__planner = p
 
     @property
     def path(self):
