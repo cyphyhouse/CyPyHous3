@@ -123,11 +123,12 @@ class MotionAutomaton(threading.Thread):
         :param data: String message
         :return: None
         """
-        print(type(data))
         a = str(data).upper()
-        print(a)
         if a == 'TRUE':
+            print(a)
             self.reached = True
+        else:
+            print(a)
 
     def goTo(self, dest: Pose, wp_type: int = None):  # -> NoReturn:
         """
