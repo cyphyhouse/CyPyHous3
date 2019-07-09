@@ -37,10 +37,10 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'f1car',10 )
+        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'hotdec_car', 10)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
-        if pid == 0:
+        if pid == 1:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
@@ -56,13 +56,16 @@ class AgentCreation(AgentThread):
 
     def run(self):
         b = Pose()
-        b.position.x, b.position.y, b.position.z = 1.0, 1.0, 1.0
+        b.position.x, b.position.y, b.position.z = 1.0, 1.0, 0.0
+        c = Pose()
+        c.position.x, c.position.y, c.position.z = 1.0, 2.0, 0.0
+        d = Pose()
+        d.position.x, d.position.y, d.position.z = 2.0, 1.0, 0.0
 
-        tasks = [Task(b, 1, False, None)]
+        tasks = [Task(b, 1, False, None), Task(c, 2, False, None), Task(d, 3, False, None)]
         route = []
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         self.agent_gvh.create_ar_var('route', list, route)
-
 
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
@@ -105,8 +108,8 @@ class AgentCreation(AgentThread):
                             print(testroute)
                             # print("just assigned mytask", mytask)
                             self.agent_gvh.put('tasks', tasks)
-                            #self.agent_gvh.moat.follow_path(testroute)
-                            self.agent_gvh.moat.goTo(tasks[i].location)
+                            self.agent_gvh.moat.follow_path(testroute)
+                            # self.agent_gvh.moat.goTo(tasks[i].location)
                             a.release_mutex()
                             break
 

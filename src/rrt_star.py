@@ -7,9 +7,9 @@ Modifications for use in CyPhyHouse made by Amelia Gosse (gossea)
 """
 
 import copy
+import math
 import random
 
-import math
 import numpy as np
 
 
@@ -31,6 +31,12 @@ class RRT(object):
 
     def planner(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
                  expandDis: float = 0.25, goalSampleRate: int = 200, maxIter: int = 500):
+
+    def __init__(self):
+        pass
+
+    def plan(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
+             expandDis: float = 0.25, goalSampleRate: int = 200, maxIter: int = 500):
         """
         Setting Parameters
 
