@@ -81,6 +81,7 @@ class AgentCreation(AgentThread):
             time.sleep(0.1)
 
             try:
+                print("reached is ", self.agent_gvh.moat.reached)
                 if mytask is not None and not self.agent_gvh.moat.reached:
                     continue
                 elif mytask is not None and self.agent_gvh.moat.reached:
