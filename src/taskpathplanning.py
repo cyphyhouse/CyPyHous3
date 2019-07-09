@@ -37,7 +37,7 @@ class AgentCreation(AgentThread):
         :param r_port:
         """
         agent_gvh = Gvh(pid, participants)
-        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'f1car', 10)
+        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT, pid, 'hotdec_car', 10)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
         if pid == 0:
@@ -56,7 +56,7 @@ class AgentCreation(AgentThread):
 
     def run(self):
         b = Pose()
-        b.position.x, b.position.y, b.position.z = 1.0, 1.0, 1.0
+        b.position.x, b.position.y, b.position.z = 1.0, 1.0, 0.0
 
         tasks = [Task(b, 1, False, None)]
         route = []
