@@ -17,6 +17,7 @@ class MotionAutomaton(threading.Thread):
     """
 
     def __init__(self, planner, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1):
+        print("calling init")
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
         self.__position = Pose()
