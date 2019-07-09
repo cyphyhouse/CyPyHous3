@@ -41,6 +41,7 @@ class RRT(object):
 
         """
         # self.__motionautomaton = motionautomaton
+        print(start, goal)
         self.start = Node(start[0], start[1])
         self.end = Node(goal[0], goal[1])
         self.minrand = randArea[0]
