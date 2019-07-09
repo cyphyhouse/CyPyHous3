@@ -170,14 +170,7 @@ class MotionAutomaton(threading.Thread):
             self.goTo(wp, 0)
         self.goTo(wp_list[-1], 1)
 
-    def find_path(self, goal_point):
-        if self.planner is not None:
-            path = self.planner([self.position.position.x,
-                                 self.position.position.y], [goal_point.position.x, goal_point.position.y]).Planning()
-            return path
 
-        else:
-            return [[goal_point.position.x, goal_point.position.y]]
 
     def run(self):
         """
