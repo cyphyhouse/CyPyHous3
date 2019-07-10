@@ -64,7 +64,8 @@ class AgentCreation(AgentThread):
         tasks = [Task(b, 1, False, None), Task(c, 2, False, None), Task(d, 3, False, None)]
         route = []
         self.agent_gvh.create_aw_var('tasks', list, tasks)
-        #self.agent_gvh.create_ar_var('route', list, route)
+        #ÅSself.agent_gvh.create_ar_var('route', list, route)
+        "?≥"
 
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
