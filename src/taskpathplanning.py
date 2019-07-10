@@ -107,7 +107,7 @@ class AgentCreation(AgentThread):
                         self.agent_gvh.moat.position.position.y], [mytask.location.position.x, mytask.location.position.y])
                             testroute = self.agent_gvh.moat.planner.Planning()
 
-                            print(testroute)
+                            #print(testroute)
                             # print("just assigned mytask", mytask)
                             self.agent_gvh.put('tasks', tasks)
                             self.agent_gvh.moat.follow_path(testroute)

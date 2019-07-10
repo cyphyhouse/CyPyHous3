@@ -26,7 +26,7 @@ class MotionAutomaton(threading.Thread):
         self.__planner = planner
 
         rospy.init_node('quad_wp_node', anonymous=True)
-        self.__pub = rospy.Publisher('Waypoint_bot' + str(bot_num), PoseStamped, queue_size=queue_size)
+        self.__pub = rospy.Publisher('Waypoint', PoseStamped, queue_size=queue_size)
         self.__sub_vicon = rospy.Subscriber('/vrpn_client_node/' + bot_name + '/pose', PoseStamped, self._getVicon,
                                             queue_size=1)
         self.__sub_reached = rospy.Subscriber('/Reached', String, self._getReached, queue_size=1)

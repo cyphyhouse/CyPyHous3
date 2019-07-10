@@ -26,11 +26,11 @@ class RRT(object):
     """
     Class for RRT* Planning
     """
+
     def __init__(self):
         pass
 
-
-    def plan(self,start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
+    def plan(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
              expandDis: float = 0.16, goalSampleRate: int = 200, maxIter: int = 500):
         """
         Setting Parameters
@@ -231,8 +231,12 @@ class vec(object):
     def topoint(self):
         return [self.x, self.y, self.z]
 
+    def magnitude(self):
+        import math
+        return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+
     def __repr__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.z)
+        return "("+str(self.x) + "," + str(self.y) + "," + str(self.z)+")"
 
 
 class seg(object):
@@ -259,6 +263,13 @@ def dot_prod(u: vec, v: vec):
 def norm(v):
     import math
     return math.sqrt(dot_prod(v, v))
+
+
+def cross_prod(u: vec, v: vec):
+    x1 = u.y * v.z - u.z * v.y
+    y1 = u.z * v.x - u.x * v.z
+    z1 = u.x * v.y - u.y * v.x
+    return vec(x1, y1, z1)
 
 
 def d(u, v):
@@ -321,15 +332,63 @@ def dist3D(l1: seg, l2: seg, tol=0.000001):
     return norm(dP)
 
 
-def isclose(l1, l2, tolerance):
-    if dist3D(l1, l2) < tolerance:
+def collinear(p1: vec, p2: vec, p3: vec):
+    n1 = vec(p2.x - p1.x, p2.y - p1.y, p2.z - p3.z)
+    n2 = vec(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z)
+    n3 = cross_prod(n1, n2)
+    if n3.magnitude() == 0:
         return True
+
+
+def DistancePtLine(l: seg, p: vec):
+    if not collinear(l.p0, l.p1, p):
+        ab = minus(l.p1, l.p0)
+        ac = minus(p, l.p0)
+        area = cross_prod(ab, ac).magnitude()
+        cd = area / ab.magnitude()
+        return cd
+
+    else:
+        return min(distance(l.p0, p), distance(l.p1, p))
+
+
+def isclose(l1, l2, tolerance):
+    if isinstance(l1, seg) and isinstance(l2, seg):
+        if dist3D(l1, l2) < tolerance:
+            return True
+    elif isinstance(l1, seg) and isinstance(l2, vec):
+        if DistancePtLine(l1, l2) < tolerance:
+            return True
+    elif isinstance(l1, vec) and isinstance(l2, seg):
+        if DistancePtLine(l2, l1) < tolerance:
+            return True
+    elif isinstance(l1, vec) and isinstance(l2, vec):
+        import math
+        if math.sqrt((l1.x - l2.x) ** 2 + (l1.y - l2.y) ** 2) < tolerance:
+            return True
     return False
+
+def get_path_segs(p:list):
+    path_segs = []
+    if len(p) > 1:
+        for i in range(1,len(p)):
+            path_segs.append(seg(p[i-1],p[i]))
+    else:
+        path_segs = p
+    return path_segs
+
+def distance(u: vec, v: vec):
+    import math
+    return math.sqrt(vec(u.x - v.x, u.y - v.y, u.z - v.z).magnitude())
 
 
 def path_is_close(l1, l2, tolerance):
+
+    l1 = get_path_segs(l1)
+    l2 = get_path_segs(l2)
     for path_seg_1 in l1:
         for path_seg_2 in l2:
+            #print(path_seg_1,path_seg_2)
             if isclose(path_seg_1, path_seg_2, tolerance):
                 return True
     return False
@@ -341,19 +400,15 @@ def clear_path(paths, proposed_path):
             return False
     return True
 
-
 def to_path(myList):
     returnpath = []
     for point in myList:
         returnpath.append(vec(point[0], point[1], 0))
     return returnpath
 
-
-'''a = vec (0,0,1)
-b = vec(1,1,1)
-c = seg(a,b)
-d = vec(0 ,4,1)
-e = vec(2,2, 1)
-f = seg(d,e)
-print(dist3D(c,f))'''
-
+a = RRT()
+a.plan([0,0,0],[1,1,0])
+c = a.Planning()
+d = [vec(0.5,0.5,0)]
+t = path_is_close(c,d,-1)
+print(t)
