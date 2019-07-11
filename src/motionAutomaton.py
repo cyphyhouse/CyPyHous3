@@ -187,12 +187,14 @@ class MotionAutomaton(threading.Thread):
         self.__bot_type = bot_type
 
     def takeoff(self):
+        print("taking off")
         takeoff = Pose()
         takeoff.position.x, takeoff.position.y, takeoff.position.z = self.position.position.x, \
                                                                      self.position.position.y, 1.
         self.goTo(takeoff)
 
     def land(self):
+        print("landing")
         land = Pose()
         land.position.x, land.position.y, land.position.z = self.position.position.x, \
                                                                      self.position.position.y, 0.
