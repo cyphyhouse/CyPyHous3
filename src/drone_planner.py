@@ -13,14 +13,6 @@ import random
 import numpy as np
 
 
-class Node():
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.cost = 0.0
-        self.parent = None
-
 
 class DPLAN(object):
     """
@@ -43,8 +35,8 @@ class DPLAN(object):
 
         """
         # self.__motionautomaton = motionautomaton
-        self.start = Node(start[0], start[1])
-        self.end = Node(goal[0], goal[1])
+        self.start = [start[0], start[1], start[2]]
+        self.end = [goal[0], goal[1], goal[2]]
 
     def Planning(self) -> list:
         """
