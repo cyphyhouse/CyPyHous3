@@ -49,7 +49,7 @@ class AgentCreation(AgentThread):
 
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         self.agent_gvh.create_ar_var('route', list, route)
-        self.agent_gvh.put('route',[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)], self.pid())
+        self.agent_gvh.put('route',[[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]], self.pid())
         print(self.agent_gvh.get('route'))
 
         a = BaseMutex(1, [2000])
@@ -111,8 +111,8 @@ class AgentCreation(AgentThread):
                                 self.agent_gvh.put('route',route,self.pid())
                                 self.agent_gvh.moat.follow_path(testroute)
                             else:
-                                self.agent_gvh.put('route', [vec(self.agent_gvh.moat.position.x, self.agent_gvh.moat.position.y,
-                                             self.agent_gvh.moat.position.z)], self.pid())
+                                self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.x, self.agent_gvh.moat.position.y,
+                                             self.agent_gvh.moat.position.z)]], self.pid())
                                 continue
 
 
