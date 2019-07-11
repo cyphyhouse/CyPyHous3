@@ -184,4 +184,3 @@ def get_tasks(taskfile='tasks.txt', repeat=1):
     return tasks
 
 
-a = AgentCreation(1, 2, "", 2000, 'f1car')
