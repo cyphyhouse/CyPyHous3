@@ -104,8 +104,8 @@ class AgentCreation(AgentThread):
                             # print("planner is", self.agent_gvh.moat.planner)
 
                             self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
-                                                              self.agent_gvh.moat.position.position.y],
-                                                             [mytask.location.position.x, mytask.location.position.y])
+                                                              self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.z],
+                                                             [mytask.location.position.x, mytask.location.position.y, self.agent_gvh.moat.potion.z])
                             testroute = self.agent_gvh.moat.planner.Planning()
                             #print('route is', testroute)
                             if rrt_star.clear_path(route, testroute,self.pid()):
