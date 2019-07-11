@@ -383,7 +383,7 @@ def distance(u: vec, v: vec):
     return math.sqrt(vec(u.x - v.x, u.y - v.y, u.z - v.z).magnitude())
 
 
-def path_is_close(l1, l2, tolerance = 0.75):
+def path_is_close(l1, l2, tolerance = 0.5):
 
     l1 = get_path_segs(l1)
     l2 = get_path_segs(l2)
