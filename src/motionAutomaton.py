@@ -162,7 +162,7 @@ class MotionAutomaton(threading.Thread):
         """
         # Initialize list of waypoints
         wp_list = []
-        for point in path:
+        for point in path[1:]:
             point = point.topoint()
             wp = Pose()
             wp.position.x = point[0]
