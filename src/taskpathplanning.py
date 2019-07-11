@@ -101,7 +101,7 @@ class AgentCreation(AgentThread):
                                                               self.agent_gvh.moat.position.position.y],
                                                              [mytask.location.position.x, mytask.location.position.y])
                             testroute = self.agent_gvh.moat.planner.Planning()
-                            print('route is', testroute)
+                            #print('route is', testroute)
                             if rrt_star.clear_path(route, testroute):
                                 print("cleared path")
                                 tasks[i].assigned = True
@@ -111,6 +111,7 @@ class AgentCreation(AgentThread):
                                 self.agent_gvh.put('route',route,self.pid())
                                 self.agent_gvh.moat.follow_path(testroute)
                             else:
+                                print('route is not clear')
                                 self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y,
                                              self.agent_gvh.moat.position.position.z)]], self.pid())
                                 mytask = None
