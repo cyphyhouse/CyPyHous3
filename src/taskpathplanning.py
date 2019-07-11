@@ -18,6 +18,10 @@ class Task(object):
         self.assigned = assigned
         self.assigned_to = assigned_to
 
+    def unassign(self,id):
+        if self.id == id:
+            self.assigned = False
+
     def __repr__(self):
         return (str(self.id) + " assigned to " + str(self.assigned_to))
 
@@ -43,10 +47,12 @@ class AgentCreation(AgentThread):
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
 
-        self.rounds = 10
+        self.rounds = 2
         self.start()
 
+
     def run(self):
+
         if self.agent_gvh.moat.bot_type == 0:
             self.agent_gvh.moat.takeoff()
         tasks = get_tasks()
@@ -69,6 +75,7 @@ class AgentCreation(AgentThread):
 
         while not self.stopped():
             print("current task status", [l.assigned for l in tasks])
+
             time.sleep(0.6)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
@@ -148,11 +155,22 @@ class AgentCreation(AgentThread):
                     req_num = req_num + 1
                     if all(task.assigned for task in tasks):
                         if mytask is None:
-                            self.stop()
-                            continue
+                            if self.rounds == 0:
+                                continue
+                            else:
+                                for i in range(len(tasks)):
+                                    tasks[i].unassign(i)
+                                self.rounds = self.rounds -1
+                                continue
+
                         elif mytask is not None and self.agent_gvh.moat.reached:
-                            self.stop()
-                            continue
+                            if self.rounds == 0:
+                                continue
+                            else:
+                                for i in range(len(tasks)):
+                                    tasks[i].unassign(i)
+                                self.rounds = self.rounds -1
+                                continue
                         else:
                             continue
 
