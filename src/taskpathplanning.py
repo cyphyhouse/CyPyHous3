@@ -72,6 +72,10 @@ class AgentCreation(AgentThread):
                     print('pub a reached msg to prog')
                     continue
                 elif mytask is not None and self.agent_gvh.moat.reached:
+                    self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x,
+                                                      self.agent_gvh.moat.position.position.y,
+                                                      self.agent_gvh.moat.position.position.z)]], self.pid())
+
                     mytask = None
 
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
@@ -112,8 +116,11 @@ class AgentCreation(AgentThread):
                                 self.agent_gvh.moat.follow_path(testroute)
                             else:
                                 print('route is not clear')
-                                self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y,
-                                             self.agent_gvh.moat.position.position.z)]], self.pid())
+                                self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x,
+                                                                  self.agent_gvh.moat.position.position.y,
+                                                                  self.agent_gvh.moat.position.position.z)]],
+                                                   self.pid())
+
                                 mytask = None
                                 continue
 
