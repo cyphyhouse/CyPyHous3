@@ -395,11 +395,11 @@ def path_is_close(l1, l2, tolerance = 0.5):
     return False
 
 
-def clear_path(paths, proposed_path):
-    for path in paths:
-        if path is not None:
-            if path_is_close(path, proposed_path):
-                print(path, proposed_path, "are the conflicting paths")
+def clear_path(paths, proposed_path, ignore = None):
+    for i in range(len(paths)):
+        if paths[i] is not None and ignore is not i:
+            if path_is_close(paths[i], proposed_path):
+                print(paths[i], proposed_path, "are the conflicting paths")
                 return False
     return True
 

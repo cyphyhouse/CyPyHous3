@@ -102,7 +102,7 @@ class AgentCreation(AgentThread):
                                                              [mytask.location.position.x, mytask.location.position.y])
                             testroute = self.agent_gvh.moat.planner.Planning()
                             #print('route is', testroute)
-                            if rrt_star.clear_path(route, testroute):
+                            if rrt_star.clear_path(route, testroute,self.pid()):
                                 print("cleared path")
                                 tasks[i].assigned = True
                                 tasks[i].assigned_to = self.pid()
