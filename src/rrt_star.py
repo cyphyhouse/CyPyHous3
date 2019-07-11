@@ -395,7 +395,7 @@ def path_is_close(l1, l2, tolerance = 0.5):
 
 
 def clear_path(paths, proposed_path, ignore = None):
-    print("ignoring", i)
+    print("ignoring", ignore)
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:
             if path_is_close(paths[i], proposed_path):
