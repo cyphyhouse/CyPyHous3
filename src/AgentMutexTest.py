@@ -50,6 +50,7 @@ class AgentCreation(AgentThread):
         requested = False
         a.agent_comm_handler = self.agent_comm_handler
         while not self.stopped():
+            print("current list of tasks ")
             time.sleep(0.4)
             self.agent_gvh.flush_msgs()
             # print("before",self.agent_gvh.msg_list,self.pid())

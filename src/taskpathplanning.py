@@ -68,6 +68,7 @@ class AgentCreation(AgentThread):
         mytask = None
 
         while not self.stopped():
+            print("current task status", [l.assigned for l in tasks])
             time.sleep(0.6)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
