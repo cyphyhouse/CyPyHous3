@@ -1,12 +1,10 @@
 import time
 
-import basic_synchronizer
-import motionAutomaton
 import rrt_star
+from rrt_star import vec
 from agentThread import AgentThread
 from base_mutex import BaseMutex
 from comm_handler import CommHandler, CommTimeoutError
-from geometry_msgs.msg import Pose
 from gvh import Gvh
 from mutex_handler import BaseMutexHandler
 
@@ -24,22 +22,15 @@ class Task(object):
 
 
 class AgentCreation(AgentThread):
-    """
-    test class to test that agent thread objects are created
-    and fields are accessed safely and correctly .
-    """
 
     def __init__(self, pid, participants, receiver_ip, r_port):
-        """
-        parameters to instantiate the gvh and communication handler.
-        :param pid:
-        :param participants:
-        :param r_port:
-        """
+
         agent_gvh = Gvh(pid, participants)
+        import motionAutomaton
         moat = motionAutomaton.MotionAutomaton(rrt_star.RRT(), pid, 'hotdec_car', 10)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
+
         if pid == 1:
             agent_gvh.is_leader = True
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
@@ -48,7 +39,6 @@ class AgentCreation(AgentThread):
         super(AgentCreation, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
-        self.agent_gvh.synchronizer = basic_synchronizer.BasicSynchronizer(pid, participants, [2000])
 
         self.rounds = 10
         self.start()
@@ -62,19 +52,20 @@ class AgentCreation(AgentThread):
         d.position.x, d.position.y, d.position.z = 2.0, -1.0, 0.0
 
         tasks = [Task(b, 1, False, None), Task(c, 2, False, None), Task(d, 3, False, None)]
-        route = []
+        route = [vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]
+
         self.agent_gvh.create_aw_var('tasks', list, tasks)
-        #ÅSself.agent_gvh.create_ar_var('route', list, route)
-        "?≥"
+        self.agent_gvh.create_ar_var('route', list, route)
 
         a = BaseMutex(1, [2000])
+
         self.agent_gvh.mutex_handler.add_mutex(a)
         a.agent_comm_handler = self.agent_comm_handler
+
         req_num = 0
         mytask = None
 
         while not self.stopped():
-            print("working at this point")
             time.sleep(0.6)
             self.agent_gvh.flush_msgs()
             self.agent_comm_handler.handle_msgs()
@@ -89,30 +80,48 @@ class AgentCreation(AgentThread):
                     mytask = None
 
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
+
+
                 # print("has mutex is", test)
                 if not test:
                     # print(req_num)
                     a.request_mutex(req_num)
                     # print("requesting")
+
+
                 else:
                     # print("have mutex at", time.time())
                     tasks = self.agent_gvh.get('tasks')
+                    route = self.agent_gvh.get('route')
                     for i in range(len(tasks)):
                         if not tasks[i].assigned:
-                            tasks[i].assigned = True
-                            tasks[i].assigned_to = self.pid()
+
+
+
                             # print("assigned task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
-                            #print("planner is", self.agent_gvh.moat.planner)
-                            self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
-                        self.agent_gvh.moat.position.position.y], [mytask.location.position.x, mytask.location.position.y])
-                            testroute = self.agent_gvh.moat.planner.Planning()
+                            # print("planner is", self.agent_gvh.moat.planner)
 
-                            #print(testroute)
+                            self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
+                                                              self.agent_gvh.moat.position.position.y],
+                                                             [mytask.location.position.x, mytask.location.position.y])
+                            testroute = self.agent_gvh.moat.planner.Planning()
+                            if rrt_star.clear_path(route, testroute):
+                                tasks[i].assigned = True
+                                tasks[i].assigned_to = self.pid()
+                                route = testroute
+                                self.agent_gvh.put('tasks', tasks)
+                                self.agent_gvh.put('route',route,self.pid())
+                                self.agent_gvh.moat.follow_path(testroute)
+                            else:
+                                continue
+
+
+                            # print(testroute)
                             # print("just assigned mytask", mytask)
-                            self.agent_gvh.put('tasks', tasks)
-                            self.agent_gvh.moat.follow_path(testroute)
+
                             # self.agent_gvh.moat.goTo(tasks[i].location)
+
                             a.release_mutex()
                             break
 
@@ -141,4 +150,18 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
+def get_tasks(taskfile = 'tasks.txt', repeat = 1):
+    from geometry_msgs.msg import Pose
+    tasks = []
+    tasklocs = open(taskfile,"r").readlines()
+    for i in range(len(tasklocs)):
+        locxyz = tasklocs[i].split(',')
+        locnew = Pose()
+        locnew.position.x, locnew.position.y , locnew.position.z = locxyz[0], locxyz[1], locxyz[2]
+        tasks.append(Task(locnew,i,False,None))
+    return tasks
+
+
 a = AgentCreation(1, 1, "", 2000)
+
+

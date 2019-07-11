@@ -30,10 +30,14 @@ class RRT(object):
     def __init__(self):
         pass
 
+<<<<<<< HEAD
+    def plan(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
+             expandDis: float = 0.16, goalSampleRate: int = 200, maxIter: int = 500):
+=======
 
     def plan(self,start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
              expandDis: float = 0.55555, goalSampleRate: int = 200, maxIter: int = 500):
-
+>>>>>>> d6e09b5be35ed037da9dc34064405830d016c5c0
         """
         Setting Parameters
 
@@ -398,9 +402,8 @@ def path_is_close(l1, l2, tolerance):
 
 def clear_path(paths, proposed_path):
     for path in paths:
-        if path is not None:
-            if path_is_close(path, proposed_path):
-                return False
+        if path_is_close(path, proposed_path):
+            return False
     return True
 
 def to_path(myList):
@@ -408,11 +411,10 @@ def to_path(myList):
     for point in myList:
         returnpath.append(vec(point[0], point[1], 0))
     return returnpath
-'''
+
 a = RRT()
 a.plan([0,0,0],[1,1,0])
 c = a.Planning()
 d = [vec(0.5,0.5,0)]
 t = path_is_close(c,d,-1)
 print(t)
-'''
