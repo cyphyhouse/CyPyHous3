@@ -27,9 +27,9 @@ class AgentCreation(AgentThread):
     def __init__(self, pid, participants, receiver_ip, r_port):
 
         agent_gvh = Gvh(pid, participants)
-        import motionAutomaton
-        moat = motionAutomaton.MotionAutomaton_car(rrt_star.RRT(), pid, 'hotdec_car', 10, 1)
-        #moat = motionAutomaton.MotionAutomaton_drone(drone_planner.DPLAN(), pid, 'cyphyhousecopter', 10,0)
+        import motionAutomaton_car as ma, motionAutomaton_drone as ma
+        moat = ma.MotionAutomaton(rrt_star.RRT(), pid, 'hotdec_car', 10, 1)
+        #moat = ma.MotionAutomaton(drone_planner.DPLAN(), pid, 'cyphyhousecopter', 10,0)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
 
