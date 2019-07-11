@@ -389,7 +389,6 @@ def path_is_close(l1, l2, tolerance = 0.5):
     l2 = get_path_segs(l2)
     for path_seg_1 in l1:
         for path_seg_2 in l2:
-            #print(path_seg_1,path_seg_2)
             if isclose(path_seg_1, path_seg_2, tolerance):
                 return True
     return False
@@ -398,6 +397,7 @@ def path_is_close(l1, l2, tolerance = 0.5):
 def clear_path(paths, proposed_path, ignore = None):
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:
+            print(paths[i], proposed_path)
             if path_is_close(paths[i], proposed_path):
                 print(paths[i], proposed_path, "are the conflicting paths")
                 return False
