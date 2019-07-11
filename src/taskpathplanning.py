@@ -18,10 +18,6 @@ class Task(object):
         self.assigned = assigned
         self.assigned_to = assigned_to
 
-    def unassign(self,id):
-        if self.id == id:
-            self.assigned = False
-
     def __repr__(self):
         return (str(self.id) + " assigned to " + str(self.assigned_to))
 
@@ -47,7 +43,7 @@ class AgentCreation(AgentThread):
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
 
-        self.rounds = 2
+        self.rounds = 10
         self.start()
 
 
@@ -155,27 +151,12 @@ class AgentCreation(AgentThread):
                     req_num = req_num + 1
                     if all(task.assigned for task in tasks):
                         if mytask is None:
-                            if self.rounds == 0:
-                                continue
-                            else:
-                                for i in range(len(tasks)):
-                                    tasks[i].unassign(i)
-
-                                self.agent_gvh.put('tasks',tasks)
-                                self.rounds = self.rounds -1
-                                continue
+                            self.stop()
+                            continue
 
                         elif mytask is not None and self.agent_gvh.moat.reached:
-                            if self.rounds == 0:
-                                continue
-                            else:
-
-                                for i in range(len(tasks)):
-                                    tasks[i].unassign(i)
-                                self.agent_gvh.put('tasks', tasks)
-
-                                self.rounds = self.rounds -1
-                                continue
+                            self.stop()
+                            continue
                         else:
                             continue
 
