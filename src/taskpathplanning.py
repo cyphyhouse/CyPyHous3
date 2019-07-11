@@ -50,6 +50,7 @@ class AgentCreation(AgentThread):
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         self.agent_gvh.create_ar_var('route', list, route)
         self.agent_gvh.put('route',[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)], self.pid())
+        print(self.agent_gvh.get('route'))
 
         a = BaseMutex(1, [2000])
 
