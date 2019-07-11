@@ -207,6 +207,4 @@ class MotionAutomaton(threading.Thread):
         calls the spin function to check for new vicon data
         :return:
         """
-        if self.__bot_type == 0:
-            self.takeoff()
         rospy.spin()

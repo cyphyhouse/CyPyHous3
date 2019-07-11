@@ -46,6 +46,8 @@ class AgentCreation(AgentThread):
         self.start()
 
     def run(self):
+        if self.agent_gvh.moat.bot_type == 0:
+            self.agent_gvh.moat.takeoff()
         tasks = get_tasks()
         route = [] # [vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]
 
