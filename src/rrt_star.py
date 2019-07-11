@@ -30,14 +30,10 @@ class RRT(object):
     def __init__(self):
         pass
 
-<<<<<<< HEAD
-    def plan(self, start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
-             expandDis: float = 0.16, goalSampleRate: int = 200, maxIter: int = 500):
-=======
 
     def plan(self,start: list, goal: list, obstacleList: list = [], randArea: list = [-5, 5],
              expandDis: float = 0.55555, goalSampleRate: int = 200, maxIter: int = 500):
->>>>>>> d6e09b5be35ed037da9dc34064405830d016c5c0
+
         """
         Setting Parameters
 

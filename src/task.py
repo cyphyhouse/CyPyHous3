@@ -39,6 +39,7 @@ class AgentCreation(AgentThread):
         agent_gvh.port_list = [2000]
         if pid == 0:
             agent_gvh.is_leader = True
+
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
         agent_comm_handler = CommHandler(receiver_ip, r_port, agent_gvh, 10)
@@ -52,11 +53,15 @@ class AgentCreation(AgentThread):
         self.start()
 
     def run(self):
+
         b = Pose()
         b.position.x, b.position.y, b.position.z = 1.0, 1.0, 1.0
 
         tasks = [Task(b, 1, False, None)]
+        routes = []
         self.agent_gvh.create_aw_var('tasks', list, tasks)
+        self.agent_gvh.create_aw_var('routes', list, routes)
+
         a = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
         a.agent_comm_handler = self.agent_comm_handler
