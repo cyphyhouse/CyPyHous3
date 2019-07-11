@@ -103,6 +103,10 @@ class AgentCreation(AgentThread):
 
                             #print("assigning task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
+                            if mytask.location.position.z > 0 and self.agent_gvh.moat.bot_type == 1 :
+                                continue
+                            if mytask.location.position.z <= 0 and self.agent_gvh.moat.bot_type == 0:
+                                continue
                             # print("planner is", self.agent_gvh.moat.planner)
 
                             self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
