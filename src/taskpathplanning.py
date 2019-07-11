@@ -1,13 +1,14 @@
 import time
 
-import rrt_star
-from rrt_star import vec
 import drone_planner
+import rrt_star
 from agentThread import AgentThread
 from base_mutex import BaseMutex
 from comm_handler import CommHandler, CommTimeoutError
 from gvh import Gvh
 from mutex_handler import BaseMutexHandler
+from rrt_star import vec
+
 
 class Task(object):
 
@@ -23,12 +24,13 @@ class Task(object):
 
 class AgentCreation(AgentThread):
 
-    def __init__(self, pid, participants, receiver_ip, r_port):
+    def __init__(self, pid, participants, receiver_ip, r_port, bot_name):
 
         agent_gvh = Gvh(pid, participants)
-        import motionAutomaton_car as ma, motionAutomaton_drone as mb
-        #moat = ma.MotionAutomaton(rrt_star.RRT(), pid, 'hotdec_car', 10, 1)
-        moat = mb.MotionAutomaton(drone_planner.DPLAN(), pid, 'cyphyhousecopter', 10,0)
+        import motionAutomaton_drone as mb
+        import motionAutomaton_car as ma
+        moat = ma.MotionAutomaton(rrt_star.RRT(), pid, bot_name, 10, 1)
+        # moat = mb.MotionAutomaton(drone_planner.DPLAN(), pid, bot_name, 10, 0)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
 
@@ -48,11 +50,13 @@ class AgentCreation(AgentThread):
         if self.agent_gvh.moat.bot_type == 0:
             self.agent_gvh.moat.takeoff()
         tasks = get_tasks()
-        route = [] # [vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]
+        route = []  # [vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]
 
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         self.agent_gvh.create_ar_var('route', list, route)
-        self.agent_gvh.put('route',[[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]], self.pid())
+        self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x,
+                                          self.agent_gvh.moat.position.position.y,
+                                          self.agent_gvh.moat.position.position.z)]], self.pid())
         print(self.agent_gvh.get('route'))
 
         a = BaseMutex(1, [2000])
@@ -83,7 +87,6 @@ class AgentCreation(AgentThread):
 
                 test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
 
-
                 # print("has mutex is", test)
                 if not test:
                     # print(req_num)
@@ -98,28 +101,28 @@ class AgentCreation(AgentThread):
                     for i in range(len(tasks)):
                         if not tasks[i].assigned:
 
-
-
-                            #print("assigning task", tasks[i].id, "to ", self.pid())
+                            # print("assigning task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
-                            if mytask.location.position.z > 0 and self.agent_gvh.moat.bot_type == 1 :
+                            if mytask.location.position.z > 0 and self.agent_gvh.moat.bot_type == 1:
                                 continue
                             if mytask.location.position.z <= 0 and self.agent_gvh.moat.bot_type == 0:
                                 continue
                             # print("planner is", self.agent_gvh.moat.planner)
 
                             self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
-                                                              self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z],
-                                                             [mytask.location.position.x, mytask.location.position.y, mytask.location.position.z])
+                                                              self.agent_gvh.moat.position.position.y,
+                                                              self.agent_gvh.moat.position.position.z],
+                                                             [mytask.location.position.x, mytask.location.position.y,
+                                                              mytask.location.position.z])
                             testroute = self.agent_gvh.moat.planner.Planning()
-                            #print('route is', testroute)
-                            if rrt_star.clear_path(route, testroute,self.pid()):
+                            # print('route is', testroute)
+                            if rrt_star.clear_path(route, testroute, self.pid()):
                                 print("cleared path")
                                 tasks[i].assigned = True
                                 tasks[i].assigned_to = self.pid()
                                 route = testroute
                                 self.agent_gvh.put('tasks', tasks)
-                                self.agent_gvh.put('route',route,self.pid())
+                                self.agent_gvh.put('route', route, self.pid())
                                 self.agent_gvh.moat.follow_path(testroute)
                             else:
                                 print('route is not clear')
@@ -130,7 +133,6 @@ class AgentCreation(AgentThread):
 
                                 mytask = None
                                 continue
-
 
                             # print(testroute)
                             # print("just assigned mytask", mytask)
@@ -164,18 +166,17 @@ class AgentCreation(AgentThread):
                 print("timed out on communication")
                 self.stop()
 
-def get_tasks(taskfile = 'tasks.txt', repeat = 1):
+
+def get_tasks(taskfile='tasks.txt', repeat=1):
     from geometry_msgs.msg import Pose
     tasks = []
-    tasklocs = open(taskfile,"r").readlines()
+    tasklocs = open(taskfile, "r").readlines()
     for i in range(len(tasklocs)):
         locxyz = tasklocs[i].split(',')
         locnew = Pose()
-        locnew.position.x,locnew.position.y , locnew.position.z = float(locxyz[0]), float(locxyz[1]), float(locxyz[2])
-        tasks.append(Task(locnew,i,False,None))
+        locnew.position.x, locnew.position.y, locnew.position.z = float(locxyz[0]), float(locxyz[1]), float(locxyz[2])
+        tasks.append(Task(locnew, i, False, None))
     return tasks
 
 
-a = AgentCreation(0, 1, "", 2000)
-
-
+a = AgentCreation(0, 2, "", 2000, 'hotdec_car')
