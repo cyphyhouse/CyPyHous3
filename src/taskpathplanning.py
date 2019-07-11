@@ -152,7 +152,7 @@ def get_tasks(taskfile = 'tasks.txt', repeat = 1):
     for i in range(len(tasklocs)):
         locxyz = tasklocs[i].split(',')
         locnew = Pose()
-        locnew.position.x, locnew.position.y , locnew.position.z = locxyz[0], locxyz[1], locxyz[2]
+        locnew.position.x, locnew.position.y , locnew.position.z = float(locxyz[0]), float(locxyz[1]), float(locxyz[2])
         tasks.append(Task(locnew,i,False,None))
     return tasks
 
