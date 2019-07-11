@@ -370,6 +370,7 @@ def isclose(l1, l2, tolerance):
     return False
 
 def get_path_segs(p:list):
+    print('arg is',p)
     path_segs = []
     if len(p) > 1:
         for i in range(1,len(p)):
