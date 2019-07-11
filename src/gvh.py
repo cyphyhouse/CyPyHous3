@@ -142,7 +142,7 @@ class Gvh(object):
                     return var.value
                 else:
                     if pid == -1:
-                        return var.value[self.pid]
+                        return var.value
                     return var.value[pid]
 
     def put(self, varname: str, value: Union[int, bool, float, list, object, tuple], pid: int = -1) -> None:

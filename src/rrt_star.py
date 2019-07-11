@@ -399,7 +399,7 @@ def clear_path(paths, proposed_path, ignore = None):
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:
             if path_is_close(paths[i], proposed_path):
-                print(i,ignore,"are the conflicting paths")
+                print(paths[i], proposed_path, "are the conflicting paths")
                 return False
     return True
 
