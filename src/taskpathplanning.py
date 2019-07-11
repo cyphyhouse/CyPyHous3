@@ -160,6 +160,8 @@ class AgentCreation(AgentThread):
                             else:
                                 for i in range(len(tasks)):
                                     tasks[i].unassign(i)
+
+                                self.agent_gvh.put('tasks',tasks)
                                 self.rounds = self.rounds -1
                                 continue
 
@@ -167,8 +169,11 @@ class AgentCreation(AgentThread):
                             if self.rounds == 0:
                                 continue
                             else:
+
                                 for i in range(len(tasks)):
                                     tasks[i].unassign(i)
+                                self.agent_gvh.put('tasks', tasks)
+
                                 self.rounds = self.rounds -1
                                 continue
                         else:
