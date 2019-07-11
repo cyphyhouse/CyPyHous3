@@ -83,7 +83,7 @@ class AgentCreation(AgentThread):
 
 
                 else:
-                    # print("have mutex at", time.time())
+                    print("have mutex at", time.time())
                     tasks = self.agent_gvh.get('tasks')
                     route = self.agent_gvh.get('route')
                     for i in range(len(tasks)):
@@ -91,7 +91,7 @@ class AgentCreation(AgentThread):
 
 
 
-                            # print("assigned task", tasks[i].id, "to ", self.pid())
+                            #print("assigning task", tasks[i].id, "to ", self.pid())
                             mytask = tasks[i]
                             # print("planner is", self.agent_gvh.moat.planner)
 
@@ -99,7 +99,9 @@ class AgentCreation(AgentThread):
                                                               self.agent_gvh.moat.position.position.y],
                                                              [mytask.location.position.x, mytask.location.position.y])
                             testroute = self.agent_gvh.moat.planner.Planning()
+                            print('route is', testroute)
                             if rrt_star.clear_path(route, testroute):
+                                print("cleared path")
                                 tasks[i].assigned = True
                                 tasks[i].assigned_to = self.pid()
                                 route = testroute
