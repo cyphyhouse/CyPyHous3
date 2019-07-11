@@ -44,14 +44,7 @@ class AgentCreation(AgentThread):
         self.start()
 
     def run(self):
-        b = Pose()
-        b.position.x, b.position.y, b.position.z = 1.0, 1.0, 0.0
-        c = Pose()
-        c.position.x, c.position.y, c.position.z = -1.0, 2.0, 0.0
-        d = Pose()
-        d.position.x, d.position.y, d.position.z = 2.0, -1.0, 0.0
-
-        tasks = [Task(b, 1, False, None), Task(c, 2, False, None), Task(d, 3, False, None)]
+        tasks = get_tasks()
         route = [vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]
 
         self.agent_gvh.create_aw_var('tasks', list, tasks)
