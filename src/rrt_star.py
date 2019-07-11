@@ -203,8 +203,8 @@ class RRT(object):
             tmpNode.y += self.expandDis * math.sin(theta)
             if not self.__CollisionCheck(tmpNode, self.obstacleList):
                 return False
-
         return True
+
 
     def GetNearestListIndex(self, nodeList: list, rnd: list):
         dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 for node in nodeList]

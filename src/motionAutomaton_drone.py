@@ -174,9 +174,9 @@ class MotionAutomaton(threading.Thread):
             wp.position.y = point[1]
             wp.position.z = point[2]
             wp_list.append(wp)
-        for wp in wp_list[:-1]:
-            self.goTo(wp, 0)
-        self.goTo(wp_list[-1], 1)
+        for wp in wp_list:
+            self.goTo(wp)
+
 
     @property
     def bot_type(self):
