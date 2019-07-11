@@ -113,6 +113,7 @@ class AgentCreation(AgentThread):
                             else:
                                 self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y,
                                              self.agent_gvh.moat.position.position.z)]], self.pid())
+                                mytask = None
                                 continue
 
 
