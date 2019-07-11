@@ -162,6 +162,6 @@ def get_tasks(taskfile = 'tasks.txt', repeat = 1):
     return tasks
 
 
-a = AgentCreation(1, 1, "", 2000)
+a = AgentCreation(0, 1, "", 2000)
 
 
