@@ -9,7 +9,6 @@ from comm_handler import CommHandler, CommTimeoutError
 from gvh import Gvh
 from mutex_handler import BaseMutexHandler
 
-
 class Task(object):
 
     def __init__(self, location, id, assigned, assigned_to):
@@ -164,7 +163,6 @@ class AgentCreation(AgentThread):
             except CommTimeoutError:
                 print("timed out on communication")
                 self.stop()
-
 
 def get_tasks(taskfile = 'tasks.txt', repeat = 1):
     from geometry_msgs.msg import Pose
