@@ -73,6 +73,9 @@ class AgentThread(ABC, Thread):
          a flag to set to to safely exit the thread
         :return: None
         """
+        if self.agent_gvh.moat is not None:
+            if self.agent_gvh.moat.bot_type is 0:
+                self.agent_gvh.moat.land()
         if self.agent_gvh.dsm is not None:
             for dsmvar in self.agent_gvh.dsm:
                 print(dsmvar, "for", self.agent_gvh.pid)

@@ -16,7 +16,9 @@ class MotionAutomaton(threading.Thread):
 
     """
 
-    def __init__(self, planner, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1):
+    def __init__(self, planner, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1 , bot_type = 0):
+        #bot type is 0 for quadcopter, 1 for car.
+        #TODO queue size is unnecessary
         print("calling init")
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
@@ -24,6 +26,7 @@ class MotionAutomaton(threading.Thread):
         self.__reached = False
         self.__path = []
         self.__planner = planner
+        self.__bot_type = bot_type
 
         rospy.init_node('quad_wp_node', anonymous=True)
         self.__pub = rospy.Publisher('Waypoint', PoseStamped, queue_size=queue_size)
@@ -31,6 +34,8 @@ class MotionAutomaton(threading.Thread):
                                             queue_size=1)
         self.__sub_reached = rospy.Subscriber('/Reached', String, self._getReached, queue_size=1)
         time.sleep(1)
+
+
 
     @property
     def planner(self):
@@ -173,6 +178,26 @@ class MotionAutomaton(threading.Thread):
             self.goTo(wp, 0)
         self.goTo(wp_list[-1], 1)
 
+    @property
+    def bot_type(self):
+        return self.__bot_type
+
+    @bot_type.setter
+    def bot_type(self, bot_type):
+        self.__bot_type = bot_type
+
+    def takeoff(self):
+        takeoff = Pose()
+        takeoff.position.x, takeoff.position.y, takeoff.position.z = self.position.position.x, \
+                                                                     self.position.position.y, 1.
+        self.goTo(takeoff)
+
+    def land(self):
+        land = Pose()
+        land.position.x, land.position.y, land.position.z = self.position.position.x, \
+                                                                     self.position.position.y, 0.
+        self.goTo(land)
+
 
 
     def run(self):
@@ -180,4 +205,6 @@ class MotionAutomaton(threading.Thread):
         calls the spin function to check for new vicon data
         :return:
         """
+        if self.__bot_type == 0:
+            self.takeoff()
         rospy.spin()

@@ -2,6 +2,7 @@ import time
 
 import rrt_star
 from rrt_star import vec
+import drone_planner
 from agentThread import AgentThread
 from base_mutex import BaseMutex
 from comm_handler import CommHandler, CommTimeoutError
@@ -27,7 +28,8 @@ class AgentCreation(AgentThread):
 
         agent_gvh = Gvh(pid, participants)
         import motionAutomaton
-        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT(), pid, 'hotdec_car', 10)
+        moat = motionAutomaton.MotionAutomaton(rrt_star.RRT(), pid, 'hotdec_car', 10, 1)
+        #moat = motionAutomaton.MotionAutomaton(drone_planner.DPLAN(), pid, 'cyphyhousecopter', 10,0)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
 
