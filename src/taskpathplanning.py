@@ -8,6 +8,7 @@ from comm_handler import CommHandler, CommTimeoutError
 from gvh import Gvh
 from mutex_handler import BaseMutexHandler
 from rrt_star import vec
+import demo_planner
 
 
 class Task(object):
@@ -29,7 +30,7 @@ class AgentCreation(AgentThread):
         agent_gvh = Gvh(pid, participants)
         import motionAutomaton_drone as mb
         import motionAutomaton_car as ma
-        moat = ma.MotionAutomaton(rrt_star.RRT(), pid, bot_name, 10, 1)
+        moat = ma.MotionAutomaton(demo_planner.DemoPlan(), pid, bot_name, 10, 1)
         # moat = mb.MotionAutomaton(drone_planner.DPLAN(), pid, bot_name, 10, 0)
         agent_gvh.moat = moat
         agent_gvh.port_list = [2000]
@@ -120,7 +121,7 @@ class AgentCreation(AgentThread):
                                                               mytask.location.position.z])
                             testroute = self.agent_gvh.moat.planner.Planning()
                             # print('route is', testroute)
-                            if rrt_star.clear_path(route, testroute, self.pid()):
+                            if demo_planner.clear_path(route, testroute, self.pid()):
                                 print("cleared path")
                                 tasks[i].assigned = True
                                 tasks[i].assigned_to = self.pid()

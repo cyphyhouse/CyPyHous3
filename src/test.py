@@ -1,2 +1,2 @@
 from taskpathplanning import AgentCreation
-a = AgentCreation(1, 2, "", 2000, 'f1car')
+a = AgentCreation(0, 1, "", 2000, 'hotdec_car')
