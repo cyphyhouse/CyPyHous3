@@ -56,7 +56,7 @@ class DemoPlan(object):
         dist = distance(vec(self.start.x, self.start.y, 0) , vec(self.end.x, self.end.y, 0))
         start = [self.start.x, self.start.y]
         end = [self.end.x,self.end.y]
-        mid = [self.start.x + 0.5, self.start.y + 0.5]
+        mid = [(start[0]+end[0])/2, (start[1]+end[1])/2]
         path = [start, mid, end]
 
 
