@@ -54,9 +54,14 @@ class DemoPlan(object):
         search_until_maxiter: Search until max iteration for path improving or not
         """
         dist = distance(vec(self.start.x, self.start.y, 0) , vec(self.end.x, self.end.y, 0))
-        mid = Node(self.start.x + 0.5, self.start.y + 0.5)
+        start = [self.start.x, self.start.y]
+        end = [self.end.x,self.end.y]
+        mid = [self.start.x + 0.5, self.start.y + 0.5]
+        path = [start, mid, end]
 
-        return to_path([self.start, mid, self.end])
+
+
+        return to_path(path)
 
 
 
