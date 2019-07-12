@@ -30,9 +30,27 @@ class AgentThread(ABC, Thread):
         self.__agent_comm_handler = agent_comm_handler
         self.__stop_event = Event()
         self.__mutex_handler = mutex_handler
+        self.__locals = {}
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)
+
+    def create_ar_var(self, name, type, initial_value=None):
+        self.agent_gvh.create_ar_var(name,type,initial_value)
+        pass
+
+    def create_aw_var(self, name, type, initial_value=None):
+        self.agent_gvh.create_aw_var(name, type, initial_value)
+        pass
+
+    @property
+    def locals(self):
+        return self.__locals
+
+
+    @locals.setter
+    def locals(self, locals):
+        self.__locals = locals
 
     @property
     def agent_gvh(self) -> Gvh:
@@ -87,6 +105,9 @@ class AgentThread(ABC, Thread):
                 self.agent_comm_handler.stop()
         self.__stop_event.set()
         print("stopped", self.pid())
+
+    def lock(self):
+        pass
 
     def initialize_vars(self, varlist):
         pass

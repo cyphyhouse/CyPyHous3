@@ -80,7 +80,6 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     mutex_id,req_num = msg.content
     requester = msg.sender
     if agent_gvh.is_leader:
-        print("got mutex request from ",msg.sender)
         agent_gvh.mutex_handler.add_request(mutex_id, requester, req_num)
     else:
         pass
@@ -96,7 +95,6 @@ def mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     mutex_id, grantee,mutexnum = msg.content
     index = agent_gvh.mutex_handler.find_mutex_index(mutex_id)
     agent_gvh.mutex_handler.mutexes[index].mutex_holder = grantee
-    print(mutexnum," granted to",grantee, time.time())
     pass
 
 
