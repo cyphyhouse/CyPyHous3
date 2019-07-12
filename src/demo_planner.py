@@ -57,8 +57,8 @@ class DemoPlan(object):
         start = [self.start.x, self.start.y]
         end = [self.end.x,self.end.y]
         mid = [(start[0]+end[0])/2, (start[1]+end[1])/2]
-        #path = [start, mid, end]
-        path = [start, end]
+        path = [start, mid, end]
+        #path = [start, end]
 
 
 
