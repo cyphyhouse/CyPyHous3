@@ -4,9 +4,9 @@ import socket
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 
-from comm_handler import CommHandler
-from gvh import Gvh
-from message import Message
+from .comm_handler import CommHandler
+from .gvh import Gvh
+from .message import Message
 
 
 class AgentThread(ABC, Thread):
@@ -36,7 +36,7 @@ class AgentThread(ABC, Thread):
         signal.signal(signal.SIGINT, self.signal_handler)
 
     def create_ar_var(self, name, type, initial_value=None):
-        self.agent_gvh.create_ar_var(name,type,initial_value)
+        self.agent_gvh.create_ar_var(name, type, initial_value)
         pass
 
     def create_aw_var(self, name, type, initial_value=None):
@@ -46,7 +46,6 @@ class AgentThread(ABC, Thread):
     @property
     def locals(self):
         return self.__locals
-
 
     @locals.setter
     def locals(self, locals):
@@ -94,6 +93,8 @@ class AgentThread(ABC, Thread):
         if self.agent_gvh.moat is not None:
             if self.agent_gvh.moat.bot_type is 0:
                 self.agent_gvh.moat.land()
+                # todo: msg = tERMINATE_MSG() best termination message
+                # TODO: send(msg,"",best_post,time.time()) best termination message.
         if self.agent_gvh.dsm is not None:
             for dsmvar in self.agent_gvh.dsm:
                 print(dsmvar, "for", self.agent_gvh.pid)
@@ -111,7 +112,6 @@ class AgentThread(ABC, Thread):
 
     def initialize_vars(self, varlist):
         pass
-
 
     def stopped(self) -> bool:
         """
