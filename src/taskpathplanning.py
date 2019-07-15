@@ -113,6 +113,7 @@ class AgentCreation(AgentThread):
                             if mytask.location.position.z <= 0 and self.agent_gvh.moat.bot_type == 0:
                                 continue
                             # print("planner is", self.agent_gvh.moat.planner)
+                            print(mytask.location)
 
                             self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
                                                               self.agent_gvh.moat.position.position.y,
