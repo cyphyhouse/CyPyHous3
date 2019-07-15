@@ -45,7 +45,7 @@ class SimplePlanner(pl.Planner):
         # calculating the unit vector along the line
         dist = distance(start_point, end_point)
         segment = Seg(start_point, end_point)
-        direction = segment.direction()
+        direction = segment.direction()  # direction is the unit vector along the line segment.
         seg_length = dist / self.num_segs
         path = [start_point]
         last_point = start_point

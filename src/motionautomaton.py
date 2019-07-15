@@ -1,13 +1,36 @@
 import threading
 import time
-
+from enum import Enum
+from planner import Planner
 import rospy
 from geometry_msgs.msg import PoseStamped, Pose
+from simpleplanner import SimplePlanner
 from std_msgs.msg import String
 
 
+class BotType(Enum):
+    """
+    add more bot types here
+    """
+    QUAD = 1
+    CAR = 2
+
+
 class MoatConfig(object):
-    def __init__(self):
+
+    def __init__(self, bot_name: str, queue_size:int, bot_type: BotType, planner:Planner =SimplePlanner()):
+        """
+        initialize motion automaton config
+        :param bot_name: name of the bot
+        :param queue_size: message queue size
+        :param bot_type: bot type
+        :param planner: planner
+        """
+        self.bot_name = bot_name
+        self.queue_size = queue_size
+        self.bot_type = BotType
+        self.planner = planner
+
 
 class MotionAutomaton(threading.Thread):
     """
@@ -19,10 +42,9 @@ class MotionAutomaton(threading.Thread):
 
     """
 
-
-    def __init__(self, planner, bot_name: str = 'cyphyhousecopter', queue_size=1 , bot_type = 1):
-        #bot type is 0 for quadcopter, 1 for car.
-        #TODO queue size is unnecessary
+    def __init__(self, config):
+        # bot type is 0 for quadcopter, 1 for car.
+        # TODO queue size is unnecessary
         print("calling init")
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
@@ -38,8 +60,6 @@ class MotionAutomaton(threading.Thread):
                                             queue_size=1)
         self.__sub_reached = rospy.Subscriber('/Reached', String, self._getReached, queue_size=1)
         time.sleep(1)
-
-
 
     @property
     def planner(self):
@@ -126,7 +146,7 @@ class MotionAutomaton(threading.Thread):
         """
         self.position = data.pose
 
-    def _getReached(self, data:  str):  # -> NoReturn:
+    def _getReached(self, data: str):  # -> NoReturn:
         """
         This is a callback function that updates the internal Reached state
         :param data: String message
@@ -135,7 +155,6 @@ class MotionAutomaton(threading.Thread):
         a = str(data).upper()
         if 'TRUE' in a:
             self.reached = True
-
 
     def goTo(self, dest: Pose, wp_type: int = None):  # -> NoReturn:
         """
@@ -189,7 +208,6 @@ class MotionAutomaton(threading.Thread):
     @bot_type.setter
     def bot_type(self, bot_type):
         self.__bot_type = bot_type
-
 
     def run(self):
         """
