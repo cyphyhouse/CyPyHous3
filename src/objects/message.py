@@ -22,9 +22,12 @@ class Message(object):
         self.__content = content
         self.__timestamp = timestamp
 
-
     def __repr__(self):
-        return str(self.sender)+" , " + str(self.message_type)+ " , "+ str(self.content)
+        """
+        string representation
+        :return:
+        """
+        return str(self.sender) + " , " + str(self.message_type) + " , " + str(self.content)
 
     @property
     def sender(self) -> int:
@@ -77,9 +80,10 @@ class Message(object):
         """
         self.__message_type = message_type
 
-
     @property
     def timestamp(self):
+        """
+        getter method for timestamp
+        :return:
+        """
         return self.__timestamp
-
-

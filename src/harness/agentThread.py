@@ -4,9 +4,9 @@ import socket
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 
-from .comm_handler import CommHandler
-from .gvh import Gvh
-from .message import Message
+from src.CyPyHous3.src.harness.comm_handler import CommHandler
+from src.CyPyHous3.src.harness.gvh import Gvh
+from src.CyPyHous3.src.objects.message import Message
 
 
 class AgentThread(ABC, Thread):
@@ -177,3 +177,4 @@ def send(msg: Message, ip: str, port: int) -> None:
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     client_sock.sendto(pickle.dumps(msg), (ip, port))
+

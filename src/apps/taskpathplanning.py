@@ -1,14 +1,13 @@
 import time
 
-import drone_planner
-import rrt_star
-from agentThread import AgentThread
-from base_mutex import BaseMutex
-from comm_handler import CommHandler, CommTimeoutError
-from gvh import Gvh
-from mutex_handler import BaseMutexHandler
-from rrt_star import vec
-import demo_planner
+import src.CyPyHous3.src.motion.demo_planner as demo_planner
+import src.CyPyHous3.src.motion.motionAutomaton_car as ma
+from src.CyPyHous3.src.functionality.mutex_handler import BaseMutexHandler
+from src.CyPyHous3.src.harness.agentThread import AgentThread
+from src.CyPyHous3.src.harness.comm_handler import CommHandler, CommTimeoutError
+from src.CyPyHous3.src.harness.gvh import Gvh
+from src.CyPyHous3.src.motion.demo_planner import vec
+from src.CyPyHous3.src.objects.base_mutex import BaseMutex
 
 
 class Task(object):
@@ -28,8 +27,6 @@ class AgentCreation(AgentThread):
     def __init__(self, pid, participants, receiver_ip, r_port, bot_name):
 
         agent_gvh = Gvh(pid, participants)
-        import motionAutomaton_drone as mb
-        import motionAutomaton_car as ma
         moat = ma.MotionAutomaton(demo_planner.DemoPlan(), pid, bot_name, 10, 1)
         # moat = mb.MotionAutomaton(drone_planner.DPLAN(), pid, bot_name, 10, 0)
         agent_gvh.moat = moat
@@ -47,7 +44,6 @@ class AgentCreation(AgentThread):
         self.rounds = 10
         self.start()
 
-
     def run(self):
 
         if self.agent_gvh.moat.bot_type == 0:
@@ -57,10 +53,10 @@ class AgentCreation(AgentThread):
 
         self.agent_gvh.create_aw_var('tasks', list, tasks)
         self.agent_gvh.create_ar_var('route', list, route)
-        self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x,
+        self.agent_gvh.put('route', [[Pos(self.agent_gvh.moat.position.position.x,
                                           self.agent_gvh.moat.position.position.y,
                                           self.agent_gvh.moat.position.position.z)]], self.pid())
-        #print(self.agent_gvh.get('route'))
+        # print(self.agent_gvh.get('route'))
 
         a = BaseMutex(1, [2000])
 
@@ -184,5 +180,3 @@ def get_tasks(taskfile='tasks.txt', repeat=1):
         locnew.position.x, locnew.position.y, locnew.position.z = float(locxyz[0]), float(locxyz[1]), float(locxyz[2])
         tasks.append(Task(locnew, i, False, None))
     return tasks
-
-

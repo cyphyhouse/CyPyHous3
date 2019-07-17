@@ -2,10 +2,10 @@ import pickle
 import socket
 import time
 from typing import Union
-from dsm import dsmvar
-from message import Message
-from mutex_handler import BaseMutexHandler
-from synchronizer import Synchronizer
+from src.CyPyHous3.src.objects.dsm import dsmvar
+from src.CyPyHous3.src.objects.message import Message
+from src.CyPyHous3.src.functionality.mutex_handler import BaseMutexHandler
+from src.CyPyHous3.src.functionality.synchronizer import Synchronizer
 
 
 class Gvh(object):
@@ -34,7 +34,6 @@ class Gvh(object):
         :param mutex_handler : mutual exclusion handler
 
         """
-        self.msg_seq_num = 0
         self.__pid = pid
         self.__participants = participants
         self.__bot_name = bot_name

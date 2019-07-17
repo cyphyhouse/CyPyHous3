@@ -1,18 +1,19 @@
 import time
 
-import motionAutomaton_drone
-import rrt_star
-from agentThread import AgentThread
+from src.CyPyHous3.src.motion.moat_test_car import MoatTestCar
+from src.CyPyHous3.src.motion.motionautomaton import MoatConfig, default_car_moat_config
+from src.CyPyHous3.src.harness.agentThread import AgentThread
+from src.CyPyHous3.src.harness.comm_handler import CommHandler
 from geometry_msgs.msg import Pose
-from gvh import Gvh
+from src.CyPyHous3.src.harness.gvh import Gvh
 
 
 class BasicFollowApp(AgentThread):
 
-    def __init__(self, pid: int, num_bots: int):
+    def __init__(self, pid: int, num_bots: int, moat_config: MoatConfig):
         agent_gvh = Gvh(pid, num_bots)
-        agent_gvh.moat = motionAutomaton_drone.MotionAutomaton(None, pid, 'cyphyhousecopter', 10)
-        super(BasicFollowApp, self).__init__(agent_gvh, None)
+        agent_gvh.moat = MoatTestCar(moat_config)
+        super(BasicFollowApp, self).__init__(agent_gvh, CommHandler() )
         self.start()
 
     def run(self):
@@ -23,9 +24,9 @@ class BasicFollowApp(AgentThread):
         tries = 1
 
         dest1 = Pose()
-        dest1.position.x, dest1.position.y, dest1.position.z = 2., 1., 1.
+        dest1.position.x, dest1.position.y, dest1.position.z = 2., 1., 0.
         dest2 = Pose()
-        dest2.position.x, dest2.position.y, dest2.position.z = -1., -1., 1.
+        dest2.position.x, dest2.position.y, dest2.position.z = -1., -1., 0.
         dest3 = Pose()
         dest3.position.x, dest3.position.y, dest3.position.z = 1., 2., 0.
 
@@ -43,15 +44,14 @@ class BasicFollowApp(AgentThread):
             # stop
 
             if tries == 1:
-
                 self.agent_gvh.moat.goTo(dest1)
                 # self.agent_gvh.moat.follow_path([dest1])
                 time.sleep(5)
                 tries = 2
                 continue
             if tries == 2:
-
                 self.agent_gvh.moat.goTo(dest2)
+
                 # self.agent_gvh.moat.follow_path([dest2])
 
                 tries = 3
@@ -66,4 +66,6 @@ class BasicFollowApp(AgentThread):
                 continue
 
 
-BasicFollowApp(1, 1)
+m = default_car_moat_config('hotdec_car')
+moat = MoatConfig(m)
+app = BasicFollowApp(1,1,moat)

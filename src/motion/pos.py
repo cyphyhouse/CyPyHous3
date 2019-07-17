@@ -1,4 +1,4 @@
-from typing import Union
+import typing
 
 import numpy as np
 from scipy.spatial.distance import pdist
@@ -9,7 +9,7 @@ class Pos(object):
     vector object, 3d point. Has x, y and z components.
     """
 
-    def __init__(self, vector: np.ndarray):
+    def __init__(self, vector: np.ndarray = np.array([])):
         """
         initialize 3d pointer given an np array
         :param vector: np array of length 3.
@@ -19,7 +19,10 @@ class Pos(object):
             self.y = vector[1]
             self.z = vector[2]
         except IndexError:
-            print("Incorrect dimensions of vector")
+            print("initializing an empty position")
+            self.x = None
+            self.y = None
+            self.z = None
 
     def __repr__(self) -> str:
         """
@@ -59,7 +62,7 @@ class Pos(object):
         """
         return Pos(np.array(self.mk_arr() - other.mk_arr()))
 
-    def __mul__(self, other: Union[int, float]):
+    def __mul__(self, other: typing.Union[int, float]):
         """
         scalar multiplication
         :param other: scalar
@@ -75,37 +78,16 @@ class Pos(object):
         """
         return self.x == other.x and self.y == other.y and self.z == other.z
 
-
-def distance(x: Pos, y: Pos) -> float:
-    """
-    distance between two points
-    :param x: position
-    :param y: position
-    :return: distance
-    """
-    d = np.vstack((x.mk_arr(), y.mk_arr()))
-    dist = pdist(d)[0]
-    return dist
-
-
-def dot(x: Pos, y: Pos) -> np.ndarray:
-    """
-    dot product
-    :param x: vector (position)
-    :param y: vector (position)
-    :return: dot product
-    """
-    return np.dot(x.mk_arr(), y.mk_arr())
-
-
-def cross(x: Pos, y: Pos) -> Pos:
-    """
-    cross product
-    :param x: vector
-    :param y: vector
-    :return: vector
-    """
-    return Pos(np.cross(x.mk_arr(), y.mk_arr()))
+    def to_pose(self):
+        """
+        convert position to posestamped
+        :return:
+        """
+        from geometry_msgs.msg import PoseStamped, Pose
+        return_pt = Pose()
+        return_pt.position.x = self.x
+        return_pt.position.y = self.y
+        return_pt.position.y = self.z
 
 
 class Seg(object):
@@ -145,3 +127,38 @@ class Seg(object):
                                           (self.end.y - self.start.y) / self.length(),
                                           (self.end.z - self.start.z) / self.length()])))
         return uvec
+
+
+
+
+
+def distance(x: Pos, y: Pos) -> float:
+    """
+    distance between two points
+    :param x: position
+    :param y: position
+    :return: distance
+    """
+    d = np.vstack((x.mk_arr(), y.mk_arr()))
+    dist = pdist(d)[0]
+    return dist
+
+
+def dot(x: Pos, y: Pos) -> np.ndarray:
+    """
+    dot product
+    :param x: vector (position)
+    :param y: vector (position)
+    :return: dot product
+    """
+    return np.dot(x.mk_arr(), y.mk_arr())
+
+
+def cross(x: Pos, y: Pos) -> Pos:
+    """
+    cross product
+    :param x: vector
+    :param y: vector
+    :return: vector
+    """
+    return Pos(np.cross(x.mk_arr(), y.mk_arr()))

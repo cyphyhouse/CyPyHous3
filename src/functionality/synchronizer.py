@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from message import Message
+from src.CyPyHous3.src.objects.message import Message
 
 
 class Synchronizer(ABC):

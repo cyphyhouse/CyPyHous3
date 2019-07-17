@@ -1,5 +1,5 @@
-from message import Message
-from synchronizer import Synchronizer
+from src.CyPyHous3.src.objects.message import Message
+from src.CyPyHous3.src.functionality.synchronizer import Synchronizer
 
 
 class BasicSynchronizer(Synchronizer):

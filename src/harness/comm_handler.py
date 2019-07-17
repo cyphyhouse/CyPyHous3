@@ -2,8 +2,8 @@ import pickle
 import socket
 from threading import Thread, Event
 
-from gvh import Gvh
-from message_handler import message_handler
+from src.CyPyHous3.src.harness.gvh import Gvh
+from src.CyPyHous3.src.harness.message_handler import message_handler
 
 # TODO: move to a base config file.
 RETRY_VAL = 10
@@ -20,7 +20,7 @@ class CommHandler(Thread):
     __retries : retries
     """
 
-    def __init__(self, ip: str, r_port: int, agent_gvh=None, timeout: float = 10.0, retries: int = RETRY_VAL):
+    def __init__(self, ip: str = "", r_port: int = 2000, agent_gvh=None, timeout: float = 10.0, retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:

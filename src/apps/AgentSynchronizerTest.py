@@ -1,10 +1,10 @@
 import time
 
-import basic_synchronizer
-from agentThread import AgentThread, send
-from comm_handler import CommHandler, CommTimeoutError
-from gvh import Gvh
-from message_handler import round_update_create
+import src.CyPyHous3.src.functionality.basic_synchronizer as basic_synchronizer
+from src.CyPyHous3.src.harness.agentThread import AgentThread, send
+from src.CyPyHous3.src.harness.comm_handler import CommHandler
+from src.CyPyHous3.src.harness.gvh import Gvh
+from src.CyPyHous3.src.harness.message_handler import round_update_create
 
 
 class AgentCreation(AgentThread):
@@ -31,11 +31,11 @@ class AgentCreation(AgentThread):
     def run(self):
         while not self.stopped():
             started = False
-            if not started :
+            if not started:
                 msg = round_update_create(self.pid(), self.agent_gvh.synchronizer.round_num, time.time())
 
                 for port in self.agent_gvh.synchronizer.ip_port_list:
-                    send(msg,"192.168.1.255",port)
+                    send(msg, "192.168.1.255", port)
                 self.agent_gvh.add_msg(msg)
                 self.agent_gvh.flush_msgs()
                 time.sleep(1)
@@ -51,25 +51,26 @@ class AgentCreation(AgentThread):
                 if self.agent_gvh.synchronizer.round_num < 10:
                     msg = round_update_create(self.pid(), self.agent_gvh.synchronizer.round_num, time.time())
                     for port in self.agent_gvh.synchronizer.ip_port_list:
-                        send(msg,"192.168.1.255",port)
+                        send(msg, "192.168.1.255", port)
                     self.agent_gvh.add_msg(msg)
                     self.agent_gvh.flush_msgs()
                     self.agent_comm_handler.handle_msgs()
                     try:
                         self.agent_gvh.synchronizer.synchronize()
-                        print("round",self.agent_gvh.synchronizer.round_num,"on agent",self.pid())
+                        print("round", self.agent_gvh.synchronizer.round_num, "on agent", self.pid())
 
                     except basic_synchronizer.RoundSyncError:
                         print("waiting to sync")
                         time.sleep(0.01)
                         continue
 
-                    if self.agent_gvh.is_alive :
+                    if self.agent_gvh.is_alive:
                         continue
                     else:
                         self.stop()
                 else:
                     self.stop()
+
 
 b = AgentCreation(1, 2, "", 2001)
 a = AgentCreation(0, 2, "", 2000)

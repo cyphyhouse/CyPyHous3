@@ -2,7 +2,8 @@
 # use numpy arrays
 
 from abc import ABC, abstractmethod
-import numpy as np
+
+from pos import Pos
 
 
 class Planner(ABC):
@@ -17,7 +18,7 @@ class Planner(ABC):
         pass
 
     @abstractmethod
-    def find_path(self, start_point: np.ndarray, end_point: np.ndarray, obstacles: list) -> list:
+    def find_path(self, start_point: Pos, end_point: Pos, obstacles: list) -> list:
         """
         find a path from the start point to an end point given a list of obstacles.
         :param start_point: starting point as a vector [x,y,z]
