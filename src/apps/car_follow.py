@@ -67,5 +67,4 @@ class BasicFollowApp(AgentThread):
 
 
 m = default_car_moat_config('hotdec_car')
-moat = MoatConfig(m)
-app = BasicFollowApp(1,1,moat)
+app = BasicFollowApp(1,1,m)
