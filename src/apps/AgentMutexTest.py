@@ -1,11 +1,11 @@
 import time
 
 import src.functionality.basic_synchronizer as basic_synchronizer
+from src.functionality.mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
-from src.objects.base_mutex import BaseMutex
 from src.harness.comm_handler import CommHandler, CommTimeoutError
 from src.harness.gvh import Gvh
-from src.functionality.mutex_handler import BaseMutexHandler
+from src.objects.base_mutex import BaseMutex
 
 
 class AgentCreation(AgentThread):

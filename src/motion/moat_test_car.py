@@ -9,10 +9,10 @@ class MoatTestCar(MotionAutomaton):
     def __init__(self, config):
         super(MoatTestCar, self).__init__(config)
 
-    def _getPositioning(self, data) -> Pos:
+    def _getPositioning(self, data) -> None:
         self.position = Pos(np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z]))
 
-    def _getReached(self, data) -> bool:
+    def _getReached(self, data) -> None:
         a = str(data).upper()
         if 'TRUE' in a:
             self.reached = True
