@@ -1,13 +1,13 @@
 import time
 
-import src.CyPyHous3.src.motion.demo_planner as demo_planner
-import src.CyPyHous3.src.motion.motionAutomaton_car as ma
-from src.CyPyHous3.src.functionality.mutex_handler import BaseMutexHandler
-from src.CyPyHous3.src.harness.agentThread import AgentThread
-from src.CyPyHous3.src.harness.comm_handler import CommHandler, CommTimeoutError
-from src.CyPyHous3.src.harness.gvh import Gvh
-from src.CyPyHous3.src.motion.demo_planner import vec
-from src.CyPyHous3.src.objects.base_mutex import BaseMutex
+import src.motion.demo_planner as demo_planner
+import src.motion.motionAutomaton_car as ma
+from src.functionality.mutex_handler import BaseMutexHandler
+from src.harness.agentThread import AgentThread
+from src.harness.comm_handler import CommHandler, CommTimeoutError
+from src.harness.gvh import Gvh
+from src.motion.demo_planner import vec
+from src.objects.base_mutex import BaseMutex
 
 
 class Task(object):

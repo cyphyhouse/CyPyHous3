@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.CyPyHous3.src.motion.motionautomaton import MotionAutomaton
-from src.CyPyHous3.src.motion.pos import Pos
+from src.motion.motionautomaton import MotionAutomaton
+from src.motion.pos import Pos
 
 
 class MoatTestCar(MotionAutomaton):

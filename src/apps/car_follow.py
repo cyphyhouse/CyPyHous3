@@ -1,11 +1,11 @@
 import time
 
-from src.CyPyHous3.src.motion.moat_test_car import MoatTestCar
-from src.CyPyHous3.src.motion.motionautomaton import MoatConfig, default_car_moat_config
-from src.CyPyHous3.src.harness.agentThread import AgentThread
-from src.CyPyHous3.src.harness.comm_handler import CommHandler
+from src.motion.moat_test_car import MoatTestCar
+from src.motion.motionautomaton import MoatConfig, default_car_moat_config
+from src.harness.agentThread import AgentThread
+from src.harness.comm_handler import CommHandler
 from geometry_msgs.msg import Pose
-from src.CyPyHous3.src.harness.gvh import Gvh
+from src.harness.gvh import Gvh
 
 
 class BasicFollowApp(AgentThread):

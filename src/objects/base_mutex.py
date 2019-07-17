@@ -1,10 +1,10 @@
 import time
 
-from src.CyPyHous3.src.harness.agentThread import send
-from src.CyPyHous3.src.harness.message_handler import mutex_grant_create, mutex_release_create, mutex_request_create
-from src.CyPyHous3.src.objects.mutex import Mutex
+from src.harness.agentThread import send
+from src.harness.message_handler import mutex_grant_create, mutex_release_create, mutex_request_create
+from src.objects.mutex import Mutex
 from typing import Union
-from src.CyPyHous3.src.harness.comm_handler import CommHandler
+from src.harness.comm_handler import CommHandler
 
 
 class BaseMutex(Mutex):

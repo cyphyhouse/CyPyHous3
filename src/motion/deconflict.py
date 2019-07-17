@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import src.CyPyHous3.src.motion.pos as pos
+import src.motion.pos as pos
 
 
 def is_collinear(p1: pos.Pos, p2: pos.Pos, p3: pos.Pos):

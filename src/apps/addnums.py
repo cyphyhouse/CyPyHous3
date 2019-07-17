@@ -1,10 +1,10 @@
 import time
 
-from src.CyPyHous3.src.harness.agentThread import AgentThread
-from src.CyPyHous3.src.objects.base_mutex import BaseMutex
-from src.CyPyHous3.src.harness.comm_handler import CommHandler, CommTimeoutError
-from src.CyPyHous3.src.harness.gvh import Gvh
-from src.CyPyHous3.src.functionality.mutex_handler import BaseMutexHandler
+from src.harness.agentThread import AgentThread
+from src.objects.base_mutex import BaseMutex
+from src.harness.comm_handler import CommHandler, CommTimeoutError
+from src.harness.gvh import Gvh
+from src.functionality.mutex_handler import BaseMutexHandler
 
 
 class AgentCreation(AgentThread):

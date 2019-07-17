@@ -1,9 +1,9 @@
 import time
 
-from src.CyPyHous3.src.harness.agentThread import AgentThread, send
-from src.CyPyHous3.src.harness.comm_handler import CommHandler
-from src.CyPyHous3.src.harness.gvh import Gvh
-from src.CyPyHous3.src.objects.message import Message
+from src.harness.agentThread import AgentThread, send
+from src.harness.comm_handler import CommHandler
+from src.harness.gvh import Gvh
+from src.objects.message import Message
 
 
 class SndRecv(AgentThread):

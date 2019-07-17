@@ -1,10 +1,10 @@
 import time
 
-import src.CyPyHous3.src.functionality.basic_synchronizer as basic_synchronizer
-from src.CyPyHous3.src.harness.agentThread import AgentThread, send
-from src.CyPyHous3.src.harness.comm_handler import CommHandler
-from src.CyPyHous3.src.harness.gvh import Gvh
-from src.CyPyHous3.src.harness.message_handler import round_update_create
+import src.functionality.basic_synchronizer as basic_synchronizer
+from src.harness.agentThread import AgentThread, send
+from src.harness.comm_handler import CommHandler
+from src.harness.gvh import Gvh
+from src.harness.message_handler import round_update_create
 
 
 class AgentCreation(AgentThread):

@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from src.CyPyHous3.src.motion.deconflict import is_collinear, line_to_pt_dist, seg_distance_3d
-from src.CyPyHous3.src.motion.pos import Pos, Seg
+from src.motion.deconflict import is_collinear, line_to_pt_dist, seg_distance_3d
+from src.motion.pos import Pos, Seg
 
 
 class DeconflictTest(unittest.TestCase):

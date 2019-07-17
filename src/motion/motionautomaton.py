@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Union
 
-from src.CyPyHous3.src.motion.planner import Planner
-from src.CyPyHous3.src.motion.pos import Pos
-from src.CyPyHous3.src.motion.simpleplanner import SimplePlanner
+from src.motion.planner import Planner
+from src.motion.pos import Pos
+from src.motion.simpleplanner import SimplePlanner
 
 
 class BotType(Enum):

@@ -2,9 +2,9 @@
 
 import time
 
-import src.CyPyHous3.src.objects.message as message
-from src.CyPyHous3.src.functionality.basic_synchronizer import RoundSyncError
-from src.CyPyHous3.src.harness.gvh import Gvh
+import src.objects.message as message
+from src.functionality.basic_synchronizer import RoundSyncError
+from src.harness.gvh import Gvh
 
 
 def round_update_create(pid: int, round_num: int, ts: float) -> message.Message:

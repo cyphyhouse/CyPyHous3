@@ -2,8 +2,8 @@ import time
 
 from geometry_msgs.msg import Pose
 
-from src.CyPyHous3.src.harness.agentThread import AgentThread
-from src.CyPyHous3.src.harness.gvh import Gvh
+from src.harness.agentThread import AgentThread
+from src.harness.gvh import Gvh
 
 
 class BasicFollowApp(AgentThread):

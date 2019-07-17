@@ -4,9 +4,9 @@ import socket
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 
-from src.CyPyHous3.src.harness.comm_handler import CommHandler
-from src.CyPyHous3.src.harness.gvh import Gvh
-from src.CyPyHous3.src.objects.message import Message
+from src.harness.comm_handler import CommHandler
+from src.harness.gvh import Gvh
+from src.objects.message import Message
 
 
 class AgentThread(ABC, Thread):

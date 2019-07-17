@@ -2,10 +2,10 @@ import pickle
 import socket
 import time
 from typing import Union
-from src.CyPyHous3.src.objects.dsm import dsmvar
-from src.CyPyHous3.src.objects.message import Message
-from src.CyPyHous3.src.functionality.mutex_handler import BaseMutexHandler
-from src.CyPyHous3.src.functionality.synchronizer import Synchronizer
+from src.objects.dsm import dsmvar
+from src.objects.message import Message
+from src.functionality.mutex_handler import BaseMutexHandler
+from src.functionality.synchronizer import Synchronizer
 
 
 class Gvh(object):

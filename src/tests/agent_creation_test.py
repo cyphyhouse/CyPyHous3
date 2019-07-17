@@ -2,9 +2,9 @@
 
 import unittest
 
-from src.CyPyHous3.src.harness.agentThread import AgentThread
-from src.CyPyHous3.src.harness.comm_handler import CommHandler
-from src.CyPyHous3.src.harness.gvh import Gvh
+from src.harness.agentThread import AgentThread
+from src.harness.comm_handler import CommHandler
+from src.harness.gvh import Gvh
 
 
 class AgentCreation(AgentThread):
