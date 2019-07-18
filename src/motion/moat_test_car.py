@@ -35,12 +35,13 @@ class MoatTestCar(MotionAutomaton):
         pose = PoseStamped()
         pose.header.stamp = rospy.Time.now()
         pose.header.frame_id = frame_id
+        a = dest.to_pose()
+        print("to pose of",dest,"results in",a)
         pose.pose = dest.to_pose()
 
         self.reached = False
 
         self.waypoint_count += 1
-        print("actually going to",pose.pose)
         self.pub.publish(pose)
 
     def follow_path(self, path: list) -> None:
