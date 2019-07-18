@@ -88,6 +88,7 @@ class Pos(object):
         return_pt.position.x = self.x
         return_pt.position.y = self.y
         return_pt.position.y = self.z
+        return return_pt
 
 
 class Seg(object):
