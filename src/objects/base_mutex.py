@@ -1,10 +1,10 @@
 import time
+from typing import Union
 
-from src.harness.agentThread import send
+from src.functionality.comm_funcs import send
+from src.harness.comm_handler import CommHandler
 from src.harness.message_handler import mutex_grant_create, mutex_release_create, mutex_request_create
 from src.objects.mutex import Mutex
-from typing import Union
-from src.harness.comm_handler import CommHandler
 
 
 class BaseMutex(Mutex):
@@ -16,7 +16,7 @@ class BaseMutex(Mutex):
     __agent_comm_handler : "reference" to agent comm handler
     """
 
-    def __init__(self, mutex_id: int, ip_port_list:list=[]):
+    def __init__(self, mutex_id: int, ip_port_list: list = []):
         """
         base init method for mutex
         :param mutex_id: mutex id
@@ -70,7 +70,7 @@ class BaseMutex(Mutex):
         return self.__agent_comm_handler
 
     @mutex_id.setter
-    def mutex_id(self, mutex_id:int) -> None:
+    def mutex_id(self, mutex_id: int) -> None:
         """
         setter method for mutex_id
         :param mutex_id: int mutex id
@@ -97,7 +97,7 @@ class BaseMutex(Mutex):
         self.__mutex_request_list = mutex_request_list
 
     @ip_port_list.setter
-    def ip_port_list(self, ip_port_list:list)-> None:
+    def ip_port_list(self, ip_port_list: list) -> None:
         """
         setter method for list of ports.
         :param ip_port_list:
@@ -114,7 +114,7 @@ class BaseMutex(Mutex):
         """
         self.__agent_comm_handler = agent_comm_handler
 
-    def request_mutex(self, req_num:int) -> None:
+    def request_mutex(self, req_num: int) -> None:
         """
         method to request mutex
         :param req_num: request number
@@ -128,7 +128,7 @@ class BaseMutex(Mutex):
         else:
             send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
 
-    def grant_mutex(self,mutexnum:int) -> None:
+    def grant_mutex(self, mutexnum: int) -> None:
         """
         method to grant mutex, if leader
         :return:
@@ -137,7 +137,8 @@ class BaseMutex(Mutex):
             agent_id = self.mutex_request_list[0][0]
             self.__mutex_holder = agent_id
             self.__mutex_request_list = self.mutex_request_list[1:]
-            msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum, time.time())
+            msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
+                                     time.time())
             if self.ip_port_list is not []:
                 for port in self.ip_port_list:
                     send(msg, '192.168.1.255', port)
