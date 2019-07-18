@@ -14,7 +14,7 @@ class AddNums(AgentThread):
     """
 
     def __init__(self, config):
-        super(AddNums, self).__init__(config)
+        super(AddNums, self).__init__(config,None)
         self.requestedlock = False
         self.req_num = 0
         self.baselock = None

@@ -4,7 +4,7 @@ from threading import Thread, Event
 from typing import Union
 
 from src.harness.comm_handler import CommHandler
-from src.harness.configs import AgentConfig
+from src.harness.configs import AgentConfig, MoatConfig
 from src.harness.gvh import Gvh
 
 
@@ -18,7 +18,7 @@ class AgentThread(ABC, Thread):
     __stop_event : stop thread safely.
     """
 
-    def __init__(self, agent_config:AgentConfig, moat_config:Union[MoatConfig, None]) -> None:
+    def __init__(self, agent_config: AgentConfig, moat_config: Union[MoatConfig, None]) -> None:
         """
         init method for for agent application thread object.
         :param agent_gvh: agent global variable holder object
@@ -39,7 +39,6 @@ class AgentThread(ABC, Thread):
         self.__stop_event = Event()
         self.__mutex_handler = mutex_handler
         self.__locals = {}
-
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)

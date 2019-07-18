@@ -11,7 +11,7 @@ from src.motion.pos import Pos
 class BasicFollowApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
-        super(BasicFollowApp, self).__init__(agent_config)
+        super(BasicFollowApp, self).__init__(agent_config, moat_config)
         self.agent_gvh.moat = MoatTestCar(moat_config)
         self.start()
 
