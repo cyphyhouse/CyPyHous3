@@ -25,6 +25,12 @@ class Pos(object):
             self.y = None
             self.z = None
 
+        except TypeError:
+            print("initializing an empty position")
+            self.x = None
+            self.y = None
+            self.z = None
+
     def __repr__(self) -> str:
         """
         string representation
