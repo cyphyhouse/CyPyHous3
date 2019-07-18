@@ -82,7 +82,7 @@ def default_car_moat_config(bot_name) -> MoatConfig:
                       queue_size, bot_type, pub_msg_type, SimplePlanner())
 
 
-def default_qc_moat_config(bot_name, positioning_callback, reached_callback) -> MoatConfig:
+def default_qc_moat_config(bot_name) -> MoatConfig:
     rospy_node = 'quad_wp_node'
     bot_type = BotType.CAR
     waypoint_topic = 'Waypoint'
