@@ -39,7 +39,7 @@ class MoatConfig(object):
         self.reached_topic = reached_topic
         self.reached_params = reached_params
         self.positioning_params = positioning_params
-        self.msg_type = msg_type
+        self.pub_msg_type = pub_msg_type
         self.rospy_node = rospy_node
         self.bot_name = bot_name
         self.queue_size = queue_size
@@ -60,7 +60,7 @@ def default_car_moat_config(bot_name) -> MoatConfig:
     waypoint_topic = 'Waypoint'
     reached_topic = '/Reached'
 
-    from geometry_msgs import PoseStamped
+    from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
 
     pub_msg_type = PoseStamped
@@ -77,7 +77,7 @@ def default_qc_moat_config(bot_name, positioning_callback, reached_callback) -> 
     waypoint_topic = 'Waypoint'
     reached_topic = '/Reached'
 
-    from geometry_msgs import PoseStamped
+    from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
 
     pub_msg_type = PoseStamped
@@ -106,8 +106,8 @@ class MotionAutomaton(threading.Thread, ABC):
             import rospy
             rospy.init_node(config.rospy_node, anonymous=True)
             self.__pub = rospy.Publisher(config.waypoint_topic, config.pub_msg_type, queue_size=config.queue_size)
-            self.__sub_reached = rospy.Subscriber(*config.reached_params, self._getReached() , queue_size=config.queue_size)
-            self.__sub_positioning = rospy.Subscriber(*config.positioning_params, self._getPositioning(), queue_size=config.queue_size)
+            self.__sub_reached = rospy.Subscriber(*config.reached_params, self._getReached, queue_size=config.queue_size)
+            self.__sub_positioning = rospy.Subscriber(*config.positioning_params, self._getPositioning, queue_size=config.queue_size)
 
         except ImportError:
             self.__pub = None
