@@ -85,6 +85,8 @@ class Pos(object):
         """
         from geometry_msgs.msg import PoseStamped, Pose
         return_pt = Pose()
+        print("extracting x, y and z",self.x, self.y, self.z)
+
         return_pt.position.x = self.x
         return_pt.position.y = self.y
         return_pt.position.y = self.z
