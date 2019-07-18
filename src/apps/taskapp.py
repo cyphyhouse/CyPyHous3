@@ -8,21 +8,10 @@ from src.harness.comm_handler import CommHandler, CommTimeoutError
 from src.harness.gvh import Gvh
 from src.motion.demo_planner import vec
 from src.objects.base_mutex import BaseMutex
+from src.objects.udt import Task
 
 
-class Task(object):
-
-    def __init__(self, location, id, assigned, assigned_to):
-        self.location = location
-        self.id = id
-        self.assigned = assigned
-        self.assigned_to = assigned_to
-
-    def __repr__(self):
-        return (str(self.id) + " assigned to " + str(self.assigned_to))
-
-
-class AgentCreation(AgentThread):
+class TaskApp(AgentThread):
 
     def __init__(self, pid, participants, receiver_ip, r_port, bot_name):
 
@@ -37,7 +26,7 @@ class AgentCreation(AgentThread):
         mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
         agent_gvh.mutex_handler = mutex_handler
         agent_comm_handler = CommHandler(receiver_ip, r_port, agent_gvh, 10)
-        super(AgentCreation, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
+        super(TaskApp, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
 
         self.agent_comm_handler.agent_gvh = self.agent_gvh
 

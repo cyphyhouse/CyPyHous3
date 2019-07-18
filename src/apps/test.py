@@ -1,2 +1,2 @@
-from src.apps.taskpathplanning import AgentCreation
-a = AgentCreation(0, 1, "", 2000, 'hotdec_car')
+from src.apps.taskapp import TaskApp
+a = TaskApp(0, 1, "", 2000, 'hotdec_car')
