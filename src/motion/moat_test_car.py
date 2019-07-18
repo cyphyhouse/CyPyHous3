@@ -22,12 +22,7 @@ class MoatTestCar(MotionAutomaton):
         if wp_type is not None:
             frame_id = str(wp_type)
         else:
-            if self.waypoint_count == 0:
-                frame_id = '0'
-            elif dest.z <= 0:
-                frame_id = '2'
-            else:
-                frame_id = '1'
+            frame_id = '1'
 
         import rospy
         from geometry_msgs.msg import PoseStamped
