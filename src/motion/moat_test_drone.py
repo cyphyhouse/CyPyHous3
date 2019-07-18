@@ -40,8 +40,8 @@ class MoatTestDrone(MotionAutomaton):
         self.reached = False
 
         self.waypoint_count += 1
+        print(self.pub)
         self.pub.publish(pose)
-        print("publishing pose", pose)
 
     def follow_path(self, path: list) -> None:
         wp_list = []
