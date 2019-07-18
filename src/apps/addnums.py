@@ -3,36 +3,21 @@ import time
 from src.harness.agentThread import AgentThread
 from src.objects.base_mutex import BaseMutex
 from src.harness.comm_handler import CommHandler, CommTimeoutError
-from src.harness.gvh import Gvh
 from src.functionality.mutex_handler import BaseMutexHandler
+from src.harness.configs import AgentConfig
 
 
-class AgentCreation(AgentThread):
+class AddNums(AgentThread):
     """
     test class to test that agent thread objects are created
     and fields are accessed safely and correctly .
     """
 
-    def __init__(self, pid, participants, receiver_ip, r_port):
-        """
-        parameters to instantiate the gvh and communication handler.
-        :param pid:
-        :param participants:
-        :param r_port:
-        """
-        #config object.
-        agent_gvh = Gvh(pid, participants)
-        agent_gvh.port_list = [2000,2001,2002,2005,2004]
-        if pid == 0:
-            agent_gvh.is_leader = True
-        mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
-        agent_gvh.mutex_handler = mutex_handler
-        agent_comm_handler = CommHandler(receiver_ip, r_port)
-
-        super(AgentCreation, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
-        self.agent_comm_handler.agent_gvh = self.agent_gvh
+    def __init__(self, config):
+        super(AddNums, self).__init__(config)
         self.requestedlock = False
         self.req_num = 0
+        self.baselock = None
 
         self.start()
 
@@ -89,6 +74,12 @@ class AgentCreation(AgentThread):
                 self.stop()
 
 
-b,c,d = AgentCreation(2, 3, "", 2001),AgentCreation(4, 3, "", 2002),AgentCreation(0, 3, "", 2000)
 
+plist = [2000,2001,2002,2003,2004]
+bots = 3
+c1 = AgentConfig(2,bots,"",2001,plist, BaseMutexHandler(False,2))
+c2 = AgentConfig(3,bots,"",2002,plist, BaseMutexHandler(False,3))
+c3 = AgentConfig(0,bots,"",2003,plist, BaseMutexHandler(True,0))
+
+b,c,d = AddNums(c1),AddNums(c2),AddNums(c3)
 

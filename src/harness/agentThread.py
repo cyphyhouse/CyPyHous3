@@ -1,8 +1,10 @@
 import signal
 from abc import ABC, abstractmethod
 from threading import Thread, Event
+from typing import Union
 
 from src.harness.comm_handler import CommHandler
+from src.harness.configs import AgentConfig
 from src.harness.gvh import Gvh
 
 
@@ -16,18 +18,28 @@ class AgentThread(ABC, Thread):
     __stop_event : stop thread safely.
     """
 
-    def __init__(self, agent_gvh: Gvh, agent_comm_handler: CommHandler, mutex_handler=None) -> None:
+    def __init__(self, agent_config:AgentConfig, moat_config:Union[MoatConfig, None]) -> None:
         """
         init method for for agent application thread object.
         :param agent_gvh: agent global variable holder object
         :param agent_comm_handler: agent communication handler thread object
         """
         super(AgentThread, self).__init__()
+        agent_gvh = Gvh(agent_config.pid, agent_config.bots)
+        agent_gvh.port_list = agent_config.plist
+        agent_gvh.is_leader = agent_config.pid == 0
+
+        mutex_handler = agent_config.mutex_handler
+        agent_gvh.mutex_handler = mutex_handler
+        agent_comm_handler = CommHandler(agent_config.rip, agent_config.rport)
+        agent_comm_handler.agent_gvh = agent_gvh
+
         self.__agent_gvh = agent_gvh
         self.__agent_comm_handler = agent_comm_handler
         self.__stop_event = Event()
         self.__mutex_handler = mutex_handler
         self.__locals = {}
+
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)

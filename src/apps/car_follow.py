@@ -3,19 +3,16 @@ import time
 import numpy as np
 
 from src.harness.agentThread import AgentThread
-from src.harness.comm_handler import CommHandler
-from src.harness.gvh import Gvh
+from src.harness.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.motion.moat_test_car import MoatTestCar
-from src.motion.motionautomaton import MoatConfig, default_car_moat_config
 from src.motion.pos import Pos
 
 
 class BasicFollowApp(AgentThread):
 
-    def __init__(self, pid: int, num_bots: int, moat_config: MoatConfig):
-        agent_gvh = Gvh(pid, num_bots)
-        agent_gvh.moat = MoatTestCar(moat_config)
-        super(BasicFollowApp, self).__init__(agent_gvh, CommHandler())
+    def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
+        super(BasicFollowApp, self).__init__(agent_config)
+        self.agent_gvh.moat = MoatTestCar(moat_config)
         self.start()
 
     def run(self):
