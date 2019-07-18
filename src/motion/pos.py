@@ -9,11 +9,12 @@ class Pos(object):
     vector object, 3d point. Has x, y and z components.
     """
 
-    def __init__(self, vector: np.ndarray = np.array([])):
+    def __init__(self, x: float, y: float, z: float = 0.):
         """
         initialize 3d pointer given an np array
         :param vector: np array of length 3.
         """
+        vector = np.array([x, y, z])
         try:
             self.x = vector[0]
             self.y = vector[1]
@@ -83,7 +84,7 @@ class Pos(object):
         convert position to posestamped
         :return:
         """
-        from geometry_msgs.msg import PoseStamped, Pose
+        from geometry_msgs.msg import Pose
         return_pt = Pose()
         return_pt.position.x = self.x
         return_pt.position.y = self.y
@@ -127,9 +128,6 @@ class Seg(object):
                                           (self.end.y - self.start.y) / self.length(),
                                           (self.end.z - self.start.z) / self.length()])))
         return uvec
-
-
-
 
 
 def distance(x: Pos, y: Pos) -> float:

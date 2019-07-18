@@ -1,7 +1,5 @@
 import time
 
-import numpy as np
-
 from src.harness.agentThread import AgentThread
 from src.harness.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.motion.moat_test_car import MoatTestCar
@@ -16,12 +14,9 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        dest1 = Pos(np.array([2., 1., 0.]))
-        dest2 = Pos(np.array([-2., 1., 0.]))
-        dest3 = Pos(np.array([2., -1., 0.]))
-        self.locals['dest1'] = dest1
-        self.locals['dest2'] = dest2
-        self.locals['dest3'] = dest3
+        self.locals['dest1'] = Pos(2., 1., 0.)
+        self.locals['dest2'] = Pos(-2., 1., 0.)
+        self.locals['dest3'] = Pos(2., -1., 0.)
         self.locals['tries'] = 1
 
     def loop_body(self):
@@ -41,7 +36,6 @@ class BasicFollowApp(AgentThread):
             time.sleep(5)
             self.stop()
             return
-
 
 
 m = default_car_moat_config('hotdec_car')

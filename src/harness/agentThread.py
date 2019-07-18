@@ -195,7 +195,6 @@ class AgentThread(ABC, Thread):
 
         while not self.stopped():
             self.msg_handle()
-
             try:
                 self.loop_body()
 
