@@ -14,7 +14,7 @@ class MotionAutomaton(threading.Thread, ABC):
         # print("initializing motion automaton")
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
-        self.__position = Pos()
+
         self.__reached = False
         self.__path = []
         self.__planner = config.planner
