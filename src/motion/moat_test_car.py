@@ -40,7 +40,7 @@ class MoatTestCar(MotionAutomaton):
         self.reached = False
 
         self.waypoint_count += 1
-        print("actually going to",pose)
+        print("actually going to",pose.pose)
         self.pub.publish(pose)
 
     def follow_path(self, path: list) -> None:
