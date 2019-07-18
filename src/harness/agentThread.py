@@ -1,9 +1,10 @@
 import signal
+import time
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 from typing import Union
 
-from src.harness.comm_handler import CommHandler
+from src.harness.comm_handler import CommHandler, CommTimeoutError
 from src.harness.configs import AgentConfig, MoatConfig
 from src.harness.gvh import Gvh
 
@@ -118,9 +119,6 @@ class AgentThread(ABC, Thread):
     def lock(self):
         pass
 
-    def initialize_vars(self, varlist):
-        pass
-
     def stopped(self) -> bool:
         """
         set the stop flag
@@ -166,10 +164,41 @@ class AgentThread(ABC, Thread):
         """
         self.stop()
 
+    def msg_handle(self):
+        time.sleep(0.4)
+        self.agent_gvh.flush_msgs()
+        self.agent_comm_handler.handle_msgs()
+        time.sleep(0.4)
+
     @abstractmethod
+    def initialize_vars(self):
+        """
+        abstract method to initialize variables
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def loop_body(self):
+        """
+        loop body
+        :return:
+        """
+        pass
+
     def run(self) -> None:
         """
         needs to be implemented for any agenThread
         :return:
         """
-        pass
+        self.initialize_vars()
+
+        while not self.stopped():
+            self.msg_handle()
+
+            try:
+                self.loop_body()
+
+            except CommTimeoutError:
+                print("timed out on communication")
+                self.stop()

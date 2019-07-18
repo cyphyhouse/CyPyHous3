@@ -15,33 +15,35 @@ class BasicFollowApp(AgentThread):
         self.agent_gvh.moat = MoatTestCar(moat_config)
         self.start()
 
-    def run(self):
-
-        tries = 1
-
+    def initialize_vars(self):
         dest1 = Pos(np.array([2., 1., 0.]))
         dest2 = Pos(np.array([-2., 1., 0.]))
         dest3 = Pos(np.array([2., -1., 0.]))
+        self.locals['dest1'] = dest1
+        self.locals['dest2'] = dest2
+        self.locals['dest3'] = dest3
+        self.locals['tries'] = 1
 
-        while not self.stopped():
+    def loop_body(self):
+        if self.locals['tries'] == 1:
+            self.agent_gvh.moat.goTo(self.locals['dest1'])
+            time.sleep(5)
+            self.locals['tries'] = 2
+            return
+        if self.locals['tries'] == 2:
+            self.agent_gvh.moat.goTo(self.locals['dest2'])
+            self.locals['tries'] = 3
+            time.sleep(5)
+            return
+        if self.locals['tries'] == 3:
+            self.agent_gvh.moat.goTo(self.locals['dest3'])
+            self.locals['tries'] = 4
+            time.sleep(5)
+            self.stop()
+            return
 
-            if tries == 1:
-                self.agent_gvh.moat.goTo(dest1)
-                time.sleep(5)
-                tries = 2
-                continue
-            if tries == 2:
-                self.agent_gvh.moat.goTo(dest2)
-                tries = 3
-                time.sleep(5)
-                continue
-            if tries == 3:
-                self.agent_gvh.moat.goTo(dest3)
-                tries = 4
-                time.sleep(5)
-                self.stop()
-                continue
 
 
 m = default_car_moat_config('hotdec_car')
-app = BasicFollowApp(1, 1, m)
+a = AgentConfig(1, 1, "", 2000)
+app = BasicFollowApp(a, m)
