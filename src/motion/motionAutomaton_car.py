@@ -159,6 +159,7 @@ class MotionAutomaton(threading.Thread):
         self.reached = False
 
         self.waypoint_count += 1
+        print("actually going to",pose)
         self.pub.publish(pose)
 
     def follow_path(self, path) -> None:

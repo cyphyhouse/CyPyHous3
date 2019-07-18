@@ -63,6 +63,8 @@ def gen_positioning_params(node_name, bot_name, msg_type):
 def gen_reached_params(reached_topic, msg_type):
     return reached_topic, msg_type
 
+#TODO generate default simulation moat car config
+#TODO generate detault simulation moat drone config
 
 def default_car_moat_config(bot_name) -> MoatConfig:
     rospy_node = 'quad_wp_node'
