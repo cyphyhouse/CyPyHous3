@@ -109,7 +109,8 @@ class CommHandler(Thread):
          a flag to set to to safely exit the thread
         :return: None
         """
-        self.agent_gvh.is_alive = False
+        if self.agent_gvh is not None:
+            self.agent_gvh.is_alive = False
         self.__stop_event.set()
 
     def stopped(self) -> bool:
