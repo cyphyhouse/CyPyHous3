@@ -41,6 +41,7 @@ class MoatTestDrone(MotionAutomaton):
 
         self.waypoint_count += 1
         self.pub.publish(pose)
+        print("publishing pose", pose)
 
     def follow_path(self, path: list) -> None:
         wp_list = []
