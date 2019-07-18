@@ -4,7 +4,7 @@ from src.harness.agentThread import AgentThread
 from src.harness.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos import Pos
-
+import numpy as np
 
 class BasicFollowApp(AgentThread):
 
@@ -14,9 +14,9 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.locals['dest1'] = Pos(2., 1., 0.)
-        self.locals['dest2'] = Pos(-2., 1., 0.)
-        self.locals['dest3'] = Pos(2., -1., 0.)
+        self.locals['dest1'] = Pos(np.array([2., 1., 0.]))
+        self.locals['dest2'] = Pos(np.array([-2., 1., 0.]))
+        self.locals['dest3'] = Pos(np.array([2., -1., 0.]))
         self.locals['tries'] = 1
 
     def loop_body(self):
