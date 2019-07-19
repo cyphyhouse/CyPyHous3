@@ -4,7 +4,7 @@ from typing import Union
 from src.functionality.comm_funcs import send
 from src.functionality.mutex_handler import BaseMutexHandler
 from src.functionality.synchronizer import Synchronizer
-from src.harness.configs import AgentConfig
+from src.harness.configs import AgentConfig, MoatConfig
 from src.objects.dsm import dsmvar
 from src.objects.message import Message
 
@@ -27,7 +27,7 @@ class Gvh(object):
 
     """
 
-    def __init__(self, a: AgentConfig):
+    def __init__(self, a: AgentConfig, m: MoatConfig):
         """
         init method for global variable holder object
         :param pid: integer pid
@@ -47,7 +47,10 @@ class Gvh(object):
         self.__dsm = None
         self.__synchronizer = None
         self.__mutex_handler = a.mutex_handler
-        self.__moat = None
+        if a.moat_class is not None:
+            self.__moat = a.moat_class(m)
+        else:
+            self.__moat = None
 
     def start_moat(self):
         if self.moat is not None:
