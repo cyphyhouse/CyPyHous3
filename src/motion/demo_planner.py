@@ -41,24 +41,17 @@ class DemoPlan(Planner):
         """
         if obstaclelist is None:
             obstaclelist = []
-        mid_point = Pos(np.array[(start_point.x + end_point.x) / 2, (start_point.y + end_point.y) / 2, (
-                start_point.z + end_point.z) / 2])
+        mid_point = Pos(np.array([(start_point.x + end_point.x) / 2, (start_point.y + end_point.y) / 2, (
+                start_point.z + end_point.z) / 2]))
         path = [start_point, mid_point, end_point]
-        return to_path(path)
+        return path
 
 
-def to_path(myList):
-    returnpath = []
-    for point in myList:
-        returnpath.append(vec(point[0], point[1], 0))
-    return returnpath
 
 
-'''
-a = RRT()
-a.plan([0,0,0],[1,1,0])
-c = a.Planning()
-d = [vec(0.5,0.5,0)]
-t = path_is_close(c,d,-1)
-print(t)
-'''
+a = DemoPlan()
+c = a.find_path(Pos(np.array([0,0,0])),Pos(np.array([1,1,0])))
+print(c)
+#d = [vec(0.5,0.5,0)]
+#t = path_is_close(c,d,-1)
+#print(t)
