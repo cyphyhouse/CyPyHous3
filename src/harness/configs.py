@@ -6,10 +6,9 @@ from src.functionality.mutex_handler import BaseMutexHandler
 from src.motion.planner import Planner
 
 
-
 class AgentConfig(object):
     def __init__(self, pid: int, bots: int, rip: str, rport: int, plist: list = [],
-                 mh: Union[BaseMutexHandler, None] = None, is_leader = False, moat_class = None):
+                 mh: Union[BaseMutexHandler, None] = None, is_leader=False, moat_class=None):
         self.pid = pid
         self.bots = bots
         self.rip = rip
@@ -57,7 +56,6 @@ class MoatConfig(object):
         self.queue_size = queue_size
         self.bot_type = bot_type
         self.planner = planner
-        self.moat_class = moat_class
 
 
 def gen_positioning_params(node_name, bot_name, msg_type):
