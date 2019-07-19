@@ -111,15 +111,6 @@ def mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     if agent_gvh.is_leader:
         if agent_gvh.mutex_handler.mutexes[i].mutex_holder == releaser:
             agent_gvh.mutex_handler.mutexes[i].mutex_holder = None
-            # if not agent_gvh.mutex_handler.mutexes[i].mutex_request_list == []:
-            # holder = agent_gvh.mutex_handler.mutexes[i].mutex_request_list[0]
-            # agent_gvh.mutex_handler.mutexes[i].mutex_holder = holder
-            # agent_gvh.mutex_handler.mutexes[i].mutex_request_list = agent_gvh.mutex_handler.mutexes[
-            # i].mutex_request_list[1:]
-            # msg = mutex_grant_create(mutex_id, holder, agent_gvh.pid, time.time())
-            # agent_gvh.add_msg(msg)
-            # else:
-            #    pass
     else:
         pass
 

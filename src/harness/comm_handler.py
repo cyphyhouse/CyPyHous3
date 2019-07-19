@@ -20,7 +20,8 @@ class CommHandler(Thread):
     __retries : retries
     """
 
-    def __init__(self, ip: str = "", r_port: int = 2000, agent_gvh=None, timeout: float = 10.0, retries: int = RETRY_VAL):
+    def __init__(self, ip: str = "", r_port: int = 2000, agent_gvh=None, timeout: float = 10.0,
+                 retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:
@@ -127,15 +128,14 @@ class CommHandler(Thread):
         """
         receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
         try:
             receiver_socket.bind((self.ip, self.r_port))
             receiver_socket.settimeout(self.timeout)
         except OSError:
             print("perhaps already created socket")
 
-
         while not self.stopped():
-
             try:
                 data, addr = receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
@@ -155,6 +155,7 @@ class CommHandler(Thread):
         TODO: better explanation
         :return: none
         """
+
         current_list = self.agent_gvh.recv_msg_list.copy()
 
         for msg in current_list:

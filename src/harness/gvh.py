@@ -1,11 +1,12 @@
-import pickle
-import socket
 import time
 from typing import Union
-from src.objects.dsm import dsmvar
-from src.objects.message import Message
+
+from src.functionality.comm_funcs import send
 from src.functionality.mutex_handler import BaseMutexHandler
 from src.functionality.synchronizer import Synchronizer
+from src.harness.configs import AgentConfig
+from src.objects.dsm import dsmvar
+from src.objects.message import Message
 
 
 class Gvh(object):
@@ -26,7 +27,7 @@ class Gvh(object):
 
     """
 
-    def __init__(self, pid: int, participants: int, bot_name: str = 'cyphyhousecopter', mutex_handler=None):
+    def __init__(self, a: AgentConfig):
         """
         init method for global variable holder object
         :param pid: integer pid
@@ -34,37 +35,26 @@ class Gvh(object):
         :param mutex_handler : mutual exclusion handler
 
         """
-        self.__pid = pid
-        self.__participants = participants
-        self.__bot_name = bot_name
+        self.__pid = a.pid
+        self.__participants = a.bots
         self.__msg_list = []
         self.__recv_msg_list = []
-        self.__port_list = []
+        self.__port_list = a.plist
         self.__is_leader = False
         self.__is_alive = True
 
         # self.__mutex = None
         self.__dsm = None
         self.__synchronizer = None
-        self.__mutex_handler = mutex_handler
+        self.__mutex_handler = a.mutex_handler
         self.__moat = None
 
     def start_moat(self):
-        try:
+        if self.moat is not None:
             self.moat.start()
-        except:
-            print("error starting motion automaton, maybe you don't have ros")
 
     @property
-    def bot_name(self):
-        return self.__bot_name
-
-    @bot_name.setter
-    def bot_name(self, bot_name):
-        self.__bot_name = bot_name
-
-    @property
-    def moat(self) :
+    def moat(self):
         """
         getter method for motionAutomaton
         :return:
@@ -126,7 +116,6 @@ class Gvh(object):
         for port in self.__port_list:
             send(msg, "", port)
             send(msg, "192.168.1.255", port)
-
 
     def get(self, varname: str, pid: int = -1) -> Union[int, bool, float, list, object, tuple]:
         """
@@ -370,15 +359,3 @@ def dsm_update_create(pid: int, dsmvar_updated, owner, ts):
     :return:
     """
     return Message(pid, 4, dsmvar_updated, ts)
-
-
-def send(msg: Message, ip: str, port: int) -> None:
-    """
-    :param msg: message to be sent
-    :param ip: ip to be sent to
-    :param port: port to be sent to
-    :return:
-    """
-    client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    client_sock.sendto(pickle.dumps(msg), (ip, port))

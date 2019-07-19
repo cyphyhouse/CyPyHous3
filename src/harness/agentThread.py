@@ -22,19 +22,15 @@ class AgentThread(ABC, Thread):
         :param agent_comm_handler: agent communication handler thread object
         """
         super(AgentThread, self).__init__()
-        agent_gvh = Gvh(agent_config.pid, agent_config.bots)
-        agent_gvh.port_list = agent_config.plist
-        agent_gvh.is_leader = agent_config.pid == 0
-
-        mutex_handler = agent_config.mutex_handler
-        agent_gvh.mutex_handler = mutex_handler
+        agent_gvh = Gvh(agent_config)
+        agent_gvh.is_leader = agent_gvh.pid == 0
         agent_comm_handler = CommHandler(agent_config.rip, agent_config.rport)
         agent_comm_handler.agent_gvh = agent_gvh
 
         self.__agent_gvh = agent_gvh
         self.__agent_comm_handler = agent_comm_handler
         self.__stop_event = Event()
-        self.__mutex_handler = mutex_handler
+        self.__mutex_handler = agent_gvh.mutex_handler
         self.__locals = {}
 
         # create a signal handler to handle ctrl + c
