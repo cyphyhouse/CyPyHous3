@@ -26,8 +26,8 @@ class RRT(Planner):
     def __init__(self, randArea: list = [-2.5, 2.5],
                  expand_dis: float = 0.1, goal_sample_rate: int = 200, max_iter: int = 500):
         super(RRT, self).__init__()
-        self.minrand = randArea[0]
-        self.maxrand = randArea[1]
+        self.min_rand = randArea[0]
+        self.max_rand = randArea[1]
         self.expand_dis = expand_dis
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
@@ -138,8 +138,8 @@ class RRT(Planner):
         """
 
         if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand), 0]
+            rnd = [random.uniform(self.min_rand, self.max_rand),
+                   random.uniform(self.min_rand, self.max_rand), 0]
         else:  # goal point sampling
             rnd = [end.x, end.y, 0]
 

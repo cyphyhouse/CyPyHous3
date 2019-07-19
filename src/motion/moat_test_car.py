@@ -30,7 +30,6 @@ class MoatTestCar(MotionAutomaton):
         pose = PoseStamped()
         pose.header.stamp = rospy.Time.now()
         pose.header.frame_id = frame_id
-        a = dest.to_pose()
         pose.pose = dest.to_pose()
 
         self.reached = False

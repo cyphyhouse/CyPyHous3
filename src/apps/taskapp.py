@@ -5,7 +5,7 @@ from src.harness.configs import AgentConfig, MoatConfig
 from src.motion.deconflict import clear_path
 from src.motion.moat_test_car import MoatTestCar
 from src.objects.base_mutex import BaseMutex
-from src.objects.udt import Task, get_tasks
+from src.objects.udt import get_tasks
 
 
 class TaskApp(AgentThread):
@@ -33,12 +33,11 @@ class TaskApp(AgentThread):
         self.locals['mytask'] = None
 
     def loop_body(self):
+
         if self.locals['mytask'] is not None and not self.agent_gvh.moat.reached:
-            # print('pub a reached msg to prog')
             return
         elif self.locals['mytask'] is not None and self.agent_gvh.moat.reached:
             self.agent_gvh.put('route', [self.agent_gvh.moat.position], self.pid())
-
             self.locals['mytask'] = None
 
         test = self.agent_gvh.mutex_handler.has_mutex(self.baselock.mutex_id)
@@ -57,7 +56,6 @@ class TaskApp(AgentThread):
                         continue
                     if self.locals['mytask'].location.z <= 0 and self.agent_gvh.moat.bot_type == 0:
                         continue
-                    # print("planner is", self.agent_gvh.moat.planner)
                     print(self.locals['mytask'].location)
                     testroute = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                       self.locals['mytask'].location)
@@ -99,6 +97,3 @@ class TaskApp(AgentThread):
 
         if not self.agent_gvh.is_alive:
             self.stop()
-
-
-

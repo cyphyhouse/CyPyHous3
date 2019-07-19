@@ -13,10 +13,6 @@ class AgentThread(ABC, Thread):
     """
     abstract object for each agent thread/application. This contains
     the methods and fields each agent application must implement.
-
-    __gvh : global variable holder.
-    __comm_handler : communication handler
-    __stop_event : stop thread safely.
     """
 
     def __init__(self, agent_config: AgentConfig, moat_config: Union[MoatConfig, None]) -> None:
