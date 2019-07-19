@@ -15,7 +15,7 @@ from typing import Union
 import numpy as np
 
 from src.motion.planner import Planner
-from src.motion.pos import Pos, Node
+from src.motion.pos import Pos, Node, to_node
 
 
 class RRT(Planner):
@@ -289,13 +289,6 @@ def calc_dist_to_goal(end: Node, x: float, y: float) -> float:
     return np.linalg.norm([x - end.x, y - end.y])
 
 
-def to_node(p: Pos) -> Node:
-    """
-    converting a pos into a node
-    :param p:
-    :return:
-    """
-    return Node(p.x, p.y, p.z)
 
 '''
 a = RRT()
