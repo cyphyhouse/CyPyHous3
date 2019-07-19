@@ -23,20 +23,26 @@ class RRT(Planner):
     Class for RRT* Planning
     """
 
-    def __init__(self, randArea: list = [-2.5, 2.5],
-                 expand_dis: float = 0.1, goal_sample_rate: int = 200, max_iter: int = 500):
+    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 200,
+                 max_iter: int = 500):
         super(RRT, self).__init__()
-        self.min_rand = randArea[0]
-        self.max_rand = randArea[1]
+        if rand_area is None:
+            rand_area = [-2.5, 2.5]
+        self.min_rand = rand_area[0]
+        self.max_rand = rand_area[1]
         self.expand_dis = expand_dis
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
 
-    def find_path(self, start, end, obstacle_list=[], search_until_max_iter: bool = False) -> Union[list, None]:
+    def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
+                  search_until_max_iter: bool = False) -> \
+            Union[list, None]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
         """
+        if obstacle_list is None:
+            obstacle_list = []
         start = to_node(start)
         end = to_node(end)
         node_list = [start]

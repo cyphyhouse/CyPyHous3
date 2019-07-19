@@ -1,7 +1,6 @@
-
 class dsmvar(object):
 
-    def __init__(self, name, dtype, size , pid,  value = None, owner = 0,last_updated = 0.0):
+    def __init__(self, name, dtype, size, pid, value=None, owner=0, last_updated=0.0):
         # owner 0 for aw, 1 for ar
         self.__name = name
         self.__dtype = dtype
@@ -19,52 +18,47 @@ class dsmvar(object):
                 if i == pid:
                     self.__value[i] = value
 
-            #print(self.__value)
+            # print(self.__value)
         self.__owner = owner
 
     def __repr__(self):
-        return (str(self.name)+" "+str(self.value)+" for "+str(self.__pid))
-
+        return (str(self.name) + " " + str(self.value) + " for " + str(self.__pid))
 
     @property
     def updated(self):
         return self.__last_updated
 
     @updated.setter
-    def updated(self,ts):
+    def updated(self, ts):
         self.__last_updated = ts
 
-
-    def last_update(self,pid = -1):
+    def last_update(self, pid=-1):
         if pid is not -1:
-            return  self.updated[pid]
+            return self.updated[pid]
         else:
             return self.updated
 
-    def set_update(self,updatets, pid = -1):
+    def set_update(self, updatets, pid=-1):
         if pid is not -1:
             self.__last_updated[pid] = updatets
         else:
             self.__last_updated = updatets
-
 
     @property
     def name(self):
         return self.__name
 
     @name.setter
-    def name(self,name):
+    def name(self, name):
         self.__name = name
-
 
     @property
     def dtype(self):
         return self.__dtype
 
     @dtype.setter
-    def dtype(self,dtype):
+    def dtype(self, dtype):
         self.__dtype = dtype
-
 
     @property
     def value(self):
@@ -74,17 +68,17 @@ class dsmvar(object):
     def value(self, value):
         self.__value = value
 
-    def get_val(self, pid = -1):
-        #if type(self.value) is list:
+    def get_val(self, pid=-1):
+        # if type(self.value) is list:
         if self.owner is not 0:
             return self.__value[pid]
         else:
             return self.value
 
-    def set_val(self,value, pid = -1):
-        #if type(self.value) is list:
+    def set_val(self, value, pid=-1):
+        # if type(self.value) is list:
         if self.owner is not 0:
-            self.__value[pid]=value
+            self.__value[pid] = value
         else:
             self.value = value
 
@@ -95,5 +89,3 @@ class dsmvar(object):
     @owner.setter
     def owner(self, owner):
         self.__owner = owner
-
-
