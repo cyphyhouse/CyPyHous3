@@ -297,10 +297,11 @@ def to_node(p: Pos) -> Node:
     """
     return Node(p.x, p.y, p.z)
 
-
+'''
 a = RRT()
 p1 = Pos(np.array([0, 0, 0]))
 p2 = Pos(np.array([1, 1, 0]))
 
 c = a.find_path(p1, p2, [])
 print(c)
+'''
