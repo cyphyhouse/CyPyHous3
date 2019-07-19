@@ -44,17 +44,9 @@ class MoatTestDrone(MotionAutomaton):
         self.pub.publish(pose)
 
     def follow_path(self, path: list) -> None:
-        wp_list = []
-        for point in path[1:]:
-            point = point.topoint()
-            wp = Pos()
-            wp.x = point[0]
-            wp.y = point[1]
-            wp.z = point[2]
-            wp_list.append(wp)
-        for wp in wp_list[:-1]:
+        for wp in path[:-1]:
             self.goTo(wp, 0)
-        self.goTo(wp_list[-1], 1)
+        self.goTo(path[-1], 1)
 
     def run(self):
         import rospy

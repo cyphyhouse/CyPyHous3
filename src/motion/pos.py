@@ -83,7 +83,7 @@ class Pos(object):
         convert position to posestamped
         :return:
         """
-        from geometry_msgs.msg import PoseStamped, Pose
+        from geometry_msgs.msg import Pose
         return_pt = Pose()
 
         return_pt.position.x = self.x
@@ -131,9 +131,14 @@ class Seg(object):
                                           (self.end.z - self.start.z) / self.length()])))
         return uvec
 
+class Node(Pos):
+    def __init__(self, x, y, z=0):
+        super(Node, self).__init__(np.array([x, y, z]))
+        self.cost = 0.0
+        self.parent = None
 
-
-
+    def to_pos(self):
+        return Pos(np.array([self.x, self.y, self.z]))
 
 def distance(x: Pos, y: Pos) -> float:
     """
