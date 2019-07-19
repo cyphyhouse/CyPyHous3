@@ -24,11 +24,11 @@ class TaskApp(AgentThread):
         if self.agent_gvh.moat.bot_type == 0:
             self.agent_gvh.moat.takeoff()
         route = []
-        self.agent_gvh.create_aw_var('tasks', list, get_tasks())
+        self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='tasks.txt'))
         self.agent_gvh.create_ar_var('route', list, route)
         self.agent_gvh.put('route', [self.agent_gvh.moat.position], self.pid())
         self.baselock = BaseMutex(1, [2000])
-        self.agent_gvh.mutex_handler.add_mutex(a)
+        self.agent_gvh.mutex_handler.add_mutex(self.baselock)
         self.baselock.agent_comm_handler = self.agent_comm_handler
         self.locals['mytask'] = None
 

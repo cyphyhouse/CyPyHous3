@@ -1,9 +1,5 @@
 """
-Path Planning Sample Code with RRT*
-
-Author: AtsushiSakai(@Atsushi_twi)
-
-Modifications for use in CyPhyHouse made by Amelia Gosse (gossea)
+demo path planner
 """
 
 import numpy as np
@@ -47,11 +43,8 @@ class DemoPlan(Planner):
         return path
 
 
-
-
+'''
 a = DemoPlan()
-c = a.find_path(Pos(np.array([0,0,0])),Pos(np.array([1,1,0])))
+c = a.find_path(Pos(np.array([0, 0, 0])), Pos(np.array([1, 1, 0])))
 print(c)
-#d = [vec(0.5,0.5,0)]
-#t = path_is_close(c,d,-1)
-#print(t)
+'''
