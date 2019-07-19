@@ -1,7 +1,5 @@
 # functions for message handling. use dictionary to call them
 
-import time
-
 import src.objects.message as message
 from src.functionality.basic_synchronizer import RoundSyncError
 from src.harness.gvh import Gvh
@@ -18,21 +16,23 @@ def round_update_create(pid: int, round_num: int, ts: float) -> message.Message:
     return message.Message(pid, 0, round_num, ts)
 
 
-def mutex_request_create(mutex_id: int, req_num:int,  pid: int, ts: float) -> message.Message:
+def mutex_request_create(mutex_id: int, req_num: int, pid: int, ts: float) -> message.Message:
     """
     create mutex request
     :param mutex_id: variable to create mutex request for
     :param pid: pid of agent requesting mutex
+    :param req_num : request number
     :param ts: time stamp
     :return: mutex request message
     """
-    message_contents = (mutex_id,req_num)
+    message_contents = (mutex_id, req_num)
     return message.Message(pid, 1, message_contents, ts)
 
 
-def mutex_grant_create(mutex_id: int, agent_id: int, pid: int, mutexnum:int, ts: float) -> message.Message:
+def mutex_grant_create(mutex_id: int, agent_id: int, pid: int, mutexnum: int, ts: float) -> message.Message:
     """
     grant mutex message creation
+    :param mutexnum :mutex number
     :param mutex_id: variable to grant mutex on
     :param agent_id: agent to grant mutex to
     :param pid: leader pid who is granting the mutex
@@ -77,7 +77,7 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     :param agent_gvh: my gvh
     :return: nothing
     """
-    mutex_id,req_num = msg.content
+    mutex_id, req_num = msg.content
     requester = msg.sender
     if agent_gvh.is_leader:
         agent_gvh.mutex_handler.add_request(mutex_id, requester, req_num)
@@ -92,7 +92,7 @@ def mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     :param agent_gvh: my gvh
     :return: nothing
     """
-    mutex_id, grantee,mutexnum = msg.content
+    mutex_id, grantee, mutexnum = msg.content
     index = agent_gvh.mutex_handler.find_mutex_index(mutex_id)
     agent_gvh.mutex_handler.mutexes[index].mutex_holder = grantee
     pass
@@ -111,24 +111,25 @@ def mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     if agent_gvh.is_leader:
         if agent_gvh.mutex_handler.mutexes[i].mutex_holder == releaser:
             agent_gvh.mutex_handler.mutexes[i].mutex_holder = None
-            #if not agent_gvh.mutex_handler.mutexes[i].mutex_request_list == []:
-                #holder = agent_gvh.mutex_handler.mutexes[i].mutex_request_list[0]
-                #agent_gvh.mutex_handler.mutexes[i].mutex_holder = holder
-                #agent_gvh.mutex_handler.mutexes[i].mutex_request_list = agent_gvh.mutex_handler.mutexes[
+            # if not agent_gvh.mutex_handler.mutexes[i].mutex_request_list == []:
+            # holder = agent_gvh.mutex_handler.mutexes[i].mutex_request_list[0]
+            # agent_gvh.mutex_handler.mutexes[i].mutex_holder = holder
+            # agent_gvh.mutex_handler.mutexes[i].mutex_request_list = agent_gvh.mutex_handler.mutexes[
             # i].mutex_request_list[1:]
-                #msg = mutex_grant_create(mutex_id, holder, agent_gvh.pid, time.time())
-                #agent_gvh.add_msg(msg)
-            #else:
+            # msg = mutex_grant_create(mutex_id, holder, agent_gvh.pid, time.time())
+            # agent_gvh.add_msg(msg)
+            # else:
             #    pass
     else:
         pass
 
-def message_update_handle(msg:message.Message, agent_gvh:Gvh):
+
+def message_update_handle(msg: message.Message, agent_gvh: Gvh):
     var = msg.content
     updater = msg.sender
     for i in range(len(agent_gvh.dsm)):
 
-        if agent_gvh.dsm[i].name == var.name :
+        if agent_gvh.dsm[i].name == var.name:
             if var.owner == 0:
 
                 if agent_gvh.dsm[i].updated is not None and agent_gvh.dsm[i].updated > msg.timestamp:
@@ -139,14 +140,14 @@ def message_update_handle(msg:message.Message, agent_gvh:Gvh):
 
             else:
                 if agent_gvh.dsm[i].get_val(updater) is None or agent_gvh.dsm[i].last_update(updater) is None:
-                    agent_gvh.dsm[i].set_val(var.get_val(updater),updater)
-                    agent_gvh.dsm[i].set_update(msg.timestamp,updater)
+                    agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
+                    agent_gvh.dsm[i].set_update(msg.timestamp, updater)
 
                 elif agent_gvh.dsm[i].last_update(updater) > msg.timestamp:
                     pass
                 else:
-                    agent_gvh.dsm[i].set_val(var.get_val(updater),updater)
-                    agent_gvh.dsm[i].set_update(msg.timestamp,updater)
+                    agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
+                    agent_gvh.dsm[i].set_update(msg.timestamp, updater)
 
 
 message_handler = dict()

@@ -58,10 +58,7 @@ class DeconflictTest(unittest.TestCase):
         p6 = Pos(np.array([1, 1, 0]))
         s1 = Seg(p1, p5)
         s2 = Seg(p4, p6)
-        self.assertEqual(seg_distance_3d(s1,s2), 1., msg='line segment distance in 3d not computed correctly')
-
-
-
+        self.assertEqual(seg_distance_3d(s1, s2), 1., msg='line segment distance in 3d not computed correctly')
 
 
 if __name__ == '__main__':

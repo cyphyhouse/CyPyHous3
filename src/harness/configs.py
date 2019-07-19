@@ -4,7 +4,6 @@ from typing import Union
 
 from src.functionality.mutex_handler import BaseMutexHandler
 from src.motion.planner import Planner
-from src.motion.simpleplanner import SimplePlanner
 
 
 class AgentConfig(object):
@@ -27,6 +26,7 @@ class BotType(Enum):
 
 
 class MoatConfig(object):
+    from src.motion.simpleplanner import SimplePlanner
 
     def __init__(self, waypoint_topic: str, reached_topic: str, rospy_node: str, positioning_params: tuple,
                  reached_params: tuple, bot_name: str, queue_size: int, bot_type: BotType,
@@ -63,8 +63,9 @@ def gen_positioning_params(node_name, bot_name, msg_type):
 def gen_reached_params(reached_topic, msg_type):
     return reached_topic, msg_type
 
-#TODO generate default simulation moat car config
-#TODO generate detault simulation moat drone config
+
+# TODO generate default simulation moat car config
+# TODO generate detault simulation moat drone config
 
 def default_car_moat_config(bot_name) -> MoatConfig:
     rospy_node = 'quad_wp_node'
