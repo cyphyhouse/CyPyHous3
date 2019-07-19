@@ -20,7 +20,7 @@ class AddNums(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.baselock = BaseMutex(1, [2000, 2001, 2002, 2003, 2004])
+        self.baselock = BaseMutex(1, self.agent_gvh.port_list)
         self.agent_gvh.mutex_handler.add_mutex(self.baselock)
         self.baselock.agent_comm_handler = self.agent_comm_handler
         self.create_aw_var('sum', int, 0)
@@ -54,7 +54,6 @@ class AddNums(AgentThread):
             self.locals['finalsum'] = self.agent_gvh.get('sum')
             print('final sum for', self.pid(), 'is', self.locals['finalsum'])
             self.stop()
-
 
 
 plist = [2000, 2001, 2002, 2003, 2004]

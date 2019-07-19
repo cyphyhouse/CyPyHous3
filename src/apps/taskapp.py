@@ -1,171 +1,104 @@
 import time
 
-import src.motion.demo_planner as demo_planner
-import src.motion.motionAutomaton_car as ma
-from src.functionality.mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
-from src.harness.comm_handler import CommHandler, CommTimeoutError
-from src.harness.gvh import Gvh
-from src.motion.demo_planner import vec
+from src.harness.configs import AgentConfig, MoatConfig
+from src.motion.deconflict import clear_path
+from src.motion.moat_test_car import MoatTestCar
 from src.objects.base_mutex import BaseMutex
-from src.objects.udt import Task
+from src.objects.udt import Task, get_tasks
 
 
 class TaskApp(AgentThread):
 
-    def __init__(self, pid, participants, receiver_ip, r_port, bot_name):
+    def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
 
-        agent_gvh = Gvh(pid, participants)
-        moat = ma.MotionAutomaton(demo_planner.DemoPlan(), pid, bot_name, 10, 1)
-        # moat = mb.MotionAutomaton(drone_planner.DPLAN(), pid, bot_name, 10, 0)
-        agent_gvh.moat = moat
-        agent_gvh.port_list = [2000]
-
-        if pid == 0:
-            agent_gvh.is_leader = True
-        mutex_handler = BaseMutexHandler(agent_gvh.is_leader, pid)
-        agent_gvh.mutex_handler = mutex_handler
-        agent_comm_handler = CommHandler(receiver_ip, r_port, agent_gvh, 10)
-        super(TaskApp, self).__init__(agent_gvh, agent_comm_handler, mutex_handler)
-
-        self.agent_comm_handler.agent_gvh = self.agent_gvh
-
+        super(TaskApp, self).__init__(agent_config, moat_config)
+        self.agent_gvh.moat = MoatTestCar(moat_config)
+        self.requestedlock = False
+        self.req_num = 0
+        self.baselock = None
         self.rounds = 10
         self.start()
 
-    def run(self):
-
+    def initialize_vars(self):
         if self.agent_gvh.moat.bot_type == 0:
             self.agent_gvh.moat.takeoff()
-        tasks = get_tasks()
-        route = []  # [vec(self.agent_gvh.moat.position.position.x, self.agent_gvh.moat.position.position.y, self.agent_gvh.moat.position.position.z)]
-
-        self.agent_gvh.create_aw_var('tasks', list, tasks)
+        route = []
+        self.agent_gvh.create_aw_var('tasks', list, get_tasks())
         self.agent_gvh.create_ar_var('route', list, route)
-        self.agent_gvh.put('route', [[Pos(self.agent_gvh.moat.position.position.x,
-                                          self.agent_gvh.moat.position.position.y,
-                                          self.agent_gvh.moat.position.position.z)]], self.pid())
-        # print(self.agent_gvh.get('route'))
-
-        a = BaseMutex(1, [2000])
-
+        self.agent_gvh.put('route', [self.agent_gvh.moat.position], self.pid())
+        self.baselock = BaseMutex(1, [2000])
         self.agent_gvh.mutex_handler.add_mutex(a)
-        a.agent_comm_handler = self.agent_comm_handler
+        self.baselock.agent_comm_handler = self.agent_comm_handler
+        self.locals['mytask'] = None
 
-        req_num = 0
-        mytask = None
+    def loop_body(self):
+        if self.locals['mytask'] is not None and not self.agent_gvh.moat.reached:
+            # print('pub a reached msg to prog')
+            return
+        elif self.locals['mytask'] is not None and self.agent_gvh.moat.reached:
+            self.agent_gvh.put('route', [self.agent_gvh.moat.position], self.pid())
 
-        while not self.stopped():
-            print("current task status", [l.assigned for l in tasks])
+            self.locals['mytask'] = None
 
-            time.sleep(0.6)
-            self.agent_gvh.flush_msgs()
-            self.agent_comm_handler.handle_msgs()
+        test = self.agent_gvh.mutex_handler.has_mutex(self.baselock.mutex_id)
+        if not test:
+            self.baselock.request_mutex(self.req_num)
 
-            time.sleep(0.1)
+        else:
+            tasks = self.agent_gvh.get('tasks')
+            route = self.agent_gvh.get('route')
+            for i in range(len(tasks)):
+                if not tasks[i].assigned:
 
-            try:
-                if mytask is not None and not self.agent_gvh.moat.reached:
-                    print('pub a reached msg to prog')
-                    continue
-                elif mytask is not None and self.agent_gvh.moat.reached:
-                    self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x,
-                                                      self.agent_gvh.moat.position.position.y,
-                                                      self.agent_gvh.moat.position.position.z)]], self.pid())
+                    # print("assigning task", tasks[i].id, "to ", self.pid())
+                    self.locals['mytask'] = tasks[i]
+                    if self.locals['mytask'].location.z > 0 and self.agent_gvh.moat.bot_type == 1:
+                        continue
+                    if self.locals['mytask'].location.z <= 0 and self.agent_gvh.moat.bot_type == 0:
+                        continue
+                    # print("planner is", self.agent_gvh.moat.planner)
+                    print(self.locals['mytask'].location)
+                    testroute = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
+                                                                      self.locals['mytask'].location)
+                    if clear_path(route, testroute, self.pid()):
+                        print("cleared path")
+                        tasks[i].assigned = True
+                        tasks[i].assigned_to = self.pid()
+                        route = testroute
+                        self.agent_gvh.put('tasks', tasks)
+                        self.agent_gvh.put('route', route, self.pid())
+                        self.agent_gvh.moat.follow_path(testroute)
+                    else:
+                        print('route is not clear')
+                        self.agent_gvh.put('route', [self.agent_gvh.moat.position],
+                                           self.pid())
 
-                    mytask = None
+                        self.locals['mytask'] = None
+                        continue
+                    self.baselock.release_mutex()
+                    break
 
-                test = self.agent_gvh.mutex_handler.has_mutex(a.mutex_id)
-
-                # print("has mutex is", test)
-                if not test:
-                    # print(req_num)
-                    a.request_mutex(req_num)
-                    # print("requesting")
-
-
-                else:
-                    print("have mutex at", time.time())
-                    tasks = self.agent_gvh.get('tasks')
-                    route = self.agent_gvh.get('route')
-                    for i in range(len(tasks)):
-                        if not tasks[i].assigned:
-
-                            # print("assigning task", tasks[i].id, "to ", self.pid())
-                            mytask = tasks[i]
-                            if mytask.location.position.z > 0 and self.agent_gvh.moat.bot_type == 1:
-                                continue
-                            if mytask.location.position.z <= 0 and self.agent_gvh.moat.bot_type == 0:
-                                continue
-                            # print("planner is", self.agent_gvh.moat.planner)
-                            print(mytask.location)
-
-                            self.agent_gvh.moat.planner.plan([self.agent_gvh.moat.position.position.x,
-                                                              self.agent_gvh.moat.position.position.y,
-                                                              self.agent_gvh.moat.position.position.z],
-                                                             [mytask.location.position.x, mytask.location.position.y,
-                                                              mytask.location.position.z])
-                            testroute = self.agent_gvh.moat.planner.Planning()
-                            # print('route is', testroute)
-                            if demo_planner.clear_path(route, testroute, self.pid()):
-                                print("cleared path")
-                                tasks[i].assigned = True
-                                tasks[i].assigned_to = self.pid()
-                                route = testroute
-                                self.agent_gvh.put('tasks', tasks)
-                                self.agent_gvh.put('route', route, self.pid())
-                                self.agent_gvh.moat.follow_path(testroute)
-                            else:
-                                print('route is not clear')
-                                self.agent_gvh.put('route', [[vec(self.agent_gvh.moat.position.position.x,
-                                                                  self.agent_gvh.moat.position.position.y,
-                                                                  self.agent_gvh.moat.position.position.z)]],
-                                                   self.pid())
-
-                                mytask = None
-                                continue
-
-                            # print(testroute)
-                            # print("just assigned mytask", mytask)
-
-                            # self.agent_gvh.moat.goTo(tasks[i].location)
-
-                            a.release_mutex()
-                            break
-
-                    time.sleep(0.4)
-                    self.rounds -= 1
-                    req_num = req_num + 1
-                    if all(task.assigned for task in tasks):
-                        if mytask is None:
-                            self.stop()
-                            continue
-
-                        elif mytask is not None and self.agent_gvh.moat.reached:
-                            self.stop()
-                            continue
-                        else:
-                            continue
-
-                if self.rounds <= 0:
-                    if not self.agent_gvh.is_leader:
-                        self.stop()
-
-                if not self.agent_gvh.is_alive:
+            time.sleep(0.4)
+            self.rounds -= 1
+            self.req_num = self.req_num + 1
+            if all(task.assigned for task in tasks):
+                if self.locals['mytask'] is None:
                     self.stop()
+                    return
 
-            except CommTimeoutError:
-                print("timed out on communication")
+                elif self.locals['mytask'] is not None and self.agent_gvh.moat.reached:
+                    self.stop()
+                    return
+                else:
+                    return
+
+        if self.rounds <= 0:
+            if not self.agent_gvh.is_leader:
                 self.stop()
 
+        if not self.agent_gvh.is_alive:
+            self.stop()
 
-def get_tasks(taskfile='tasks.txt', repeat=1):
-    from geometry_msgs.msg import Pose
-    tasks = []
-    tasklocs = open(taskfile, "r").readlines()
-    for i in range(len(tasklocs)):
-        locxyz = tasklocs[i].split(',')
-        locnew = Pose()
-        locnew.position.x, locnew.position.y, locnew.position.z = float(locxyz[0]), float(locxyz[1]), float(locxyz[2])
-        tasks.append(Task(locnew, i, False, None))
-    return tasks
+
+
