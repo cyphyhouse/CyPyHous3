@@ -2,6 +2,7 @@ import pickle
 import socket
 from threading import Thread, Event
 
+from src.harness.configs import AgentConfig
 from src.harness.gvh import Gvh
 from src.harness.message_handler import message_handler
 
@@ -20,8 +21,7 @@ class CommHandler(Thread):
     __retries : retries
     """
 
-    def __init__(self, ip: str = "", r_port: int = 2000, agent_gvh=None, timeout: float = 10.0,
-                 retries: int = RETRY_VAL):
+    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 10.0, retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:
@@ -30,8 +30,8 @@ class CommHandler(Thread):
         :param retries:
         """
         super(CommHandler, self).__init__()
-        self.__ip = ip
-        self.__r_port = r_port
+        self.__ip = a.rip
+        self.__r_port = a.rport
         self.__agent_gvh = agent_gvh
         self.__stop_event = Event()
         self.__timeout = timeout

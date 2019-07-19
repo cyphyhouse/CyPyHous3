@@ -60,6 +60,6 @@ plist = [2000, 2001, 2002, 2003, 2004]
 bots = 3
 c1 = AgentConfig(2, bots, "", 2001, plist, BaseMutexHandler(False, 2))
 c2 = AgentConfig(3, bots, "", 2002, plist, BaseMutexHandler(False, 3))
-c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler(True, 0))
+c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler(True, 0), is_leader=True)
 
 b, c, d = AddNums(c1), AddNums(c2), AddNums(c3)

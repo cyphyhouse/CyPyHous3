@@ -8,13 +8,14 @@ from src.motion.planner import Planner
 
 class AgentConfig(object):
     def __init__(self, pid: int, bots: int, rip: str, rport: int, plist: list = [],
-                 mh: Union[BaseMutexHandler, None] = None):
+                 mh: Union[BaseMutexHandler, None] = None, is_leader = False):
         self.pid = pid
         self.bots = bots
         self.rip = rip
         self.rport = rport
         self.plist = plist
         self.mutex_handler = mh
+        self.is_leader = is_leader
 
 
 class BotType(Enum):

@@ -40,7 +40,7 @@ class Gvh(object):
         self.__msg_list = []
         self.__recv_msg_list = []
         self.__port_list = a.plist
-        self.__is_leader = False
+        self.__is_leader = a.is_leader
         self.__is_alive = True
 
         # self.__mutex = None
