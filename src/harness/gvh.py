@@ -1,10 +1,10 @@
 import time
 from typing import Union
 
+from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.comm_funcs import send
 from src.functionality.mutex_handler import BaseMutexHandler
 from src.functionality.synchronizer import Synchronizer
-from src.config.configs import AgentConfig, MoatConfig
 from src.objects.dsm import dsmvar
 from src.objects.message import Message
 
@@ -42,8 +42,6 @@ class Gvh(object):
         self.__port_list = a.plist
         self.__is_leader = a.is_leader
         self.__is_alive = True
-
-        # self.__mutex = None
         self.__dsm = None
         self.__synchronizer = None
         self.__mutex_handler = a.mutex_handler
@@ -347,9 +345,7 @@ class Gvh(object):
         :param msg_list:
         :return:
         """
-        # print("sending")
         for msg in self.msg_list:
-            # print("sending out msg", self.pid)
             for port in self.__port_list:
                 send(msg, "", port)
                 send(msg, "192.168.1.255", port)

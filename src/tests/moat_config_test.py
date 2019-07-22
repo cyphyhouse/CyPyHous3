@@ -3,7 +3,6 @@ import unittest
 from src.config.configs import BotType
 from src.config.configs import MoatConfig
 
-
 class MoatConfigTest(unittest.TestCase):
     def setUp(self):
         self.config = MoatConfig('test_wp_topic', 'test_reached_topic', 'test_wp_node', 'drone1', 1, BotType.CAR,

@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from threading import Thread, Event
 from typing import Union
 
-from src.harness.comm_handler import CommHandler, CommTimeoutError
 from src.config.configs import AgentConfig, MoatConfig
+from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
 
 
@@ -23,7 +23,7 @@ class AgentThread(ABC, Thread):
         """
         super(AgentThread, self).__init__()
         self.__agent_gvh = Gvh(agent_config, moat_config)
-        self.__agent_comm_handler = CommHandler(agent_config,self.__agent_gvh)
+        self.__agent_comm_handler = CommHandler(agent_config, self.__agent_gvh)
         self.__agent_gvh.start_moat()
         self.__agent_gvh.start_mh()
         self.__stop_event = Event()
@@ -103,7 +103,7 @@ class AgentThread(ABC, Thread):
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
         self.__stop_event.set()
-        print("stopped", self.pid())
+        print("stopped application thread on agent", self.pid())
 
     def lock(self):
         pass
@@ -154,10 +154,10 @@ class AgentThread(ABC, Thread):
         self.stop()
 
     def msg_handle(self):
-        time.sleep(0.4)
+        time.sleep(0.1)
         self.agent_gvh.flush_msgs()
         self.agent_comm_handler.handle_msgs()
-        time.sleep(0.4)
+        time.sleep(0.1)
 
     @abstractmethod
     def initialize_vars(self):
@@ -183,10 +183,12 @@ class AgentThread(ABC, Thread):
         self.initialize_vars()
 
         while not self.stopped():
+
             self.msg_handle()
             try:
                 self.loop_body()
+            except OSError:
+                print("some unhandled error in application thread for agent", self.pid())
 
-            except CommTimeoutError:
-                print("timed out on communication")
+            if self.agent_comm_handler.stopped():
                 self.stop()

@@ -45,4 +45,3 @@ motion_automaton:
       pos_msg_type: PoseStamped
       rchd_msg_type : String
       planner : SimplePlanner
-

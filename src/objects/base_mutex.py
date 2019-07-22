@@ -139,6 +139,7 @@ class BaseMutex(Mutex):
             self.__mutex_request_list = self.mutex_request_list[1:]
             msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
                                      time.time())
+
             if self.ip_port_list is not []:
                 for port in self.ip_port_list:
                     send(msg, '192.168.1.255', port)

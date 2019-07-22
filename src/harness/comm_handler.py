@@ -35,6 +35,7 @@ class CommHandler(Thread):
         self.__agent_gvh = agent_gvh
         self.__stop_event = Event()
         self.__timeout = timeout
+        self.__msgs = []
         self.start()
 
     @property
@@ -140,11 +141,11 @@ class CommHandler(Thread):
                 data, addr = receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
-            except OSError:
-                self.stop()
             except socket.timeout:
-                print("timed out")
+                print("agent", self.agent_gvh.pid, "timed out")
                 self.stop()
+            except OSError:
+                print("unexpected os error on agent", self.agent_gvh.pid)
 
         receiver_socket.close()
 

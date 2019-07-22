@@ -1,7 +1,6 @@
 class Message(object):
     """
     message format for cyphyhouse
-
     __sender : sender of the message
     __message_type : message type
     __content : message contents

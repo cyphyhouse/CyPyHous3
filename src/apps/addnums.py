@@ -1,8 +1,8 @@
 import time
 
+from src.config.configs import AgentConfig
 from src.functionality.mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
-from src.config.configs import AgentConfig
 from src.objects.base_mutex import BaseMutex
 
 
@@ -40,26 +40,28 @@ class AddNums(AgentThread):
             else:
                 if not self.agent_gvh.mutex_handler.has_mutex(self.baselock.mutex_id):
                     return
-
+            # print("doing the rest", self.pid())
             self.agent_gvh.put('sum', self.agent_gvh.get('sum') + self.pid() * 2)
             self.agent_gvh.put('numadded', self.agent_gvh.get('numadded') + 1)
             self.locals['added'] = True
-
-            # unlock()
-            time.sleep(0.4)
             self.baselock.release_mutex()
+            # unlock()
+            time.sleep(0.1)
+
             self.requestedlock = False
 
-        if self.agent_gvh.get('numadded') >= self.agent_gvh.participants:
+        elif self.agent_gvh.get('numadded') >= self.agent_gvh.participants:
             self.locals['finalsum'] = self.agent_gvh.get('sum')
             print('final sum for', self.pid(), 'is', self.locals['finalsum'])
             self.stop()
 
 
 plist = [2000, 2001, 2002, 2003, 2004]
-bots = 3
+bots = 5
 c1 = AgentConfig(2, bots, "", 2001, plist, BaseMutexHandler(False, 2))
-c2 = AgentConfig(3, bots, "", 2002, plist, BaseMutexHandler(False, 3))
+c2 = AgentConfig(1, bots, "", 2002, plist, BaseMutexHandler(False, 1))
+c4 = AgentConfig(4, bots, "", 2004, plist, BaseMutexHandler(False, 4))
+c5 = AgentConfig(5, bots, "", 2000, plist, BaseMutexHandler(False, 5))
 c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler(True, 0), is_leader=True)
 
-b, c, d = AddNums(c1), AddNums(c2), AddNums(c3)
+b, c, d, e, f = AddNums(c1), AddNums(c2), AddNums(c3), AddNums(c4), AddNums(c5)
