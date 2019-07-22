@@ -1,0 +1,48 @@
+agents:
+    - pid: 1
+      bots: 3
+      rip: 127.0.0.1
+      rport: 2001
+      plist: [2002, 2003]
+      mutex_handler: BaseMutexHandler
+      is_leader : false
+      moat_class: MoatTestDrone
+    - pid: 2
+      bots: 3
+      rip: 127.0.0.1
+      rport: 2002
+      plist: [2001, 2003]
+      mutex_handler: BaseMutexHandler
+      is_leader : false
+      moat_class : MoatTestDrone
+    - pid: 3
+      bots: 3
+      rip: 127.0.0.1
+      rport: 2003
+      plist: [2001]
+      mutex_handler: BaseMutexHandler
+      is_leader : true
+      moat_class : MoatTestDrone
+
+motion_automaton:
+    - waypoint_topic : 'Waypoint'
+      reached_topic : '/Reached'
+      rospy_node : 'quad_wp_node'
+      bot_name: 'drone1'
+      queue_size: 1
+      bot_type: QUAD
+      pos_node: '/vrpn_client_node/'
+      pos_msg_type: PoseStamped
+      rchd_msg_type : String
+      planner : SimplePlanner
+    - waypoint_topic : 'Waypoint'
+      reached_topic : '/Reached'
+      rospy_node : 'quad_wp_node'
+      bot_name: 'drone2'
+      queue_size: 1
+      bot_type: QUAD
+      pos_node: '/vrpn_client_node/'
+      pos_msg_type: PoseStamped
+      rchd_msg_type : String
+      planner : SimplePlanner
+

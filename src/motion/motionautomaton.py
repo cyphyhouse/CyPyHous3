@@ -3,7 +3,7 @@ import time
 from abc import ABC, abstractmethod
 from typing import Union
 
-from src.harness.configs import MoatConfig
+from src.config.configs import MoatConfig, gen_positioning_params,gen_reached_params
 from src.motion.pos import Pos
 
 
@@ -23,10 +23,10 @@ class MotionAutomaton(threading.Thread, ABC):
         try:
             import rospy
             rospy.init_node(config.rospy_node, anonymous=True)
-            self.__pub = rospy.Publisher(config.waypoint_topic, config.pub_msg_type, queue_size=config.queue_size)
-            self.__sub_reached = rospy.Subscriber(*config.reached_params, self._getReached,
+            self.__pub = rospy.Publisher(config.waypoint_topic, config.pos_msg_type, queue_size=config.queue_size)
+            self.__sub_reached = rospy.Subscriber(*gen_reached_params(config), self._getReached,
                                                   queue_size=config.queue_size)
-            self.__sub_positioning = rospy.Subscriber(*config.positioning_params, self._getPositioning,
+            self.__sub_positioning = rospy.Subscriber(*gen_positioning_params(config), self._getPositioning,
                                                       queue_size=config.queue_size)
 
         except ImportError:

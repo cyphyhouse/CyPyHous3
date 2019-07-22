@@ -2,7 +2,7 @@ import pickle
 import socket
 from threading import Thread, Event
 
-from src.harness.configs import AgentConfig
+from src.config.configs import AgentConfig
 from src.harness.gvh import Gvh
 from src.harness.message_handler import message_handler
 

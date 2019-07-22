@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from src.harness.agentThread import AgentThread
-from src.harness.configs import AgentConfig, MoatConfig, default_car_moat_config
+from src.config.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos import Pos
 

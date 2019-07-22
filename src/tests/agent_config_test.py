@@ -1,7 +1,7 @@
 import unittest
 
 from src.functionality.mutex_handler import BaseMutexHandler
-from src.harness.configs import AgentConfig
+from src.config.configs import AgentConfig
 
 
 class AgentConfigTest(unittest.TestCase):

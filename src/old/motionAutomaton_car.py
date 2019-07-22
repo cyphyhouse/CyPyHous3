@@ -16,9 +16,9 @@ class MotionAutomaton(threading.Thread):
 
     """
 
-    def __init__(self, planner, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1 , bot_type = 1):
-        #bot type is 0 for quadcopter, 1 for car.
-        #TODO queue size is unnecessary
+    def __init__(self, planner, bot_num: int = 1, bot_name: str = 'cyphyhousecopter', queue_size=1, bot_type=1):
+        # bot type is 0 for quadcopter, 1 for car.
+        # TODO queue size is unnecessary
         print("calling init")
         threading.Thread.__init__(self)
         self.__waypoint_count = 0
@@ -34,8 +34,6 @@ class MotionAutomaton(threading.Thread):
                                             queue_size=1)
         self.__sub_reached = rospy.Subscriber('/Reached', String, self._getReached, queue_size=1)
         time.sleep(1)
-
-
 
     @property
     def planner(self):
@@ -122,7 +120,7 @@ class MotionAutomaton(threading.Thread):
         """
         self.position = data.pose
 
-    def _getReached(self, data:  str):  # -> NoReturn:
+    def _getReached(self, data: str):  # -> NoReturn:
         """
         This is a callback function that updates the internal Reached state
         :param data: String message
@@ -131,7 +129,6 @@ class MotionAutomaton(threading.Thread):
         a = str(data).upper()
         if 'TRUE' in a:
             self.reached = True
-
 
     def goTo(self, dest: Pose, wp_type: int = None):  # -> NoReturn:
         """
@@ -159,7 +156,7 @@ class MotionAutomaton(threading.Thread):
         self.reached = False
 
         self.waypoint_count += 1
-        print("actually going to",pose)
+        print("actually going to", pose)
         self.pub.publish(pose)
 
     def follow_path(self, path) -> None:
@@ -186,7 +183,6 @@ class MotionAutomaton(threading.Thread):
     @bot_type.setter
     def bot_type(self, bot_type):
         self.__bot_type = bot_type
-
 
     def run(self):
         """

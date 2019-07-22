@@ -4,7 +4,7 @@ from typing import Union
 from src.functionality.comm_funcs import send
 from src.functionality.mutex_handler import BaseMutexHandler
 from src.functionality.synchronizer import Synchronizer
-from src.harness.configs import AgentConfig, MoatConfig
+from src.config.configs import AgentConfig, MoatConfig
 from src.objects.dsm import dsmvar
 from src.objects.message import Message
 
@@ -55,6 +55,10 @@ class Gvh(object):
     def start_moat(self):
         if self.moat is not None:
             self.moat.start()
+
+    def start_mh(self):
+        if self.mutex_handler is not None:
+            self.mutex_handler.start()
 
     @property
     def moat(self):

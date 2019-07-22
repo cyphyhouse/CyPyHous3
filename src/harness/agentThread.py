@@ -5,7 +5,7 @@ from threading import Thread, Event
 from typing import Union
 
 from src.harness.comm_handler import CommHandler, CommTimeoutError
-from src.harness.configs import AgentConfig, MoatConfig
+from src.config.configs import AgentConfig, MoatConfig
 from src.harness.gvh import Gvh
 
 
@@ -24,6 +24,8 @@ class AgentThread(ABC, Thread):
         super(AgentThread, self).__init__()
         self.__agent_gvh = Gvh(agent_config, moat_config)
         self.__agent_comm_handler = CommHandler(agent_config,self.__agent_gvh)
+        self.__agent_gvh.start_moat()
+        self.__agent_gvh.start_mh()
         self.__stop_event = Event()
         self.__mutex_handler = self.__agent_gvh.mutex_handler
         self.__locals = {}

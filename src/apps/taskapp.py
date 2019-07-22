@@ -1,7 +1,7 @@
 import time
 
 from src.harness.agentThread import AgentThread
-from src.harness.configs import AgentConfig, MoatConfig
+from src.config.configs import AgentConfig, MoatConfig
 from src.motion.deconflict import clear_path
 from src.motion.moat_test_car import MoatTestCar
 from src.objects.base_mutex import BaseMutex

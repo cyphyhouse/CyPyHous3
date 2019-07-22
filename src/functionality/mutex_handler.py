@@ -12,7 +12,7 @@ class BaseMutexHandler(Thread):
         self.mutexnums = []
         self.__mutexes = []
         self.__stop_event = Event()
-        self.start()
+        #self.start()
 
     def stop(self) -> None:
         """

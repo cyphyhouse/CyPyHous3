@@ -2,13 +2,13 @@ import time
 
 import numpy as np
 
-from src.harness.agentThread import AgentThread
-from src.harness.configs import AgentConfig, MoatConfig, default_qc_moat_config
+import src.harness.agentThread
+from src.config.configs import AgentConfig, MoatConfig, default_qc_moat_config
 from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.pos import Pos
 
 
-class BasicFollowApp(AgentThread):
+class BasicFollowApp(src.harness.agentThread.AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
