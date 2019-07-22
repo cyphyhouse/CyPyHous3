@@ -2,8 +2,17 @@ import yaml
 
 from src.config.configs import AgentConfig, MoatConfig
 
-with open("/Users/mim/CyPyHous3/src/config/simple.yml", 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
+
+def get_configs(configfilename, agentnum, moatnum):
+    f = open(configfilename)
+    cfg = yaml.load(f)
+    agent_config = None
+    moat_config = None
+    if agentnum >= 0:
+        agent_config = mk_agent_config(cfg['agents'][agentnum])
+    if moatnum >=0:
+        moat_config = mk_moat_config(cfg['motion_automaton'][moatnum])
+    return [agent_config, moat_config]
 
 
 def mk_agent_config(agent_dict):
@@ -27,7 +36,8 @@ def mk_moat_config(moat_dict):
     return MoatConfig(*moat_config_params)
 
 
+
 # print(cfg['motion_automaton'][0])
 # a = mk_moat_config(cfg['motion_automaton'][0])
-a = mk_agent_config(cfg['agents'][0])
-print(a)
+#a = get_configs('/Users/mim/CyPyHous3/src/config/simple.yml',-1,-1)
+#print(a)

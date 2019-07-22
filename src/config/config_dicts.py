@@ -1,6 +1,5 @@
-# from geometry_msgs.msg import PoseStamped
-# from std_msgs.msg import String
-
+#from geometry_msgs.msg import PoseStamped
+#from std_msgs.msg import String
 
 from src.config.configs import BotType
 from src.functionality.mutex_handler import BaseMutexHandler
@@ -16,8 +15,8 @@ planner_dict['RRT'] = RRT
 planner_dict['DemoPlan'] = DemoPlan
 
 msg_type_dict = dict()
-# msg_type_dict['PoseStamped'] = PoseStamped
-# msg_type_dict['String'] = String
+msg_type_dict['PoseStamped'] = 'PoseStamped'
+msg_type_dict['String'] = 'String'
 
 bot_type_dict = dict()
 bot_type_dict['CAR'] = BotType.CAR

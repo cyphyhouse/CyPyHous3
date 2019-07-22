@@ -9,10 +9,10 @@ class BaseMutexHandler(Thread):
         super(BaseMutexHandler, self).__init__()
         self.leader = leader
         self.pid = pid
-        self.mutexnums = []
+        self.mutex_nums = []
         self.__mutexes = []
         self.__stop_event = Event()
-        #self.start()
+        # self.start()
 
     def stop(self) -> None:
         """
@@ -34,14 +34,14 @@ class BaseMutexHandler(Thread):
 
     def add_mutex(self, mutex):
         self.mutexes.append(mutex)
-        self.mutexnums.append(0)
+        self.mutex_nums.append(0)
 
-    def add_request(self, index: int, pid: int, req_num:int):
-        print("adding request from",pid)
+    def add_request(self, index: int, pid: int, req_num: int):
+        print("adding request from", pid)
         i = self.find_mutex_index(index)
         if i is not None:
             if (pid, req_num) not in self.mutexes[i].mutex_request_list:
-                self.mutexes[i].mutex_request_list.append((pid,req_num))
+                self.mutexes[i].mutex_request_list.append((pid, req_num))
         else:
             pass
 
@@ -51,15 +51,15 @@ class BaseMutexHandler(Thread):
                 return i
         return None
 
-    def grant_available_mutexes(self, mutexnums:list):
+    def grant_available_mutexes(self, mutex_nums: list):
         if self.leader:
             for i in range(len(self.mutexes)):
-                #print(self.mutexes[i].mutex_request_list)
+                # print(self.mutexes[i].mutex_request_list)
                 if self.mutexes[i].mutex_holder is None:
-                    #print("mutex available, granting")
-                    #print(self.mutexnums[i])
-                    self.mutexnums[i] += 1
-                    self.mutexes[i].grant_mutex(mutexnums[i])
+                    # print("mutex available, granting")
+                    # print(self.mutexnums[i])
+                    self.mutex_nums[i] += 1
+                    self.mutexes[i].grant_mutex(mutex_nums[i])
 
     def has_mutex(self, mutex_id):
         i = self.find_mutex_index(mutex_id)
@@ -69,8 +69,7 @@ class BaseMutexHandler(Thread):
 
         return False
 
-
     def run(self):
         while not self.stopped():
-            self.grant_available_mutexes(self.mutexnums)
+            self.grant_available_mutexes(self.mutex_nums)
             time.sleep(0.1)
