@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import argparse
-from src.config.config_funcs import get_configs
+
+#from src.config.config_funcs import get_configs
+
 def get_opt_args():
     parser = argparse.ArgumentParser()
     group = parser.add_argument_group()
@@ -31,12 +33,15 @@ def mk_app_file(appfile, configfile=None, botnum=-1, moatnum=-1):
     a = get_app_name(appfile)
     appsrc = str(appfile[:-3]).replace("/", ".")
     app_import_stmt = 'from ' + appsrc + " import " + str(a)+ "\n"
-    config_import_stmt = "from src.config.configs import get_configs\n"
+    config_import_stmt = "from src.config.config_funcs import get_configs\n"
     import_stmt = app_import_stmt+config_import_stmt
     #app_config = get_configs(configfile,botnum,moatnum)
-    app_config_stmt = str(a)+"(*get_configs("+str(configfile)+","+str(botnum)+","+str(moatnum)+")"
+    app_config_stmt = str(a)+"(*get_configs("+str(configfile)+","+str(botnum)+","+str(moatnum)+"))"
     app_file_text = import_stmt+"\n"+app_config_stmt
-    print(app_file_text)
+    app_file_name = "run_"+a+".py"
+    f = open(app_file_name,'w')
+    f.write(app_file_text)
+    f.close()
 
 
 if __name__ == '__main__':
