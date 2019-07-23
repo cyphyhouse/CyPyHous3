@@ -1,9 +1,76 @@
+from typing import Tuple, Optional
 import yaml
 
 from src.config.configs import AgentConfig, MoatConfig
 
 
-def get_configs(configfilename, agentnum, moatnum):
+def __validate(cfg) -> bool:
+    # TODO validate yaml file according to a schema
+    return True
+
+
+def get_configs(config_filename: str,
+                agent_id: Optional[int] = None,
+                device_id: Optional[int] = None,
+                ) -> Tuple[AgentConfig, MoatConfig]:
+    with open(config_filename) as f:
+        cfg = yaml.load(f)
+    if not __validate(cfg):
+        raise ValueError("Invalid YAML file" + config_filename)
+
+    if agent_id is None:
+        agent_conf = None
+    else:
+        # Make AgentConfig
+        from .config_dicts import mutex_handler_dict, moat_class_dict
+        try:
+            agent_dict = cfg['agents'][agent_id]
+        except IndexError:
+            raise IndexError("Agent index out of bound")
+
+        pid = agent_dict['pid']
+        is_leader=(cfg['leader_pid'] == agent_dict['pid'])
+        agent_conf = AgentConfig(
+            # Shared configs
+            bots=len(cfg['agents']),
+            # Device specific configs
+            moat_class=moat_class_dict[agent_dict['motion_automaton']],  # TODO choose Motion Automaton only when necessary
+            # Agent specific configs
+            pid=pid,
+            is_leader=is_leader,
+            mh=mutex_handler_dict[cfg['mutex_handler']](pid, is_leader),
+            rip=agent_dict['ip'],
+            rport=agent_dict['port'],
+            plist=agent_dict['plist'],
+        )
+
+    if device_id is None:
+        moat_conf = None
+    else:
+        # Make MoatConfig
+        # from rospy import names # TODO handle ros topic names using rospy
+        from .config_dicts import planner_dict, bot_type_dict, msg_type_dict
+        try:
+            device_dict = cfg['devices'][device_id]
+        except IndexError:
+            raise IndexError("Device index out of bound")
+        moat_conf = MoatConfig(
+            bot_name=device_dict['bot_name'],
+            bot_type=bot_type_dict[device_dict['bot_type']],
+            waypoint_topic=device_dict['waypoint_topic']['topic'],
+            reached_topic=device_dict['reached_topic']['topic'],
+            rchd_msg_type=device_dict['reached_topic']['type'],
+            pos_node=device_dict['positioning_topic']['topic'],
+            pos_msg_type=device_dict['positioning_topic']['type'],
+            planner=planner_dict[device_dict['planner']],
+            queue_size=device_dict['queue_size'],
+            rospy_node=device_dict['ros_node_prefix']
+        )
+
+    return agent_conf, moat_conf
+
+
+def get_configs_old(configfilename, agentnum, moatnum):
     f = open(configfilename)
     cfg = yaml.load(f)
     agent_config = None
@@ -27,17 +94,23 @@ def mk_agent_config(agent_dict):
 
 def mk_moat_config(moat_dict):
     from src.config.config_dicts import planner_dict, bot_type_dict, msg_type_dict
-    list_keys = [a for a in moat_dict.keys()]
-    moat_dict[list_keys[9]] = planner_dict[moat_dict[list_keys[9]]]
-    moat_dict[list_keys[7]] = msg_type_dict[moat_dict[list_keys[7]]]
-    moat_dict[list_keys[8]] = msg_type_dict[moat_dict[list_keys[8]]]
-    moat_dict[list_keys[5]] = bot_type_dict[moat_dict[list_keys[5]]]
-    moat_config_params = [moat_dict[list_keys[i]] for i in range(len(list_keys))]
-    return MoatConfig(*moat_config_params)
+    moat_dict['planner'] = planner_dict[moat_dict['planner']]
+    moat_dict['pos_msg_type'] = msg_type_dict[moat_dict['pos_msg_type']]
+    moat_dict['rchd_msg_type'] = msg_type_dict[moat_dict['rchd_msg_type']]
+    moat_dict['bot_type'] = bot_type_dict[moat_dict['bot_type']]
+    return MoatConfig(**moat_dict)
 
 
+if __name__ == "__main__":
+    import sys
 
-# print(cfg['motion_automaton'][0])
-# a = mk_moat_config(cfg['motion_automaton'][0])
-#a = get_configs('/Users/mim/CyPyHous3/src/config/simple.yml',-1,-1)
-#print(a)
+    new_conf = get_configs(sys.argv[1], 1, 1)
+    old_conf = get_configs_old(sys.argv[2], 1, 1)
+
+    assert new_conf[0].__dict__.keys() == old_conf[0].__dict__.keys()
+    assert all(new_conf[0].__dict__[k] == old_conf[0].__dict__[k] \
+            for k in new_conf[0].__dict__.keys() if k != 'mutex_handler')
+
+    assert new_conf[1].__dict__ == old_conf[1].__dict__, \
+        "New: " + str(new_conf[1].__dict__) + "\n" + \
+        "Old: " + str(old_conf[1].__dict__) + "\n"
