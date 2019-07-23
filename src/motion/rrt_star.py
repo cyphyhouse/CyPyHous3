@@ -71,7 +71,7 @@ class RRT(Planner):
         last_index = self.get_best_last_index(node_list, end)
         if last_index:
             path = gen_final_course(node_list, start, end, last_index)
-            path = path[::3]
+            path = path[::2]
             return path[::-1]
 
         return None
