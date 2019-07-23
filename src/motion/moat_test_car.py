@@ -17,6 +17,12 @@ class MoatTestCar(MotionAutomaton):
         if 'TRUE' in a:
             self.reached = True
 
+    def moat_init_action(self):
+        pass
+
+    def moat_exit_action(self):
+        pass
+
     def goTo(self, dest: Pos, wp_type: int = None) -> None:
         print("going to point", dest)
         if wp_type is not None:

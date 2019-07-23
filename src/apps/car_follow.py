@@ -1,11 +1,9 @@
 import time
 
-import numpy as np
-
 from src.config.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.harness.agentThread import AgentThread
 from src.motion.moat_test_car import MoatTestCar
-from src.motion.pos import Pos
+from src.motion.pos import pos3d
 
 
 class BasicFollowApp(AgentThread):
@@ -16,26 +14,24 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.locals['dest1'] = Pos(np.array([2., 1., 0.]))
-        self.locals['dest2'] = Pos(np.array([-2., 1., 0.]))
-        self.locals['dest3'] = Pos(np.array([2., -1., 0.]))
+        self.locals['dest1'] = pos3d(2., 1., 0.)  # Pos(np.array([2., 1., 0.]))
+        self.locals['dest2'] = pos3d(-2., 1., 0.)  # Pos(np.array([-2., 1., 0.]))
+        self.locals['dest3'] = pos3d(2., -1., 0.)  # Pos(np.array([2., -1., 0.]))
         self.locals['tries'] = 1
 
     def loop_body(self):
+        time.sleep(5)
         if self.locals['tries'] == 1:
             self.agent_gvh.moat.goTo(self.locals['dest1'])
-            time.sleep(5)
             self.locals['tries'] = 2
             return
         if self.locals['tries'] == 2:
             self.agent_gvh.moat.goTo(self.locals['dest2'])
             self.locals['tries'] = 3
-            time.sleep(5)
             return
         if self.locals['tries'] == 3:
             self.agent_gvh.moat.goTo(self.locals['dest3'])
             self.locals['tries'] = 4
-            time.sleep(5)
             self.stop()
             return
 

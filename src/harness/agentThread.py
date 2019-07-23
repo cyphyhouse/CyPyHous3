@@ -116,8 +116,7 @@ class AgentThread(ABC, Thread):
         :return: None
         """
         if self.agent_gvh.moat is not None:
-            if self.agent_gvh.moat.bot_type is 0:
-                self.agent_gvh.moat.land()
+                self.agent_gvh.moat.moat_exit_action()
                 # todo: msg = tERMINATE_MSG() best termination message
                 # TODO: send(msg,"",best_post,time.time()) best termination message.
         if self.agent_gvh.mutex_handler is not None:
@@ -145,7 +144,7 @@ class AgentThread(ABC, Thread):
         """
         return self.agent_gvh.pid
 
-    def participants(self) -> int:
+    def num_agents(self) -> int:
         """
         method to return the number of participants in the system
         :return: integer number of participants
@@ -195,6 +194,19 @@ class AgentThread(ABC, Thread):
         loop body
         :return:
         """
+        pass
+
+    def write_to_shared(self, var_name, index, value):
+        if index is not None:
+            self.agent_gvh.put(var_name,value,index)
+        else:
+            self.agent_gvh.put(var_name,value)
+
+    def read_from_shared(self, var_name, index):
+        if index is not None:
+            return self.agent_gvh.get(var_name,index)
+        else:
+            return self.agent_gvh.get(var_name)
         pass
 
     def run(self) -> None:
