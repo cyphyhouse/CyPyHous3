@@ -23,7 +23,7 @@ class RRT(Planner):
     Class for RRT* Planning
     """
 
-    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 5,
+    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 15,
                  max_iter: int = 500):
         super(RRT, self).__init__()
         if rand_area is None:
