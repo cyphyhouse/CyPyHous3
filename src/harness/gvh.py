@@ -3,7 +3,7 @@ from typing import Union
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.comm_funcs import send
-from src.functionality.mutex_handler import BaseMutexHandler
+from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.functionality.synchronizer import Synchronizer
 from src.objects.dsm import dsmvar
 from src.objects.message import Message

@@ -3,7 +3,7 @@ from typing import Union
 
 from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
-from src.harness.message_handler import mutex_grant_create, mutex_release_create, mutex_request_create
+from src.harness.message_handler import base_mutex_grant_create, mutex_release_create, base_mutex_request_create
 from src.objects.mutex import Mutex
 
 
@@ -120,7 +120,7 @@ class BaseMutex(Mutex):
         :param req_num: request number
         :return:
         """
-        msg = mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
+        msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
                 send(msg, '192.168.1.255', port)
@@ -137,8 +137,8 @@ class BaseMutex(Mutex):
             agent_id = self.mutex_request_list[0][0]
             self.__mutex_holder = agent_id
             self.__mutex_request_list = self.mutex_request_list[1:]
-            msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
-                                     time.time())
+            msg = base_mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
+                                          time.time())
 
             if self.ip_port_list is not []:
                 for port in self.ip_port_list:

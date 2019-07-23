@@ -1,7 +1,7 @@
 import time
 
 from src.config.configs import AgentConfig
-from src.functionality.mutex_handler import BaseMutexHandler
+from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
 from src.objects.base_mutex import BaseMutex
 

@@ -1,7 +1,7 @@
 import time
 
-from src.harness.agentThread import AgentThread
 from src.config.configs import AgentConfig, MoatConfig
+from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
 from src.motion.moat_test_car import MoatTestCar
 from src.objects.base_mutex import BaseMutex
@@ -49,8 +49,6 @@ class TaskApp(AgentThread):
             route = self.agent_gvh.get('route')
             for i in range(len(tasks)):
                 if not tasks[i].assigned:
-
-                    # print("assigning task", tasks[i].id, "to ", self.pid())
                     self.locals['mytask'] = tasks[i]
                     if self.locals['mytask'].location.z > 0 and self.agent_gvh.moat.bot_type == 1:
                         continue

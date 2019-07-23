@@ -93,17 +93,15 @@ class AgentThread(ABC, Thread):
                 self.agent_gvh.moat.land()
                 # todo: msg = tERMINATE_MSG() best termination message
                 # TODO: send(msg,"",best_post,time.time()) best termination message.
-        if self.agent_gvh.dsm is not None:
-            for dsmvar in self.agent_gvh.dsm:
-                print(dsmvar, "for", self.agent_gvh.pid)
         if self.agent_gvh.mutex_handler is not None:
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
-        self.__stop_event.set()
-        print("stopped application thread on agent", self.pid())
+        if not self.stopped():
+            self.__stop_event.set()
+            print("stopped application thread on agent", self.pid())
 
     def lock(self):
         pass

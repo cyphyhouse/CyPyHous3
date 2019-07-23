@@ -1,6 +1,6 @@
 import unittest
 
-from src.functionality.mutex_handler import BaseMutexHandler
+from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.config.configs import AgentConfig
 
 

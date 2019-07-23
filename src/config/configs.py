@@ -2,7 +2,7 @@
 from enum import Enum, unique
 from typing import Union
 
-from src.functionality.mutex_handler import BaseMutexHandler
+from src.functionality.base_mutex_handler import BaseMutexHandler
 
 
 class AgentConfig(object):

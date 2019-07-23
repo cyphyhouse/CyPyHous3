@@ -16,7 +16,7 @@ def round_update_create(pid: int, round_num: int, ts: float) -> message.Message:
     return message.Message(pid, 0, round_num, ts)
 
 
-def mutex_request_create(mutex_id: int, req_num: int, pid: int, ts: float) -> message.Message:
+def base_mutex_request_create(mutex_id: int, req_num: int, pid: int, ts: float) -> message.Message:
     """
     create mutex request
     :param mutex_id: variable to create mutex request for
@@ -29,7 +29,7 @@ def mutex_request_create(mutex_id: int, req_num: int, pid: int, ts: float) -> me
     return message.Message(pid, 1, message_contents, ts)
 
 
-def mutex_grant_create(mutex_id: int, agent_id: int, pid: int, mutexnum: int, ts: float) -> message.Message:
+def base_mutex_grant_create(mutex_id: int, agent_id: int, pid: int, mutexnum: int, ts: float) -> message.Message:
     """
     grant mutex message creation
     :param mutexnum :mutex number
@@ -70,7 +70,7 @@ def round_update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
         print("attempting to sync")
 
 
-def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
+def base_mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     """
     add request to list of requests
     :param msg: request message
@@ -85,7 +85,7 @@ def mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
         pass
 
 
-def mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
+def base_mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     """
     grant first request
     :param msg: grant message
@@ -97,7 +97,7 @@ def mutex_grant_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     agent_gvh.mutex_handler.mutexes[index].mutex_holder = grantee
 
 
-def mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
+def base_mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     """
     release mutex held
     :param msg: release message
@@ -143,7 +143,7 @@ def message_update_handle(msg: message.Message, agent_gvh: Gvh):
 message_handler = dict()
 
 message_handler[0] = round_update_handle
-message_handler[1] = mutex_request_handle
-message_handler[2] = mutex_grant_handle
-message_handler[3] = mutex_release_handle
+message_handler[1] = base_mutex_request_handle
+message_handler[2] = base_mutex_grant_handle
+message_handler[3] = base_mutex_release_handle
 message_handler[4] = message_update_handle
