@@ -221,7 +221,7 @@ class AgentThread(ABC, Thread):
             self.msg_handle()
             try:
                 self.loop_body()
-                self.sleep(5)
+                time.sleep(5)
 
             except OSError:
                 print("some unhandled error in application thread for agent", self.pid())
