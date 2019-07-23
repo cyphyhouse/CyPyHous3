@@ -23,12 +23,14 @@ class BasicFollowApp(AgentThread):
     def loop_body(self):
         if self.locals['tries'] == 1:
             path = self.agent_gvh.moat.planner.find_path(self.locals['dest1'],self.locals['dest2'],[])
+            print("first path from 2,1,0 to -2, 1 , 0",path)
             self.agent_gvh.moat.follow_path(path)
             time.sleep(2)
             self.locals['tries'] = 2
             return
         if self.locals['tries'] == 2:
             path = self.agent_gvh.moat.planner.find_path(self.locals['dest2'], self.locals['dest3'],[])
+            print("first path from -2,1,0 to 2, -1 , 0",path)
             self.agent_gvh.moat.follow_path(path)
             time.sleep(2)
             self.locals['tries'] = 3
