@@ -22,7 +22,6 @@ class BasicFollowApp(AgentThread):
         self.locals['tries'] = 1
 
     def loop_body(self):
-        print("looping")
         if self.locals['tries'] == 1:
             self.agent_gvh.moat.goTo(self.locals['dest1'])
             time.sleep(5)

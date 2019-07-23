@@ -1,7 +1,6 @@
 from src.config.configs import AgentConfig
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
-from src.objects.base_mutex import BaseMutex
 
 
 class AddNums(AgentThread):
@@ -10,8 +9,8 @@ class AddNums(AgentThread):
     and fields are accessed safely and correctly .
     """
 
-    def __init__(self, config):
-        super(AddNums, self).__init__(config, None)
+    def __init__(self, agentconfig):
+        super(AddNums, self).__init__(agentconfig,None)
         self.start()
 
     def initialize_vars(self):
@@ -35,6 +34,7 @@ class AddNums(AgentThread):
             self.locals['finalsum'] = self.agent_gvh.get('sum')
             print('final sum for', self.pid(), 'is', self.locals['finalsum'])
             self.stop()
+
 
 
 plist = [2000, 2001, 2002, 2003, 2004]

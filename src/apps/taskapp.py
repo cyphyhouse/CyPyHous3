@@ -3,6 +3,7 @@ import time
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
+from src.motion.
 from src.motion.moat_test_car import MoatTestCar
 from src.objects.base_mutex import BaseMutex
 from src.objects.udt import get_tasks
@@ -13,15 +14,11 @@ class TaskApp(AgentThread):
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
 
         super(TaskApp, self).__init__(agent_config, moat_config)
-        self.agent_gvh.moat = MoatTestCar(moat_config)
-        self.requestedlock = False
-        self.req_num = 0
-        self.baselock = None
         self.rounds = 10
         self.start()
 
     def initialize_vars(self):
-        if self.agent_gvh.moat.bot_type == 0:
+        if self.agent_gvh.moat.bot_type == :
             self.agent_gvh.moat.takeoff()
         route = []
         self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='tasks.txt'))
