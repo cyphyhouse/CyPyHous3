@@ -72,7 +72,7 @@ class BasicFollowApp(AgentThread):
 
 
 m = default_car_moat_config('hotdec_car')
-obstacles = [Obs(-2, 0, 0.5), Obs(2, 0, 0.5)]
+obstacles = [Obs(-2, 0, 0.1), Obs(2, 0, 0.1)]
 m.planner = RRT()
 a = AgentConfig(1, 1, "", 2000)
 app = BasicFollowApp(a, m)
