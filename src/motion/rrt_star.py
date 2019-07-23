@@ -231,7 +231,6 @@ class RRT(Planner):
                 dy = obs.y - node.y
                 d = dx * dx + dy * dy
                 if d <= obs.radius ** 2:
-                    print("here")
                     return False  # collision
             except AttributeError:
                 print("obstacle might not be correctly formatted")
