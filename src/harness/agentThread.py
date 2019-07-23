@@ -28,7 +28,10 @@ class AgentThread(ABC, Thread):
         self.__agent_gvh.start_mh()
         self.__stop_event = Event()
         self.__mutex_handler = self.__agent_gvh.mutex_handler
-        self.__locals = {}
+        self.requestedlocks = {}
+        self.req_nums = {}
+        self.baselocks = {}
+        self.locals = {}
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)

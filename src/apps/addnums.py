@@ -14,15 +14,14 @@ class AddNums(AgentThread):
 
     def __init__(self, config):
         super(AddNums, self).__init__(config, None)
-        self.requestedlock = False
-        self.req_num = 0
-        self.baselock = None
         self.start()
 
     def initialize_vars(self):
-        self.baselock = BaseMutex(1, self.agent_gvh.port_list)
-        self.agent_gvh.mutex_handler.add_mutex(self.baselock)
-        self.baselock.agent_comm_handler = self.agent_comm_handler
+        self.baselocks['addevent']= BaseMutex(1, self.agent_gvh.port_list)
+        self.agent_gvh.mutex_handler.add_mutex(self.baselocks['addevent'])
+        self.baselocks['addevent'].agent_comm_handler = self.agent_comm_handler
+        self.requestedlocks['addevent'] = False
+        self.req_nums['addevent'] = 0
         self.create_aw_var('sum', int, 0)
         self.create_aw_var('numadded', int, 0)
         self.locals['added'] = False
@@ -32,23 +31,23 @@ class AddNums(AgentThread):
 
         if not self.locals['added']:
             # lock()
-            if not self.requestedlock:
-                self.baselock.request_mutex(self.req_num)
-                self.requestedlock = True
-                self.req_num += 1
+            if not self.requestedlocks['addevent']:
+                self.baselocks['addevent'].request_mutex(self.req_nums['addevent'])
+                self.requestedlocks['addevent'] = True
+                self.req_nums['addevent'] += 1
                 return
             else:
-                if not self.agent_gvh.mutex_handler.has_mutex(self.baselock.mutex_id):
+                if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks['addevent'].mutex_id):
                     return
             # print("doing the rest", self.pid())
             self.agent_gvh.put('sum', self.agent_gvh.get('sum') + self.pid() * 2)
             self.agent_gvh.put('numadded', self.agent_gvh.get('numadded') + 1)
             self.locals['added'] = True
-            self.baselock.release_mutex()
+            self.baselocks['addevent'].release_mutex()
             # unlock()
             time.sleep(0.1)
 
-            self.requestedlock = False
+            self.requestedlocks['addevent'] = False
 
         elif self.agent_gvh.get('numadded') >= self.agent_gvh.participants:
             self.locals['finalsum'] = self.agent_gvh.get('sum')
