@@ -36,6 +36,23 @@ class MotionAutomaton(threading.Thread, ABC):
             print("maybe issue with ros installation")
 
         time.sleep(1)
+        self.moat_init_action()
+
+    @abstractmethod
+    def moat_init_action(self):
+        """
+        action to perform when the motion automaton starts up.
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def moat_exit_action(self):
+        """
+        action to perform when the motion automaton exits
+        :return:
+        """
+        pass
 
     @property
     def path(self) -> Union[Pos, list]:

@@ -17,6 +17,24 @@ class MoatTestDrone(MotionAutomaton):
         if 'TRUE' in a:
             self.reached = True
 
+    def takeoff(self):
+        print("taking off")
+        takeoff = Pos(np.array([self.position.x, self.position.y, 1.0]))
+        self.goTo(takeoff)
+
+    def land(self):
+        print("landing")
+        landing = Pos(np.array([self.position.x, self.position.y, 0.0]))
+        self.goTo(landing)
+
+    def moat_init_action(self):
+        self.takeoff()
+
+    def moat_exit_action(self):
+        # TODO: maybe incorporate call to best here?
+        # self.land()
+        pass
+
     def goTo(self, dest: Pos, wp_type: int = None) -> None:
         print("going to point", dest)
         if wp_type is not None:

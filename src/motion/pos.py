@@ -181,3 +181,15 @@ def to_node(p: Pos) -> Node:
     :return:
     """
     return Node(p.x, p.y, p.z)
+
+
+class pos3d(Pos):
+    def __init__(self, x: float, y: float, z: float):
+        super(pos3d, self).__init__(np.array([x, y, z]))
+
+
+class Obs(object):
+    def __init__(self, x, y , radius):
+        self.x = x
+        self.y = y
+        self.radius = radius

@@ -10,31 +10,29 @@ class AddNums(AgentThread):
     """
 
     def __init__(self, agentconfig):
-        super(AddNums, self).__init__(agentconfig,None)
+        super(AddNums, self).__init__(agentconfig, None)
         self.start()
 
     def initialize_vars(self):
-        self.initialize_lock('addevent')
+        self.locals['added'] = False
+        self.locals['finalsum'] = None
         self.create_aw_var('sum', int, 0)
         self.create_aw_var('numadded', int, 0)
-        self.locals['added'] = False
-        self.locals['finalsum'] = 0
+        self.initialize_lock('adding')
 
     def loop_body(self):
-
         if not self.locals['added']:
-            # lock()
-            if self.lock('addevent'):
-                self.agent_gvh.put('sum', self.agent_gvh.get('sum') + self.pid() * 2)
-                self.agent_gvh.put('numadded', self.agent_gvh.get('numadded') + 1)
-                self.locals['added'] = True
-                self.unlock('addevent')
-
-        elif self.agent_gvh.get('numadded') >= self.agent_gvh.participants:
-            self.locals['finalsum'] = self.agent_gvh.get('sum')
-            print('final sum for', self.pid(), 'is', self.locals['finalsum'])
+            if not self.lock('adding'):
+                return
+            self.write_to_shared('sum', None, self.read_from_shared('sum', None) + self.pid() * 2)
+            self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
+            self.locals['added'] = True
+            self.unlock('adding')
+            return
+        if self.read_from_shared('numadded', None) == self.num_agents():
+            self.locals['finalsum'] = self.read_from_shared('sum', None)
             self.stop()
-
+            return
 
 
 plist = [2000, 2001, 2002, 2003, 2004]

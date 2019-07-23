@@ -71,7 +71,7 @@ class RRT(Planner):
         last_index = self.get_best_last_index(node_list, end)
         if last_index:
             path = gen_final_course(node_list, start, end, last_index)
-            path = path[::2]
+            path = path[::3]
             return path[::-1]
 
         return None
@@ -224,12 +224,16 @@ class RRT(Planner):
         :param obstacle_list:
         :return:
         """
-        for (ox, oy, size) in obstacle_list:
-            dx = ox - node.x
-            dy = oy - node.y
-            d = dx * dx + dy * dy
-            if d <= size ** 2:
-                return False  # collision
+
+        for obs in obstacle_list:
+            try:
+                dx = obs.x - node.x
+                dy = obs.y - node.y
+                d = dx * dx + dy * dy
+                if d <= obs.radius ** 2:
+                    return False  # collision
+            except AttributeError:
+                print("obstacle might not be correctly formatted")
 
         return True  # safe
 
