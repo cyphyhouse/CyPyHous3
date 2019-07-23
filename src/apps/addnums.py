@@ -1,5 +1,3 @@
-import time
-
 from src.config.configs import AgentConfig
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
@@ -17,11 +15,7 @@ class AddNums(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.baselocks['addevent']= BaseMutex(1, self.agent_gvh.port_list)
-        self.agent_gvh.mutex_handler.add_mutex(self.baselocks['addevent'])
-        self.baselocks['addevent'].agent_comm_handler = self.agent_comm_handler
-        self.requestedlocks['addevent'] = False
-        self.req_nums['addevent'] = 0
+        self.initialize_lock('addevent')
         self.create_aw_var('sum', int, 0)
         self.create_aw_var('numadded', int, 0)
         self.locals['added'] = False
@@ -31,23 +25,11 @@ class AddNums(AgentThread):
 
         if not self.locals['added']:
             # lock()
-            if not self.requestedlocks['addevent']:
-                self.baselocks['addevent'].request_mutex(self.req_nums['addevent'])
-                self.requestedlocks['addevent'] = True
-                self.req_nums['addevent'] += 1
-                return
-            else:
-                if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks['addevent'].mutex_id):
-                    return
-            # print("doing the rest", self.pid())
-            self.agent_gvh.put('sum', self.agent_gvh.get('sum') + self.pid() * 2)
-            self.agent_gvh.put('numadded', self.agent_gvh.get('numadded') + 1)
-            self.locals['added'] = True
-            self.baselocks['addevent'].release_mutex()
-            # unlock()
-            time.sleep(0.1)
-
-            self.requestedlocks['addevent'] = False
+            if self.lock('addevent'):
+                self.agent_gvh.put('sum', self.agent_gvh.get('sum') + self.pid() * 2)
+                self.agent_gvh.put('numadded', self.agent_gvh.get('numadded') + 1)
+                self.locals['added'] = True
+                self.unlock('addevent')
 
         elif self.agent_gvh.get('numadded') >= self.agent_gvh.participants:
             self.locals['finalsum'] = self.agent_gvh.get('sum')

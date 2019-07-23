@@ -8,13 +8,13 @@ class dsmvar(object):
         self.__pid = pid
         if owner == 0:
             self.__value = value
-            self.__last_updated = 0.0
+            self.__last_updated = last_updated
         else:
             self.__value = []
             self.__last_updated = []
             for i in range(size):
                 self.__value.append(None)
-                self.__last_updated.append(0.0)
+                self.__last_updated.append(last_updated)
                 if i == pid:
                     self.__value[i] = value
 

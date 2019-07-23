@@ -7,6 +7,7 @@ from typing import Union
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
+from src.objects.base_mutex import BaseMutex
 
 
 class AgentThread(ABC, Thread):
@@ -43,6 +44,29 @@ class AgentThread(ABC, Thread):
     def create_aw_var(self, name, dtype, initial_value=None):
         self.agent_gvh.create_aw_var(name, dtype, initial_value)
         pass
+
+    def initialize_lock(self, key):
+        self.baselocks[key] = BaseMutex(1, self.agent_gvh.port_list)
+        self.agent_gvh.mutex_handler.add_mutex(self.baselocks[key])
+        self.baselocks[key].agent_comm_handler = self.agent_comm_handler
+        self.requestedlocks[key] = False
+        self.req_nums[key] = 0
+
+    def lock(self, key: str):
+        if not self.requestedlocks[key]:
+            self.baselocks[key].request_mutex(self.req_nums[key])
+            self.requestedlocks[key] = True
+            self.req_nums[key] += 1
+            return False
+        else:
+            if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
+                return False
+        return True
+
+    def unlock(self, key: str):
+        self.baselocks[key].release_mutex()
+        self.requestedlocks[key] = False
+        time.sleep(0.1)
 
     @property
     def locals(self):
@@ -105,9 +129,6 @@ class AgentThread(ABC, Thread):
         if not self.stopped():
             self.__stop_event.set()
             print("stopped application thread on agent", self.pid())
-
-    def lock(self):
-        pass
 
     def stopped(self) -> bool:
         """
