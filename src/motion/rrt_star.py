@@ -223,12 +223,16 @@ class RRT(Planner):
         :param obstacle_list:
         :return:
         """
-        for (ox, oy, size) in obstacle_list:
-            dx = ox - node.x
-            dy = oy - node.y
-            d = dx * dx + dy * dy
-            if d <= size ** 2:
-                return False  # collision
+
+        for obs in obstacle_list:
+            try:
+                dx = obs.x - node.x
+                dy = obs.y - node.y
+                d = dx * dx + dy * dy
+                if d <= obs.radius ** 2:
+                    return False  # collision
+            except AttributeError:
+                print("obstacle might not be correctly formatted")
 
         return True  # safe
 
