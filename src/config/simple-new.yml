@@ -16,6 +16,7 @@ agents:
       port: 2003
       plist: [2001]
       motion_automaton: MoatTestDrone  # TODO
+      
 devices:
     - bot_name: drone1
       bot_type: QUAD

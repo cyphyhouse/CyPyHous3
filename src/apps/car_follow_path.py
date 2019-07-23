@@ -1,6 +1,7 @@
 import time
 
 from src.config.configs import AgentConfig, MoatConfig, default_car_moat_config
+from src.motion.rrt_star import RRT
 from src.harness.agentThread import AgentThread
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos import pos3d
@@ -21,18 +22,18 @@ class BasicFollowApp(AgentThread):
 
     def loop_body(self):
         if self.locals['tries'] == 1:
-            self.agent_gvh.moat.goTo(self.locals['dest1'])
+            self.agent_gvh.moat.follow_path(self.locals['dest1'])
             time.sleep(5)
             self.locals['tries'] = 2
             return
         if self.locals['tries'] == 2:
-            self.agent_gvh.moat.goTo(self.locals['dest2'])
+            self.agent_gvh.moat.follow_path(self.locals['dest2'])
             time.sleep(5)
             self.locals['tries'] = 3
 
             return
         if self.locals['tries'] == 3:
-            self.agent_gvh.moat.goTo(self.locals['dest3'])
+            self.agent_gvh.moat.follow_path(self.locals['dest3'])
             time.sleep(5)
             self.locals['tries'] = 4
             self.stop()
@@ -41,5 +42,6 @@ class BasicFollowApp(AgentThread):
 
 
 m = default_car_moat_config('hotdec_car')
+m.planner = RRT()
 a = AgentConfig(1, 1, "", 2000)
 app = BasicFollowApp(a, m)
