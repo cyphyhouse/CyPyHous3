@@ -20,7 +20,6 @@ class BasicFollowApp(AgentThread):
         self.locals['tries'] = 1
 
     def loop_body(self):
-        time.sleep(5)
         if self.locals['tries'] == 1:
             self.agent_gvh.moat.goTo(self.locals['dest1'])
             self.locals['tries'] = 2
@@ -28,12 +27,14 @@ class BasicFollowApp(AgentThread):
         if self.locals['tries'] == 2:
             self.agent_gvh.moat.goTo(self.locals['dest2'])
             self.locals['tries'] = 3
+
             return
         if self.locals['tries'] == 3:
             self.agent_gvh.moat.goTo(self.locals['dest3'])
             self.locals['tries'] = 4
             self.stop()
             return
+
 
 
 m = default_car_moat_config('hotdec_car')
