@@ -23,7 +23,7 @@ class RRT(Planner):
     Class for RRT* Planning
     """
 
-    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 200,
+    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 5,
                  max_iter: int = 500):
         super(RRT, self).__init__()
         if rand_area is None:
@@ -231,6 +231,7 @@ class RRT(Planner):
                 dy = obs.y - node.y
                 d = dx * dx + dy * dy
                 if d <= obs.radius ** 2:
+                    print("here")
                     return False  # collision
             except AttributeError:
                 print("obstacle might not be correctly formatted")
