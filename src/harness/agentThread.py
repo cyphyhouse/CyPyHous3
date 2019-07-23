@@ -33,12 +33,12 @@ class AgentThread(ABC, Thread):
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)
 
-    def create_ar_var(self, name, type, initial_value=None):
-        self.agent_gvh.create_ar_var(name, type, initial_value)
+    def create_ar_var(self, name, dtype, initial_value=None):
+        self.agent_gvh.create_ar_var(name, dtype, initial_value)
         pass
 
-    def create_aw_var(self, name, type, initial_value=None):
-        self.agent_gvh.create_aw_var(name, type, initial_value)
+    def create_aw_var(self, name, dtype, initial_value=None):
+        self.agent_gvh.create_aw_var(name, dtype, initial_value)
         pass
 
     @property
