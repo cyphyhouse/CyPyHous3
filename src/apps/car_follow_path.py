@@ -23,7 +23,7 @@ class BasicFollowApp(AgentThread):
         self.locals['tries'] = 1
 
     def loop_body(self):
-        if self.locals['tries'] == 1 :
+        if self.locals['tries'] == 1:
             print("going to point 1")
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest2'], obstacles)
@@ -37,15 +37,15 @@ class BasicFollowApp(AgentThread):
             self.locals['tries'] = 2
             return
         if self.locals['tries'] == 2 and self.agent_gvh.moat.reached:
-            #print("position is", self.agent_gvh.moat.position)
-           # path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
-            #if path is None:
-                #print("no path for 2 to 3 ")
-                #self.locals['tries'] = 3
-                #return
-            #print("first path from -2,1,0 to 2, -1 , 0", path)
-           # self.agent_gvh.moat.follow_path(path)
-           # time.sleep(3)
+            # print("position is", self.agent_gvh.moat.position)
+            # path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
+            # if path is None:
+            # print("no path for 2 to 3 ")
+            # self.locals['tries'] = 3
+            # return
+            # print("first path from -2,1,0 to 2, -1 , 0", path)
+            # self.agent_gvh.moat.follow_path(path)
+            # time.sleep(3)
             self.locals['tries'] = 3
 
             return
@@ -114,9 +114,8 @@ class BasicFollowApp(AgentThread):
             return
 
 
-
 m = default_car_moat_config('hotdec_car')
-obstacles = [Obs(0, 0, 0.75),Obs(0,-2,0.75)]
+obstacles = [Obs(0, 0, 0.75), Obs(0, -2, 0.75)]
 m.planner = RRT(goal_sample_rate=20)
 a = AgentConfig(1, 1, "", 2000)
 app = BasicFollowApp(a, m)
