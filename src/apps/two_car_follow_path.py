@@ -14,6 +14,7 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
+        self.agent_comm_handler.timeout = 2.0
         if self.agent_gvh.is_leader :
             print(" i am the leader", self.pid())
         self.create_ar_var('carpos', Pos, self.agent_gvh.moat.position)
