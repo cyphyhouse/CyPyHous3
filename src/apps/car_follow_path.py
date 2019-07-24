@@ -73,8 +73,59 @@ class BasicFollowApp(AgentThread):
             self.agent_gvh.moat.follow_path(path)
             time.sleep(3)
             self.locals['tries'] = 5
+            return
+        if self.locals['tries'] == 5:
+            print("position is", self.agent_gvh.moat.position)
+
+            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest2'], obstacles)
+            if path is None:
+                print("no path for 1 to 2 ")
+                self.locals['tries'] = 6
+                return
+            print("first path from 2,1,0 to -2, 1 , 0", path)
+            self.agent_gvh.moat.follow_path(path)
+            time.sleep(2)
+            self.locals['tries'] = 6
+            return
+        if self.locals['tries'] == 6:
+            print("position is", self.agent_gvh.moat.position)
+           # path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
+            #if path is None:
+                #print("no path for 2 to 3 ")
+                #self.locals['tries'] = 3
+                #return
+            #print("first path from -2,1,0 to 2, -1 , 0", path)
+           # self.agent_gvh.moat.follow_path(path)
+           # time.sleep(3)
+            self.locals['tries'] = 7
 
             return
+        if self.locals['tries'] == 7:
+            print("position is", self.agent_gvh.moat.position)
+
+            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest4'], obstacles)
+            print("first path from 2,1,0 to -2, 1 , 0", path)
+            if path is None:
+                print("no path for 3 to 4 ")
+                self.locals['tries'] = 8
+                return
+            self.agent_gvh.moat.follow_path(path)
+            time.sleep(3)
+            self.locals['tries'] = 8
+            return
+        if self.locals['tries'] == 8:
+            print("position is", self.agent_gvh.moat.position)
+            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest1'], obstacles)
+            if path is None:
+                print("no path for 1 to 2 ")
+                self.locals['tries'] = 9
+                return
+            print("first path from -2,1,0 to 2, -1 , 0", path)
+            self.agent_gvh.moat.follow_path(path)
+            time.sleep(3)
+            self.locals['tries'] = 9
+            return
+
 
 
 m = default_car_moat_config('hotdec_car')
