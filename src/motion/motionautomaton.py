@@ -23,7 +23,7 @@ class MotionAutomaton(threading.Thread, ABC):
         try:
             import rospy
             rospy.init_node(config.rospy_node, anonymous=True)
-            self.__pub = rospy.Publisher(config.waypoint_topic, config.pos_msg_type, queue_size=config.queue_size)
+            self.__pub = rospy.Publisher(*gen_waypoint_params(config), queue_size=config.queue_size)
             self.__sub_reached = rospy.Subscriber(*gen_reached_params(config), self._getReached,
                                                   queue_size=config.queue_size)
             self.__sub_positioning = rospy.Subscriber(*gen_positioning_params(config), self._getPositioning,

@@ -97,7 +97,11 @@ def gen_positioning_params(config: MoatConfig):
 
 
 def gen_reached_params(config: MoatConfig):
-    return config.reached_topic, config.rchd_msg_type
+    return config.rospy_node + '/' + config.reached_topic, config.rchd_msg_type
+
+
+def gen_waypoint_params(config: MoatConfig):
+    return config.rospy_node + '/' + config.waypoint_topic, config.pos_msg_type
 
 
 # TODO generate default simulation moat car config
@@ -106,15 +110,15 @@ def gen_reached_params(config: MoatConfig):
 def default_car_moat_config(bot_name) -> MoatConfig:
     rospy_node = 'waypoint_node'
     bot_type = BotType.CAR
-    waypoint_topic = rospy_node + '/waypoint'
-    reached_topic = rospy_node + '/reached'
+    waypoint_topic = 'waypoint'
+    reached_topic = 'reached'
 
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
 
     queue_size = 1
     bot_name = bot_name
-    pos_node = '/vrpn_client_node/'
+    pos_node = 'vrpn_client_node/'
     pos_msg_type = PoseStamped
     rchd_msg_type = String
     from src.motion.simpleplanner import SimplePlanner
@@ -126,15 +130,15 @@ def default_car_moat_config(bot_name) -> MoatConfig:
 def default_qc_moat_config(bot_name) -> MoatConfig:
     rospy_node = 'quad_wp_node'
     bot_type = BotType.QUAD
-    waypoint_topic = 'Waypoint'
-    reached_topic = '/Reached'
+    waypoint_topic = 'waypoint'
+    reached_topic = 'reached'
 
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
 
     queue_size = 1
     bot_name = bot_name
-    pos_node = '/vrpn_client_node/'
+    pos_node = 'vrpn_client_node/'
     pos_msg_type = PoseStamped
     rchd_msg_type = String
     from src.motion.simpleplanner import SimplePlanner
