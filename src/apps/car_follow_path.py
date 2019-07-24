@@ -19,7 +19,6 @@ class BasicFollowApp(AgentThread):
         self.locals['dest2'] = pos3d(2., -2., 0.)  # Pos(np.array([-2., 1., 0.]))
         self.locals['dest3'] = pos3d(-2., -2., 0.)  # Pos(np.array([2., -1., 0.]))
         self.locals['dest4'] = pos3d(-2., 2., 0.)  # Pos(np.array([2., -1., 0.]))
-
         self.locals['tries'] = 1
 
     def loop_body(self):
@@ -37,17 +36,7 @@ class BasicFollowApp(AgentThread):
             self.locals['tries'] = 2
             return
         if self.locals['tries'] == 2 and self.agent_gvh.moat.reached:
-            # print("position is", self.agent_gvh.moat.position)
-            # path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
-            # if path is None:
-            # print("no path for 2 to 3 ")
-            # self.locals['tries'] = 3
-            # return
-            # print("first path from -2,1,0 to 2, -1 , 0", path)
-            # self.agent_gvh.moat.follow_path(path)
-            # time.sleep(3)
             self.locals['tries'] = 3
-
             return
         if self.locals['tries'] == 3 and self.agent_gvh.moat.reached:
             print("going to point 2")
@@ -77,9 +66,9 @@ class BasicFollowApp(AgentThread):
         if self.locals['tries'] == 5 and self.agent_gvh.moat.reached:
             print("going to point 4")
 
-            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest2'], obstacles)
+            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
             if path is None:
-                print("no path for 1 to 2 ")
+                print("no path for 1 to 3 ")
                 self.locals['tries'] = 6
                 return
             print("first path from 2,1,0 to -2, 1 , 0", path)
