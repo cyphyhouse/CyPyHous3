@@ -142,6 +142,20 @@ class BasicFollowApp(AgentThread):
         if self.locals['tries'] == 12 and self.agent_gvh.moat.reached:
             print("going to point 10")
 
+            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest1'], obstacles)
+            if path is None:
+                print("no path for 1 to 3 ")
+                self.locals['tries'] = 13
+                return
+            print("first path from 2,1,0 to -2, 1 , 0", path)
+            self.agent_gvh.moat.follow_path(path)
+            time.sleep(2)
+            self.locals['tries'] = 13
+            return
+
+        if self.locals['tries'] == 13 and self.agent_gvh.moat.reached:
+            print("going to point 11")
+
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest4'], obstacles)
             print("first path from 2,1,0 to -2, 1 , 0", path)
             if path is None:
