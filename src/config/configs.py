@@ -106,8 +106,8 @@ def gen_reached_params(config: MoatConfig):
 def default_car_moat_config(bot_name) -> MoatConfig:
     rospy_node = 'waypoint_node'
     bot_type = BotType.CAR
-    waypoint_topic = 'waypoint'
-    reached_topic = 'reached'
+    waypoint_topic = rospy_node + '/waypoint'
+    reached_topic = rospy_node + '/reached'
 
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
