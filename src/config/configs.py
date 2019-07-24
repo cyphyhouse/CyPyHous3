@@ -104,10 +104,10 @@ def gen_reached_params(config: MoatConfig):
 # TODO generate detault simulation moat drone config
 
 def default_car_moat_config(bot_name) -> MoatConfig:
-    rospy_node = 'quad_wp_node'
+    rospy_node = 'waypoint_node'
     bot_type = BotType.CAR
-    waypoint_topic = 'Waypoint'
-    reached_topic = '/Reached'
+    waypoint_topic = 'waypoint'
+    reached_topic = 'reached'
 
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String

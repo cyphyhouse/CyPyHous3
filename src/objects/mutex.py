@@ -13,7 +13,7 @@ class Mutex(ABC):
         pass
 
     @abstractmethod
-    def request_mutex(self):
+    def request_mutex(self, *args, **kwargs):
         """
         request mutex abstract method
         :return:
@@ -21,7 +21,7 @@ class Mutex(ABC):
         pass
 
     @abstractmethod
-    def grant_mutex(self):
+    def grant_mutex(self, *args, **kwargs):
         """
         grant mutex abstract method
         :return:
@@ -29,7 +29,7 @@ class Mutex(ABC):
         pass
 
     @abstractmethod
-    def release_mutex(self):
+    def release_mutex(self, *args, **kwargs):
         """
         release mutex abstract method
         :return:
