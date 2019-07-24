@@ -23,8 +23,8 @@ class BasicFollowApp(AgentThread):
         self.locals['tries'] = 1
 
     def loop_body(self):
-        if self.locals['tries'] == 1:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 1 :
+            print("going to point 1")
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest2'], obstacles)
             if path is None:
@@ -36,8 +36,8 @@ class BasicFollowApp(AgentThread):
             time.sleep(2)
             self.locals['tries'] = 2
             return
-        if self.locals['tries'] == 2:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 2 and self.agent_gvh.moat.reached:
+            #print("position is", self.agent_gvh.moat.position)
            # path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
             #if path is None:
                 #print("no path for 2 to 3 ")
@@ -49,8 +49,8 @@ class BasicFollowApp(AgentThread):
             self.locals['tries'] = 3
 
             return
-        if self.locals['tries'] == 3:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 3 and self.agent_gvh.moat.reached:
+            print("going to point 2")
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest4'], obstacles)
             print("first path from 2,1,0 to -2, 1 , 0", path)
@@ -62,8 +62,8 @@ class BasicFollowApp(AgentThread):
             time.sleep(3)
             self.locals['tries'] = 4
             return
-        if self.locals['tries'] == 4:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 4 and self.agent_gvh.moat.reached:
+            print("going to point 3")
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest1'], obstacles)
             if path is None:
                 print("no path for 1 to 2 ")
@@ -74,8 +74,8 @@ class BasicFollowApp(AgentThread):
             time.sleep(3)
             self.locals['tries'] = 5
             return
-        if self.locals['tries'] == 5:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 5 and self.agent_gvh.moat.reached:
+            print("going to point 4")
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest2'], obstacles)
             if path is None:
@@ -87,21 +87,8 @@ class BasicFollowApp(AgentThread):
             time.sleep(2)
             self.locals['tries'] = 6
             return
-        if self.locals['tries'] == 6:
-            print("position is", self.agent_gvh.moat.position)
-           # path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest3'], obstacles)
-            #if path is None:
-                #print("no path for 2 to 3 ")
-                #self.locals['tries'] = 3
-                #return
-            #print("first path from -2,1,0 to 2, -1 , 0", path)
-           # self.agent_gvh.moat.follow_path(path)
-           # time.sleep(3)
-            self.locals['tries'] = 7
-
-            return
-        if self.locals['tries'] == 7:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 6 and self.agent_gvh.moat.reached:
+            print("going to point 5")
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest4'], obstacles)
             print("first path from 2,1,0 to -2, 1 , 0", path)
@@ -113,8 +100,8 @@ class BasicFollowApp(AgentThread):
             time.sleep(3)
             self.locals['tries'] = 8
             return
-        if self.locals['tries'] == 8:
-            print("position is", self.agent_gvh.moat.position)
+        if self.locals['tries'] == 8 and self.agent_gvh.moat.reached:
+            print("going to point 6")
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest1'], obstacles)
             if path is None:
                 print("no path for 1 to 2 ")
