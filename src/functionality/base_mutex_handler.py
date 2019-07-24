@@ -23,7 +23,7 @@ class BaseMutexHandler(MutexHandler):
         self.mutex_nums.append(0)
 
     def add_request(self, index: int, pid: int, req_num: int):
-        # print("adding request from", pid)
+        print("adding request from", pid)
         i = self.find_mutex_index(index)
         if i is not None:
             if (pid, req_num) not in self.mutexes[i].mutex_request_list:
