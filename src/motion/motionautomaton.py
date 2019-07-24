@@ -3,7 +3,7 @@ import time
 from abc import ABC, abstractmethod
 from typing import Union
 
-from src.config.configs import MoatConfig, gen_positioning_params,gen_reached_params
+from src.config.configs import MoatConfig, gen_positioning_params,gen_reached_params, gen_waypoint_params
 from src.motion.pos import Pos
 
 
