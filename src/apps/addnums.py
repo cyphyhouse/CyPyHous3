@@ -34,7 +34,7 @@ class AddNums(AgentThread):
             self.stop()
             return
 
-
+'''
 plist = [2000, 2001, 2002, 2003, 2004]
 bots = 5
 c1 = AgentConfig(2, bots, "", 2001, plist, BaseMutexHandler(False, 2))
@@ -44,3 +44,4 @@ c5 = AgentConfig(5, bots, "", 2000, plist, BaseMutexHandler(False, 5))
 c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler(True, 0), is_leader=True)
 
 b, c, d, e, f = AddNums(c1), AddNums(c2), AddNums(c3), AddNums(c4), AddNums(c5)
+'''
