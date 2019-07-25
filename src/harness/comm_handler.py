@@ -21,7 +21,7 @@ class CommHandler(Thread):
     __retries : retries
     """
 
-    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 100.0, retries: int = RETRY_VAL):
+    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 5.0, retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:
