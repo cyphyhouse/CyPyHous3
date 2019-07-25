@@ -24,18 +24,18 @@ class BasicFollowApp(AgentThread):
     def loop_body(self):
         if self.locals['tries'] == 1:
             self.agent_gvh.moat.goTo(self.locals['dest1'])
-            time.sleep(5)
             self.locals['tries'] = 2
+            time.sleep(10)
             return
         if self.locals['tries'] == 2:
             self.agent_gvh.moat.goTo(self.locals['dest2'])
             self.locals['tries'] = 3
-            time.sleep(5)
+            time.sleep(10)
             return
         if self.locals['tries'] == 3:
             self.agent_gvh.moat.goTo(self.locals['dest3'])
             self.locals['tries'] = 4
-            time.sleep(5)
+            time.sleep(10)
             self.stop()
             return
 
