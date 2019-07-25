@@ -146,6 +146,7 @@ class BaseMutex(Mutex):
                     print("sending grant mutex message to", self.__mutex_holder,"on port",port)
                     send(msg, '<broadcast>', port)
             else:
+                print("sending grant mutex message to", self.__mutex_holder, "on port", self.agent_comm_handler.r_port)
                 send(msg, '<broadcast>', self.agent_comm_handler.r_port)
         else:
             pass
