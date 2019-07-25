@@ -43,6 +43,6 @@ class BasicFollowApp(AgentThread):
 
         if self.agent_gvh.moat.reached:
             self.write_to_shared('carpos', self.pid(), self.agent_gvh.moat.position)
-            self.write_to_shared('pointnum', None, self.read_from_shared('pointnum') + 1)
+            self.write_to_shared('pointnum', None, self.read_from_shared('pointnum',None) + 1)
             time.sleep(0.1)
             self.unlock('singlelock')
