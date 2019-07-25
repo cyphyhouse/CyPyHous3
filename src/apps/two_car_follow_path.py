@@ -28,7 +28,7 @@ class BasicFollowApp(AgentThread):
             other_car = 1
         if self.read_from_shared('pointnum',None) > 3:
             self.stop()
-        if not self.lock('singlelock')
+        if not self.lock('singlelock'):
             return
 
         print("going to point ", self.read_from_shared('pointnum',None))
