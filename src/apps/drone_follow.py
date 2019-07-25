@@ -25,17 +25,14 @@ class BasicFollowApp(AgentThread):
         if self.locals['tries'] == 1:
             self.agent_gvh.moat.goTo(self.locals['dest1'])
             self.locals['tries'] = 2
-            time.sleep(10)
             return
-        if self.locals['tries'] == 2:
+        if self.locals['tries'] == 2 and self.agent_gvh.moat.reached:
             self.agent_gvh.moat.goTo(self.locals['dest2'])
             self.locals['tries'] = 3
-            time.sleep(10)
             return
-        if self.locals['tries'] == 3:
+        if self.locals['tries'] == 3 and self.agent_gvh.moat.reached:
             self.agent_gvh.moat.goTo(self.locals['dest3'])
             self.locals['tries'] = 4
-            time.sleep(10)
             self.stop()
             return
 
