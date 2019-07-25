@@ -25,12 +25,12 @@ class BasicFollowApp(AgentThread):
         if self.pid() == 0:
             other_car = 1
         self.locals['obstacles'][0] = self.read_from_shared('carpos', other_car)
-        if not self.lock('singlelock') or self.read_from_shared('pointnum') > 3:
+        if not self.lock('singlelock') or self.read_from_shared('pointnum', None) > 3:
             return
         print("going to point ", self.read_from_shared('pointnum'))
 
         path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
-                                                     self.locals['dest'][self.read_from_shared('pointnum')],
+                                                     self.locals['dest'][self.read_from_shared('pointnum',None)],
                                                      self.locals['obstacles'])
         if path is None:
             print("no path for current point, sending to other car ")
