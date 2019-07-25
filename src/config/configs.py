@@ -128,7 +128,7 @@ def default_car_moat_config(bot_name) -> MoatConfig:
 
 
 def default_qc_moat_config(bot_name) -> MoatConfig:
-    rospy_node = 'quad_wp_node'
+    rospy_node = 'drone'
     bot_type = BotType.QUAD
     waypoint_topic = 'waypoint'
     reached_topic = 'reached'
