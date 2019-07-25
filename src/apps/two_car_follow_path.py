@@ -18,35 +18,36 @@ class BasicFollowApp(AgentThread):
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
         self.locals['dest'] = [pos3d(2., 2., 0.), pos3d(2., -2., 0.), pos3d(-2., -2., 0.), pos3d(-2., 2., 0.)]
-        self.locals['obstacles'] = [pos3d(3.,3.,0)]
-
+        self.locals['obstacles'] = [pos3d(3., 3., 0)]
+        self.locals['going'] = False
 
     def loop_body(self):
         time.sleep(4)
         other_car = 0
         if self.pid() == 0:
             other_car = 1
-        if self.read_from_shared('pointnum',None) > 3:
+        if self.read_from_shared('pointnum', None) > 3:
             self.stop()
         if not self.lock('singlelock'):
             return
 
-        print("going to point ", self.read_from_shared('pointnum',None))
+        print("going to point ", self.read_from_shared('pointnum', None))
+        if not self.locals['going']:
 
-        path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
-                                                     self.locals['dest'][self.read_from_shared('pointnum',None)],
-                                                     self.locals['obstacles'])
-        if path is None:
-            print("no path for current point, sending to other car ")
-            self.locals['tries'] = 2
-            return
+            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
+                                                         self.locals['dest'][self.read_from_shared('pointnum', None)],
+                                                         self.locals['obstacles'])
+            if path is None:
+                print("no path for current point, sending to other car ")
+                self.locals['tries'] = 2
+                return
 
-        print("path is", path)
-        self.agent_gvh.moat.follow_path(path)
-        time.sleep(10)
+            print("path is", path)
+            self.agent_gvh.moat.follow_path(path)
+            self.locals['going'] = True
 
         if self.agent_gvh.moat.reached:
             self.write_to_shared('carpos', self.pid(), self.agent_gvh.moat.position)
-            self.write_to_shared('pointnum', None, self.read_from_shared('pointnum',None) + 1)
+            self.write_to_shared('pointnum', None, self.read_from_shared('pointnum', None) + 1)
             time.sleep(0.1)
             self.unlock('singlelock')
