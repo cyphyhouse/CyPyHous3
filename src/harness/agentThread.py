@@ -58,11 +58,11 @@ class AgentThread(ABC, Thread):
             self.baselocks[key].request_mutex(self.req_nums[key])
             self.requestedlocks[key] = True
             self.req_nums[key] += 1
-            print("requesting")
+            #print("requesting")
             return False
         else:
             if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
-                print("requested not granted")
+                #print("requested not granted")
                 return False
         return True
 
