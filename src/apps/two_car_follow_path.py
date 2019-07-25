@@ -17,6 +17,7 @@ class BasicFollowApp(AgentThread):
         self.create_ar_var('carpos', Pos, self.agent_gvh.moat.position)
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
+        self.locals['obstacles'] = [Obs(0.,0.,0.75)]
         self.locals['dest'] = [pos3d(2., 2., 0.), pos3d(2., -2., 0.), pos3d(-2., -2., 0.), pos3d(-2., 2., 0.)]
         self.locals['going'] = False
 
@@ -35,7 +36,7 @@ class BasicFollowApp(AgentThread):
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                          self.locals['dest'][self.read_from_shared('pointnum', None)],
-                                                         [])
+                                                         self.locals['obstacles'])
             if path is None:
                 print("no path for current point, sending to other car ")
                 self.locals['tries'] = 2
