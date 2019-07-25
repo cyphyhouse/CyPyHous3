@@ -119,7 +119,7 @@ class Gvh(object):
             self.__dsm = []
         self.__dsm.append(a)
         msg = dsm_update_create(self.pid, a, a.owner, time.time())
-        if self.__port_list is not None:
+        if not self.__port_list == []:
             for port in self.__port_list:
                 send(msg, "<broadcast>", port)
         else:
@@ -159,7 +159,7 @@ class Gvh(object):
                 var.value[pid] = value
 
             msg = dsm_update_create(self.pid, var, var.owner, time.time())
-            if self.__port_list is not None:
+            if not self.__port_list == []:
                 for port in self.__port_list:
                     send(msg, "<broadcast>", port)
             else:
@@ -351,7 +351,7 @@ class Gvh(object):
         :return:
         """
         for msg in self.msg_list:
-            if self.__port_list is not None:
+            if not self.__port_list == []:
                 for port in self.__port_list:
                     send(msg, "<broadcast>", port)
             else:
