@@ -21,6 +21,7 @@ class AddNums(AgentThread):
     def loop_body(self):
         if not self.locals['added']:
             if not self.lock('adding'):
+                print("here")
                 return
             self.write_to_shared('sum', None, self.read_from_shared('sum', None) + self.pid() * 2)
             self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
