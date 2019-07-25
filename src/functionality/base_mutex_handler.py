@@ -1,6 +1,7 @@
 import time
-from src.functionality.mutex_handler import MutexHandler
 from typing import Union
+
+from src.functionality.mutex_handler import MutexHandler
 
 
 class BaseMutexHandler(MutexHandler):
@@ -23,7 +24,6 @@ class BaseMutexHandler(MutexHandler):
         self.mutex_nums.append(0)
 
     def add_request(self, index: int, pid: int, req_num: int):
-        print("adding request from", pid)
         i = self.find_mutex_index(index)
         if i is not None:
             if (pid, req_num) not in self.mutexes[i].mutex_request_list:

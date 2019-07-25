@@ -21,7 +21,7 @@ class CommHandler(Thread):
     __retries : retries
     """
 
-    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 5.0, retries: int = RETRY_VAL):
+    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 10.0, retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:
@@ -140,7 +140,6 @@ class CommHandler(Thread):
             try:
                 data, addr = receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
-                print("got a message", msg)
                 self.agent_gvh.add_recv_msg(msg)
             except socket.timeout:
                 print("agent", self.agent_gvh.pid, "timed out")
