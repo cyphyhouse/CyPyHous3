@@ -18,7 +18,7 @@ class BasicFollowApp(AgentThread):
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
         self.locals['dest'] = [pos3d(2., 2., 0.), pos3d(2., -2., 0.), pos3d(-2., -2., 0.), pos3d(-2., 2., 0.)]
-        self.locals['obstacles'] = [None]
+        self.locals['obstacles'] = [pos3d(2.5,2.5,2.5)]
 
     def loop_body(self):
         time.sleep(4)
