@@ -26,8 +26,11 @@ class BasicFollowApp(AgentThread):
         other_car = 0
         if self.pid() == 0:
             other_car = 1
-        if not self.lock('singlelock') or self.read_from_shared('pointnum', None) > 3:
+        if self.read_from_shared('pointnum',None) > 3:
+            self.stop()
+        if not self.lock('singlelock')
             return
+
         print("going to point ", self.read_from_shared('pointnum',None))
 
         path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
