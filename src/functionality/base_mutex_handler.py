@@ -42,6 +42,7 @@ class BaseMutexHandler(MutexHandler):
             for i in range(len(self.mutexes)):
                 # print(self.mutexes[i].mutex_request_list)
                 if self.mutexes[i].mutex_holder is None:
+
                     # print("mutex available, granting")
                     # print(self.mutexnums[i])
                     self.mutex_nums[i] += 1

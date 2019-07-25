@@ -143,6 +143,7 @@ class BaseMutex(Mutex):
 
             if not self.ip_port_list == []:
                 for port in self.ip_port_list:
+                    print("sending message")
                     send(msg, '<broadcast>', port)
             else:
                 send(msg, '<broadcast>', self.agent_comm_handler.r_port)
