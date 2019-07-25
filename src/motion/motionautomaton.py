@@ -88,7 +88,7 @@ class MotionAutomaton(threading.Thread, ABC):
         getter method for position"
         :return:
         """
-        return self.__position
+        return self.position
 
     @position.setter
     def position(self, pos: Pos) -> None:
@@ -97,7 +97,7 @@ class MotionAutomaton(threading.Thread, ABC):
         :param pos: position
         :return:
         """
-        self.__position = pos
+        self.position = pos
 
     @property
     def waypoint_count(self) -> int:

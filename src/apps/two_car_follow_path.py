@@ -3,7 +3,7 @@ import time
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.moat_test_car import MoatTestCar
-from src.motion.pos import pos3d, Pos, Obs
+from src.motion.pos import pos3d, Pos
 
 
 class BasicFollowApp(AgentThread):
@@ -25,10 +25,10 @@ class BasicFollowApp(AgentThread):
         if self.pid() == 0:
             other_car = 1
         self.locals['obstacles'][0] = self.read_from_shared('carpos', other_car)
-        if not self.lock('singlelock') or self.read_from_shared('pointnum') >3:
+        if not self.lock('singlelock') or self.read_from_shared('pointnum') > 3:
             return
-
         print("going to point ", self.read_from_shared('pointnum'))
+
         path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                      self.locals['dest'][self.read_from_shared('pointnum')],
                                                      self.locals['obstacles'])
@@ -39,6 +39,7 @@ class BasicFollowApp(AgentThread):
         print("path is", path)
         self.agent_gvh.moat.follow_path(path)
         time.sleep(2)
+
         if self.agent_gvh.moat.reached:
             self.write_to_shared('carpos', self.pid(), self.agent_gvh.moat.position)
             self.write_to_shared('pointnum', None, self.read_from_shared('pointnum') + 1)
