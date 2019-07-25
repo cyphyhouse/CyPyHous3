@@ -120,6 +120,7 @@ class BaseMutex(Mutex):
         :param req_num: request number
         :return:
         """
+        print("sending request")
         msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
