@@ -1,5 +1,4 @@
 agent:
-  motion_automaton: MoatTestDrone
   on_device: drone2
   pid: 2
   plist:
