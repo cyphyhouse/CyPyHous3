@@ -32,7 +32,7 @@ class MoatTestDrone(MotionAutomaton):
 
     def moat_exit_action(self):
         # TODO: maybe incorporate call to best here?
-        # self.land()
+        self.land()
         pass
 
     def goTo(self, dest: Pos, wp_type: int = None) -> None:
