@@ -26,8 +26,6 @@ class BasicFollowApp(AgentThread):
         other_car = 0
         if self.pid() == 0:
             other_car = 1
-        if not self.read_from_shared('carpos', other_car) == None:
-            self.locals['obstacles'][0] = self.read_from_shared('carpos', other_car)
         if not self.lock('singlelock') or self.read_from_shared('pointnum', None) > 3:
             return
         print("going to point ", self.read_from_shared('pointnum',None))
