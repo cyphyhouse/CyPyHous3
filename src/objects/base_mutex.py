@@ -120,12 +120,12 @@ class BaseMutex(Mutex):
         :param req_num: request number
         :return:
         """
-        print("sending request")
         msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
                 send(msg, '<broadcast>', port)
         else:
+            print("sending request here")
             send(msg, '<broadcast>', self.agent_comm_handler.r_port)
 
     def grant_mutex(self, mutexnum: int) -> None:
