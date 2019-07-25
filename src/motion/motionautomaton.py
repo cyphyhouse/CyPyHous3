@@ -16,6 +16,7 @@ class MotionAutomaton(threading.Thread, ABC):
         self.__waypoint_count = 0
 
         self.__reached = False
+        self.__position = None
         self.__path = []
         self.__planner = config.planner
         self.__bot_type = config.bot_type
@@ -88,7 +89,7 @@ class MotionAutomaton(threading.Thread, ABC):
         getter method for position"
         :return:
         """
-        return self.position
+        return self.__position
 
     @position.setter
     def position(self, pos: Pos) -> None:
@@ -97,7 +98,7 @@ class MotionAutomaton(threading.Thread, ABC):
         :param pos: position
         :return:
         """
-        self.position = pos
+        self.__position = pos
 
     @property
     def waypoint_count(self) -> int:
