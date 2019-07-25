@@ -21,6 +21,7 @@ class BasicFollowApp(AgentThread):
         self.locals['obstacles'] = [None]
 
     def loop_body(self):
+        time.sleep(4)
         other_car = 0
         if self.pid() == 0:
             other_car = 1
