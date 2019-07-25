@@ -40,9 +40,10 @@ class BasicFollowApp(AgentThread):
             print("no path for current point, sending to other car ")
             self.locals['tries'] = 2
             return
+
         print("path is", path)
         self.agent_gvh.moat.follow_path(path)
-        time.sleep(2)
+        time.sleep(10)
 
         if self.agent_gvh.moat.reached:
             self.write_to_shared('carpos', self.pid(), self.agent_gvh.moat.position)
