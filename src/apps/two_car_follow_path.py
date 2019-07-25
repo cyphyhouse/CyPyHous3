@@ -3,7 +3,7 @@ import time
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.moat_test_car import MoatTestCar
-from src.motion.pos import pos3d, Pos
+from src.motion.pos import pos3d, Pos, Obs
 
 
 class BasicFollowApp(AgentThread):
@@ -18,7 +18,7 @@ class BasicFollowApp(AgentThread):
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
         self.locals['dest'] = [pos3d(2., 2., 0.), pos3d(2., -2., 0.), pos3d(-2., -2., 0.), pos3d(-2., 2., 0.)]
-        self.locals['obstacles'] = [pos3d(3., 3., 0)]
+        self.locals['obstacles'] = [Obs(3., 3., 0.75)]
         self.locals['going'] = False
 
     def loop_body(self):
