@@ -20,12 +20,14 @@ class BasicFollowApp(AgentThread):
         self.locals['dest'] = [pos3d(2., 2., 0.), pos3d(2., -2., 0.), pos3d(-2., -2., 0.), pos3d(-2., 2., 0.)]
         self.locals['obstacles'] = [pos3d(2.5,2.5,2.5)]
 
+
     def loop_body(self):
         time.sleep(4)
         other_car = 0
         if self.pid() == 0:
             other_car = 1
-        self.locals['obstacles'][0] = self.read_from_shared('carpos', other_car)
+        if self.read_from_shared('carpos', other_car) is not None:
+            self.locals['obstacles'][0] = self.read_from_shared('carpos', other_car)
         if not self.lock('singlelock') or self.read_from_shared('pointnum', None) > 3:
             return
         print("going to point ", self.read_from_shared('pointnum',None))
