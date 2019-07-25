@@ -127,7 +127,6 @@ class BaseMutex(Mutex):
             for port in self.ip_port_list:
                 send(msg, '<broadcast>', port)
         else:
-            print("sending request here")
             send(msg, '<broadcast>', self.agent_comm_handler.r_port)
 
     def grant_mutex(self, mutexnum: int) -> None:
