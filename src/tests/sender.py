@@ -1,10 +1,8 @@
 import pickle
 import socket
 
-from src.objects.message import Message
 
-
-def send(msg: Message, ip: str, port: int) -> None:
+def send(msg: str, ip: str, port: int) -> None:
     """
     :param msg: message to be sent
     :param ip: ip to be sent to
@@ -15,4 +13,4 @@ def send(msg: Message, ip: str, port: int) -> None:
     client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     client_sock.sendto(pickle.dumps(msg), (ip, port))
 
-
+send(msg="hello", ip="<broadcast>", port=2000)

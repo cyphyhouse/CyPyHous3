@@ -1,5 +1,3 @@
-from src.config.configs import AgentConfig
-from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
 
 
@@ -33,6 +31,7 @@ class AddNums(AgentThread):
             self.locals['finalsum'] = self.read_from_shared('sum', None)
             self.stop()
             return
+
 
 '''
 plist = [2000, 2001, 2002, 2003, 2004]

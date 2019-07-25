@@ -2,8 +2,8 @@ import time
 from typing import Union
 
 from src.config.configs import AgentConfig, MoatConfig
-from src.functionality.comm_funcs import send
 from src.functionality.base_mutex_handler import BaseMutexHandler
+from src.functionality.comm_funcs import send
 from src.functionality.synchronizer import Synchronizer
 from src.objects.dsm import dsmvar
 from src.objects.message import Message
@@ -40,6 +40,7 @@ class Gvh(object):
         self.__msg_list = []
         self.__recv_msg_list = []
         self.__port_list = a.plist
+        self.__rport = a.rport
         self.__is_leader = a.is_leader
         self.__is_alive = True
         self.__dsm = None
@@ -118,9 +119,11 @@ class Gvh(object):
             self.__dsm = []
         self.__dsm.append(a)
         msg = dsm_update_create(self.pid, a, a.owner, time.time())
-        for port in self.__port_list:
-            send(msg, "", port)
-            send(msg, "192.168.1.255", port)
+        if self.__port_list is not None:
+            for port in self.__port_list:
+                send(msg, "<broadcast>", port)
+        else:
+            send(msg, "<broadcast>", self.__rport)
 
     def get(self, varname: str, pid: int = -1) -> Union[int, bool, float, list, object, tuple]:
         """
@@ -156,9 +159,11 @@ class Gvh(object):
                 var.value[pid] = value
 
             msg = dsm_update_create(self.pid, var, var.owner, time.time())
-            for port in self.__port_list:
-                send(msg, "", port)
-                send(msg, "192.168.1.255", port)
+            if self.__port_list is not None:
+                for port in self.__port_list:
+                    send(msg, "<broadcast>", port)
+            else:
+                send(msg, "<broadcast>", self.__rport)
 
     @property
     def port_list(self):
@@ -346,9 +351,11 @@ class Gvh(object):
         :return:
         """
         for msg in self.msg_list:
-            for port in self.__port_list:
-                send(msg, "", port)
-                send(msg, "192.168.1.255", port)
+            if self.__port_list is not None:
+                for port in self.__port_list:
+                    send(msg, "<broadcast>", port)
+            else:
+                send(msg, "<broadcast>", self.__rport)
         self.msg_list = []
 
 

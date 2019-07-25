@@ -123,10 +123,9 @@ class BaseMutex(Mutex):
         msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
-                send(msg, '192.168.1.255', port)
-                send(msg, "", port)
+                send(msg, '<broadcast>', port)
         else:
-            send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
+            send(msg, '<broadcast>', self.agent_comm_handler.r_port)
 
     def grant_mutex(self, mutexnum: int) -> None:
         """
@@ -142,10 +141,9 @@ class BaseMutex(Mutex):
 
             if self.ip_port_list is not []:
                 for port in self.ip_port_list:
-                    send(msg, '192.168.1.255', port)
-                    send(msg, "", port)
+                    send(msg, '<broadcast>', port)
             else:
-                send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
+                send(msg, '<broadcast>', self.agent_comm_handler.r_port)
         else:
             pass
 
@@ -153,7 +151,6 @@ class BaseMutex(Mutex):
         msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
         if self.ip_port_list is not []:
             for port in self.ip_port_list:
-                send(msg, '192.168.1.255', port)
-                send(msg, "", port)
+                send(msg, '<broadcast>', port)
         else:
-            send(msg, '192.168.1.255', self.agent_comm_handler.r_port)
+            send(msg, '<broadcast>', self.agent_comm_handler.r_port)
