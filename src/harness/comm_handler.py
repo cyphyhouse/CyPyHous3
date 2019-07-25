@@ -140,6 +140,7 @@ class CommHandler(Thread):
             try:
                 data, addr = receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
+                print("got a message", msg)
                 self.agent_gvh.add_recv_msg(msg)
             except socket.timeout:
                 print("agent", self.agent_gvh.pid, "timed out")
