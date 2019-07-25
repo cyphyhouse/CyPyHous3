@@ -18,13 +18,13 @@ class BasicFollowApp(AgentThread):
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
         self.locals['dest'] = [pos3d(2., 2., 0.), pos3d(2., -2., 0.), pos3d(-2., -2., 0.), pos3d(-2., 2., 0.)]
-        self.locals['obstacles'] = [Obs(0, 0, 0.75), None]
+        self.locals['obstacles'] = [None]
 
     def loop_body(self):
         other_car = 0
         if self.pid() == 0:
             other_car = 1
-        self.locals['obstacles'][1] = self.read_from_shared('carpos', other_car)
+        self.locals['obstacles'][0] = self.read_from_shared('carpos', other_car)
         if not self.lock('singlelock') or self.read_from_shared('pointnum') >3:
             return
 
