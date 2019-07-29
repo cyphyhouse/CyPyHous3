@@ -137,9 +137,13 @@ class Seg(object):
         unit vector of direction
         :return: Position
         """
-        uvec = Pos(np.transpose(np.array([(self.end.x - self.start.x) / self.length(),
-                                          (self.end.y - self.start.y) / self.length(),
-                                          (self.end.z - self.start.z) / self.length()])))
+        len = self.length()
+        if len == 0.0:
+            uvec = Pos(np.transpose(np.array([0,0,0])))
+        else:
+            uvec = Pos(np.transpose(np.array([(self.end.x - self.start.x) / len,
+                                              (self.end.y - self.start.y) / len,
+                                              (self.end.z - self.start.z) / len])))
         return uvec
 
 
