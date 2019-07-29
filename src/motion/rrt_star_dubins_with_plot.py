@@ -27,7 +27,7 @@ class RRT_DUBINS():
                  max_iter: int = 100):
         super(RRT_DUBINS, self).__init__()
         if rand_area is None:
-            rand_area = [-12.5, 12.5]
+            rand_area = [-2.5, 2.5]
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
         self.expand_dis = expand_dis

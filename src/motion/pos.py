@@ -18,6 +18,7 @@ class Pos(object):
             self.x = vector[0]
             self.y = vector[1]
             self.z = vector[2]
+            self.yaw = vector[3]
         except IndexError:
             print("initializing an empty position")
             self.x = None
@@ -149,7 +150,7 @@ class Seg(object):
 
 class Node(Pos):
     def __init__(self, x, y, z=0, yaw=0.0):
-        super(Node, self).__init__(np.array([x, y, z]))
+        super(Node, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
         self.path_x = []
         self.path_y = []
@@ -199,12 +200,12 @@ def to_node(p: Pos) -> Node:
     :param p:
     :return:
     """
-    return Node(p.x, p.y, p.z)
+    return Node(p.x, p.y, p.z, p.yaw)
 
 
 class pos3d(Pos):
     def __init__(self, x: float, y: float, z: float, yaw =0.0):
-        super(pos3d, self).__init__(np.array([x, y, z]))
+        super(pos3d, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
 
 

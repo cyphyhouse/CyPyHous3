@@ -10,7 +10,10 @@ class MoatTestCar(MotionAutomaton):
         super(MoatTestCar, self).__init__(config)
 
     def _getPositioning(self, data) -> None:
-        self.position = Pos(np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z]))
+        quat = data.pose.orientation
+        import math
+        yaw = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), pow(quat.w, 2) + pow(quat.x,2) - pow(quat.y,2) - pow(quat.z,2))
+        self.position = Pos(np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z, yaw]))
 
     def _getReached(self, data) -> None:
         a = str(data).upper()

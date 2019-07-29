@@ -135,6 +135,7 @@ def LRL(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     mode = ["L", "R", "L"]
+    #compute numbers from dynamics
     tmp_lrl = (6. - d * d + 2 * c_ab + 2 * d * (- sa + sb)) / 8.
     if abs(tmp_lrl) > 1:
         return None, None, None, mode
