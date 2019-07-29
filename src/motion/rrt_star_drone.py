@@ -125,14 +125,13 @@ class RRT(Planner):
 
         # expand tree
         nearest_node = node_list[nind]
-        #theta = math.atan2(rnd[1] - nearest_node.y, rnd[0] - nearest_node.x)
+
         seg_nn_to_rnd = Seg(nearest_node, Pos(np.array(rnd)))
         nn_to_rnd_uvec = seg_nn_to_rnd.direction()
         new_node = Node(rnd[0], rnd[1], rnd[2])
-        current_distance = math.sqrt( (rnd[2] - nearest_node.z) ** 2 +
-            (rnd[1] - nearest_node.y) ** 2 + (rnd[0] - nearest_node.x) ** 2)
+
         # Find a point within expand_dis of nind, and closest to rnd
-        if current_distance <= self.expand_dis:
+        if seg_nn_to_rnd.length() <= self.expand_dis:
             pass
         else:
             new_node.x = nearest_node.x + self.expand_dis * nn_to_rnd_uvec.x
@@ -281,6 +280,12 @@ def gen_final_course(node_list: list, start: Node, end: Node, goal_ind: int) -> 
     :return:
     """
     path = [Pos(np.array([end.x, end.y, end.z]))]
+
+    node = node_list[goal_ind]
+    seg_last_two_points = Seg(Pos(np.array([node.x, node.y, node.z])), Pos(np.array([end.x, end.y, end.z])))
+    if (seg_last_two_points.length() <= 0.1): #magic number (change to something better later)
+        goal_ind = node.parent # skip last point because it is very close to end point
+
     while node_list[goal_ind].parent is not None:
         node = node_list[goal_ind]
         path.append(Pos(np.array([node.x, node.y, node.z])))
@@ -300,7 +305,7 @@ def calc_dist_to_goal(end: Node, x: float, y: float, z: float) -> float:
     return np.linalg.norm([x - end.x, y - end.y, z - end.z])
 
 
-
+'''
 a = RRT()
 p1 = Pos(np.array([-1, 0, 1]))
 p2 = Pos(np.array([1, 0, 1]))
@@ -309,4 +314,4 @@ from src.motion.pos import Obs
 o1 = Obs(0,0,0.5,1)
 c = a.find_path(p1, p2, [o1])
 print(c)
-
+'''
