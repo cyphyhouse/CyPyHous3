@@ -56,7 +56,7 @@ class RRT(Planner):
                 nearinds = find_near_nodes(node_list, new_node)
                 new_node = self.choose_parent(node_list, obstacle_list, new_node, nearinds)
                 node_list.append(new_node)
-                self.rewire(node_list, obstacle_list, new_node, nearinds)
+                #self.rewire(node_list, obstacle_list, new_node, nearinds)
 
             # generate course
             if not search_until_max_iter:
