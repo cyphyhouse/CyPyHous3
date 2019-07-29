@@ -8,7 +8,7 @@ modified by ritwika ghosh for cyphyhouse
 """
 import math
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 
 from src.motion.pos import Pos
@@ -272,7 +272,7 @@ def generate_course(length, mode, c):
 
     return px, py, pyaw, path1
 
-
+'''
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
@@ -317,3 +317,4 @@ if __name__ == '__main__':
     plt.grid(True)
     plt.axis("equal")
     plt.show()
+'''
