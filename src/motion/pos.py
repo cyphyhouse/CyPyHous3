@@ -211,5 +211,5 @@ class Obs(object):
         self.z = z
         self.radius = radius
 
-    def to_pos(self) -> Node:
+    def to_pos(self) -> Pos:
         return Pos(np.array([self.x, self.y, self.z]))
