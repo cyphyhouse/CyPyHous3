@@ -205,7 +205,8 @@ class pos3d(Pos):
 
 
 class Obs(object):
-    def __init__(self, x, y, radius):
+    def __init__(self, x, y, radius, z = 0):
         self.x = x
         self.y = y
+        self.z = z
         self.radius = radius
