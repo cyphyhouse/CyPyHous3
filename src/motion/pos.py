@@ -18,7 +18,11 @@ class Pos(object):
             self.x = vector[0]
             self.y = vector[1]
             self.z = vector[2]
-            self.yaw = vector[3]
+            if len(vector) == 4:
+                self.yaw = vector[3]
+            elif len(vector) == 3:
+                pass
+
         except IndexError:
             print("initializing an empty position")
             self.x = None
