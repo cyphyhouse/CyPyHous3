@@ -194,6 +194,7 @@ class RRT_DUBINS():
 
     def GetNearestListIndex(self, node_list, rnd):
         dlist = []
+        print(node_list)
         for node in node_list:
             if node is not None:
                 dlist.append((node.x - rnd.x) ** 2 +
