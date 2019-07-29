@@ -195,9 +195,12 @@ class RRT_DUBINS():
                 node_list[i] = tNode
 
     def GetNearestListIndex(self, node_list, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
+        dlist = []
+        for node in node_list:
+            if node is not None:
+                dlist.append((node.x - rnd.x) ** 2 +
                  (node.y - rnd.y) ** 2 +
-                 (node.yaw - rnd.yaw) ** 2 for node in node_list]
+                 (node.yaw - rnd.yaw) ** 2)
         minind = dlist.index(min(dlist))
 
         return minind
