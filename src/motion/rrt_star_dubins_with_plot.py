@@ -9,11 +9,11 @@ import copy
 import math
 import random
 
-import dubins_path_planning
+import src.motion.dubins_path_planning as dubins_path_planning
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.motion.pos import Obs
+from src.motion.pos import Obs, Node
 
 show_animation = True
 
@@ -246,20 +246,6 @@ class RRT_DUBINS():
         return True  # safe
 
 
-class Node():
-    """
-    RRT Node
-    """
-
-    def __init__(self, x, y, yaw):
-        self.x = x
-        self.y = y
-        self.yaw = yaw
-        self.path_x = []
-        self.path_y = []
-        self.path_yaw = []
-        self.cost = 0.0
-        self.parent = None
 
 
 def main():

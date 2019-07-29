@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos import Obs
+from src.motion.pos import Obs, Node
 
 
 class RRT_DUBINS():
@@ -214,21 +214,6 @@ class RRT_DUBINS():
 
         return True  # safe
 
-
-class Node():
-    """
-    RRT Node
-    """
-
-    def __init__(self, x, y, yaw):
-        self.x = x
-        self.y = y
-        self.yaw = yaw
-        self.path_x = []
-        self.path_y = []
-        self.path_yaw = []
-        self.cost = 0.0
-        self.parent = None
 
 
 def main():

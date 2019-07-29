@@ -151,6 +151,9 @@ class Node(Pos):
     def __init__(self, x, y, z=0, yaw=0.0):
         super(Node, self).__init__(np.array([x, y, z]))
         self.yaw = yaw
+        self.path_x = []
+        self.path_y = []
+        self.path_yaw = []
         self.cost = 0.0
         self.parent = None
 
