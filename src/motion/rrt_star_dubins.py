@@ -52,8 +52,6 @@ class RRT_DUBINS():
                 node_list.append(newNode)
                 self.rewire(newNode, nearinds, node_list, obstacle_list)
 
-            if animation and i % 5 == 0:
-                self.DrawGraph(start_point, end_point, node_list, obstacle_list, rnd)
 
         # generate course
         lastIndex = self.get_best_last_index(end_point, node_list)
