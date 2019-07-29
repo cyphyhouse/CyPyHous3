@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 
 from src.config.configs import AgentConfig, MoatConfig, default_qc_moat_config
@@ -16,9 +14,9 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.locals['dest1'] = Pos(np.array([2., 1., 1.]))
-        self.locals['dest2'] = Pos(np.array([-2., 1., 1.]))
-        self.locals['dest3'] = Pos(np.array([2., -1., 1.]))
+        self.locals['dest1'] = Pos(np.array([2., 1., 1., 0.0]))
+        self.locals['dest2'] = Pos(np.array([-2., 1., 1., 0.0]))
+        self.locals['dest3'] = Pos(np.array([2., -1., 1., 0.0]))
         self.locals['tries'] = 1
 
     def loop_body(self):
