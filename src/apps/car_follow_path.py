@@ -5,6 +5,7 @@ from src.harness.agentThread import AgentThread
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos import pos3d, Obs
 from src.motion.rrt_star import RRT
+from src.motion.rrt_star_dubins import RRT_DUBINS
 
 
 class BasicFollowApp(AgentThread):
@@ -171,6 +172,6 @@ class BasicFollowApp(AgentThread):
 
 m = default_car_moat_config('hotdec_car')
 obstacles = [Obs(1, 0, 0.75), Obs(0, -2, 0.75), Obs(-2,0,0.75)]
-m.planner = RRT(goal_sample_rate=30)
+m.planner = RRT_DUBINS(goal_sample_rate=15, max_iter=100)
 a = AgentConfig(1, 1, "", 2000)
 app = BasicFollowApp(a, m)
