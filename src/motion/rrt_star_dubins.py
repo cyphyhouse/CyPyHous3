@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos import Obs, Node
+from src.motion.pos import Obs, Node, to_node
 
 
 class RRT_DUBINS():
@@ -38,6 +38,9 @@ class RRT_DUBINS():
         animation: flag for animation on or off
         """
         print("start point is",start_point)
+
+        start_point = to_node(start_point)
+        end_point = to_node(end_point)
 
         node_list = [start_point]
         for i in range(self.max_iter):
