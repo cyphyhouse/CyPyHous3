@@ -25,6 +25,9 @@ class BasicFollowApp(AgentThread):
     def loop_body(self):
         if self.locals['tries'] == 1:
             print("going to point 1")
+            if self.agent_gvh.moat.position is None:
+                print("not positioned yet")
+                return
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest2'], obstacles)
             if path is None:
