@@ -214,8 +214,7 @@ class RRT_DUBINS():
 
         return True  # safe
 
-
-
+'''
 def main():
     print("Start rrt star with dubins planning")
 
@@ -240,3 +239,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+'''
