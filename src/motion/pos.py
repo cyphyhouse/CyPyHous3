@@ -46,6 +46,17 @@ class Pos(object):
         X = np.vstack((np.array([0, 0, 0]), self.mk_arr()))
         return pdist(X)[0]
 
+    def direction(self):
+        """
+        unit vector of direction
+        :return: Position
+        """
+        len = math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+        uvec = Pos(np.transpose(np.array([self.x / len,
+                                          self.y / len,
+                                          self.z / len])))
+        return uvec
+
     def __add__(self, other):
         """
         addition
