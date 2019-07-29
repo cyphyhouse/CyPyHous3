@@ -203,8 +203,9 @@ def to_node(p: Pos) -> Node:
 
 
 class pos3d(Pos):
-    def __init__(self, x: float, y: float, z: float):
+    def __init__(self, x: float, y: float, z: float, yaw =0.0):
         super(pos3d, self).__init__(np.array([x, y, z]))
+        self.yaw = yaw
 
 
 class Obs(object):
