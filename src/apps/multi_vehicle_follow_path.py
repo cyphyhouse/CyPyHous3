@@ -15,18 +15,17 @@ class BasicFollowApp(AgentThread):
         self.create_ar_var('pos', Pos, self.agent_gvh.moat.position)
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
-        self.locals['obstacles'] = [RoundObs(0.,2.,1.,1.)]
-        self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(2., -2., 1.), pos3d(-2., -2., 1.), pos3d(-2., 2., 1.)]
+        self.locals['obstacles'] = [RoundObs(0., 2., 1., 1.)]
+        self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(1., 1., 0), pos3d(2., 2., 0), pos3d(2., -2., 1.),
+                               pos3d(-2., -2., 1.), pos3d(-2., 2., 1.), pos3d(-2, 1, 0)]
         self.locals['going'] = False
 
     def loop_body(self):
-        time.sleep(2)
-
         other_vehicle = 0
         if self.pid() == 0:
             other_vehicle = 1
 
-        if self.read_from_shared('pointnum', None) > 3:
+        if self.read_from_shared('pointnum', None) > 6:
             self.stop()
 
         if not self.lock('singlelock'):
@@ -34,22 +33,21 @@ class BasicFollowApp(AgentThread):
 
         print("available point is", self.read_from_shared('pointnum', None))
 
-
         if not self.locals['going']:
             print("trying to go to point", self.read_from_shared('pointnum', None))
-
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                          self.locals['dest'][self.read_from_shared('pointnum', None)],
                                                          self.locals['obstacles'])
             if path is None:
                 print("no path for current point, sending to other vehicle ")
+                self.unlock('singlelock')
                 return
 
             print("path is", path)
             self.agent_gvh.moat.follow_path(path)
 
-            #self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
+            # self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
             self.locals['going'] = True
 
         if self.agent_gvh.moat.reached:
