@@ -11,10 +11,10 @@ r_port = 2000
 r_ip = ""
 pid = [0,1,2,3]
 
-a0 = AgentConfig(0, bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[0], is_leader=mhargs[0][0])
-a1 = AgentConfig(1, bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[1], is_leader=mhargs[1][0])
-a2 = AgentConfig(2, bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[2], is_leader=mhargs[2][0])
-a3 = AgentConfig(3, bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[3], is_leader=mhargs[3][0])
+a0 = AgentConfig(pid[0], bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[0], is_leader=mhargs[0][0])
+a1 = AgentConfig(pid[1], bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[1], is_leader=mhargs[1][0])
+a2 = AgentConfig(pid[2], bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[2], is_leader=mhargs[2][0])
+a3 = AgentConfig(pid[3], bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[3], is_leader=mhargs[3][0])
 
 m0 = default_car_moat_config('hotdec_car')
 m1 = default_car_moat_config('f1car')
