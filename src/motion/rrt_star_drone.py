@@ -23,8 +23,8 @@ class RRT(Planner):
     Class for RRT* Planning
     """
 
-    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 15,
-                 max_iter: int = 500):
+    def __init__(self, rand_area: list = None, expand_dis: float = 0.25, goal_sample_rate: int = 15,
+                 max_iter: int = 200):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-2.5, 2.5, -2.5, 2.5, 0.5, 2.5]
@@ -49,6 +49,8 @@ class RRT(Planner):
             obstacle_list = []
         start = to_node(start)
         end = to_node(end)
+        print("Start ", start)
+        print("End", end)
         if end.z == 0:
             print("z = 0, point not valid for drone")
             return None
