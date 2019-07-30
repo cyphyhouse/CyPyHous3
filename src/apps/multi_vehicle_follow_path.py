@@ -2,7 +2,6 @@ import time
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
-from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos import pos3d, Pos, RoundObs
 
 
@@ -18,7 +17,6 @@ class BasicFollowApp(AgentThread):
         self.initialize_lock('singlelock')
         self.locals['obstacles'] = [RoundObs(0., 0., 0.5)]
         self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(2., -2., 1.), pos3d(-2., -2., 1.), pos3d(-2., 2., 1.)]
-        print(self.locals['dest'][0])
         self.locals['going'] = False
 
     def loop_body(self):
@@ -41,7 +39,8 @@ class BasicFollowApp(AgentThread):
             print("continuing")
 
         if not self.locals['going']:
-            print("trying to compute path")
+            print("trying to go to point", self.read_from_shared('pointnum', None))
+            '''
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                          self.locals['dest'][self.read_from_shared('pointnum', None)],
@@ -52,6 +51,8 @@ class BasicFollowApp(AgentThread):
 
             print("path is", path)
             self.agent_gvh.moat.follow_path(path)
+            '''
+            self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
             self.locals['going'] = True
 
         if self.agent_gvh.moat.reached:
