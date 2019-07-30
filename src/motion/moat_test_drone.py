@@ -31,6 +31,7 @@ class MoatTestDrone(MotionAutomaton):
         self.takeoff()
         while not self.reached:
             time.sleep(0.1)
+        print("take off successful")
         pass
 
 
