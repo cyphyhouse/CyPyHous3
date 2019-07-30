@@ -26,5 +26,5 @@ m2.planner = RRT_DRONE()
 m3.planner = RRT_DRONE()
 
 #change this line
-a, m = a0, m0
+a, m = a1, m1
 app = BasicFollowApp(a,m)
