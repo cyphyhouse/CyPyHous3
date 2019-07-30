@@ -45,6 +45,10 @@ class RRT(Planner):
             obstacle_list = []
         start = to_node(start)
         end = to_node(end)
+        if end.z != 0:
+            print("z != 0, point not valid for car")
+            return None
+
         node_list = [start]
         for i in range(self.max_iter):
             rnd = self.get_random_point(end)
