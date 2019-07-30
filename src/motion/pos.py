@@ -21,13 +21,14 @@ class Pos(object):
             if len(vector) == 4:
                 self.yaw = vector[3]
             elif len(vector) == 3:
-                pass
+                self.yaw = 0.0
 
         except IndexError:
             print("initializing an empty position")
             self.x = None
             self.y = None
             self.z = None
+            self.yaw = None
 
     def __repr__(self) -> str:
         """
