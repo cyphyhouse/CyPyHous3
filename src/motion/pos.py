@@ -156,6 +156,7 @@ class Node(Pos):
     """
     node object, primarily for optimized path planning.
     """
+
     def __init__(self, x, y, z=0, yaw=0.0):
         super(Node, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
@@ -214,6 +215,7 @@ class pos3d(Pos):
     """
     object used in Koord.
     """
+
     def __init__(self, x: float, y: float, z: float, yaw=0.0):
         super(pos3d, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
@@ -223,6 +225,7 @@ class RoundObs(object):
     """
     obstacle object.
     """
+
     def __init__(self, x, y, radius, z=0):
         self.x = x
         self.y = y

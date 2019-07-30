@@ -9,11 +9,11 @@ import copy
 import math
 import random
 
-import src.motion.dubins_path_planning as dubins_path_planning
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.motion.pos import RoundObs, Node
+import src.motion.dubins_path_planning as dubins_path_planning
+from src.motion.pos import RoundObs, Node, Pos
 
 show_animation = True
 
@@ -158,14 +158,14 @@ class RRT_DUBINS():
         return None
 
     def gen_final_course(self, start_point, end_point, goalind, node_list):
-        path = [[end_point.x, end_point.y]]
+        path = [Pos(np.array([end_point.x, end_point.y, 0.0]))]
         while node_list[goalind].parent is not None:
             node = node_list[goalind]
             for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
+                path.append(Pos(np.array([ix, iy, 0.0])))
             #  path.append([node.x, node.y])
             goalind = node.parent
-        path.append([start_point.x, start_point.y])
+        path.append(Pos(np.array([start_point.x, start_point.y, 0.0])))
         return path
 
     def calc_dist_to_goal(self, x, y, end_point):
@@ -213,9 +213,9 @@ class RRT_DUBINS():
         for obs in obstacle_list:
             plt.plot(obs.x, obs.y, "ok", ms=30 * obs.radius)
 
-        dubins_path_planning.plot_arrow(
+        plot_arrow(
             start_point.x, start_point.y, start_point.yaw)
-        dubins_path_planning.plot_arrow(
+        plot_arrow(
             end_point.x, end_point.y, end_point.yaw)
 
         plt.axis([-2, 15, -2, 15])
@@ -245,7 +245,19 @@ class RRT_DUBINS():
 
         return True  # safe
 
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
+    """
+    Plot arrow
+    """
+    import matplotlib.pyplot as plt
 
+    if not isinstance(x, float):
+        for (ix, iy, iyaw) in zip(x, y, yaw):
+            plot_arrow(ix, iy, iyaw)
+    else:
+        plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
+                  fc=fc, ec=ec, head_width=width, head_length=width)
+        plt.plot(x, y)
 
 
 def main():
@@ -270,8 +282,8 @@ def main():
 
     # Draw final path
     if show_animation:  # pragma: no cover
-        rrt.DrawGraph(start,goal,[],obstacle_list)
-        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+        rrt.DrawGraph(start, goal, [], obstacle_list)
+        plt.plot([point.x for point in path], [point.y for point in path], '-r')
         plt.grid(True)
         plt.pause(0.001)
 

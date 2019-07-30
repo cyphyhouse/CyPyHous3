@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos import RoundObs, Node, to_node
+from src.motion.pos import Node, to_node, Pos, RoundObs
 
 
 class RRT_DUBINS():
@@ -37,7 +37,7 @@ class RRT_DUBINS():
 
         animation: flag for animation on or off
         """
-        print("start point is",start_point)
+        #print("start point is", start_point)
 
         start_point = to_node(start_point)
         end_point = to_node(end_point)
@@ -55,7 +55,6 @@ class RRT_DUBINS():
                 newNode = self.choose_parent(newNode, nearinds, node_list, obstacle_list)
                 node_list.append(newNode)
                 self.rewire(newNode, nearinds, node_list, obstacle_list)
-
 
         # generate course
         lastIndex = self.get_best_last_index(end_point, node_list)
@@ -157,14 +156,14 @@ class RRT_DUBINS():
         return None
 
     def gen_final_course(self, start_point, end_point, goalind, node_list):
-        path = [[end_point.x, end_point.y]]
+        path = [Pos(np.array([end_point.x, end_point.y, 0.0]))]
         while node_list[goalind].parent is not None:
             node = node_list[goalind]
             for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
+                path.append(Pos(np.array([ix, iy, 0.0])))
             #  path.append([node.x, node.y])
             goalind = node.parent
-        path.append([start_point.x, start_point.y])
+        path.append(Pos(np.array([start_point.x, start_point.y, 0.0])))
         return path
 
     def calc_dist_to_goal(self, x, y, end_point):
@@ -201,8 +200,8 @@ class RRT_DUBINS():
         for node in node_list:
             if node is not None:
                 dlist.append((node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2 +
-                 (node.yaw - rnd.yaw) ** 2)
+                             (node.y - rnd.y) ** 2 +
+                             (node.yaw - rnd.yaw) ** 2)
         minind = dlist.index(min(dlist))
 
         return minind
@@ -219,29 +218,28 @@ class RRT_DUBINS():
 
         return True  # safe
 
-'''
+
 def main():
     print("Start rrt star with dubins planning")
 
     # ====Search Path with RRT====
     obstacle_list = [
-        Obs(5, 5, 1),
-        Obs(3, 6, 2),
-        Obs(3, 8, 2),
-        Obs(3, 10, 2),
-        Obs(7, 5, 2),
-        Obs(9, 5, 2)
+        RoundObs(5, 5, 1),
+        RoundObs(3, 6, 2),
+        RoundObs(3, 8, 2),
+        RoundObs(3, 10, 2),
+        RoundObs(7, 5, 2),
+        RoundObs(9, 5, 2)
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
     start = Node(0.0, 0.0, np.deg2rad(0.0))
     goal = Node(10.0, 10.0, np.deg2rad(0.0))
 
-    rrt = RRT_DUBINS(rand_area=[-2.0, 15.0])
+    rrt = RRT_DUBINS(rand_area=[-2.0, 2.0])
     path = rrt.find_path(start, goal, obstacle_list)
     print(path)
 
 
 if __name__ == '__main__':
     main()
-'''
