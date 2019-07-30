@@ -15,7 +15,7 @@ class BasicFollowApp(AgentThread):
         self.create_ar_var('pos', Pos, self.agent_gvh.moat.position)
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
-        self.locals['obstacles'] = [RoundObs(0., 2., 1., 1.)]
+        self.locals['obstacles'] = []
         self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(1., 1., 0), pos3d(2., 2., 0), pos3d(2., -2., 1.),
                                pos3d(-2., -2., 1.), pos3d(-2., 2., 1.), pos3d(-2, 1, 0)]
         self.locals['going'] = False
