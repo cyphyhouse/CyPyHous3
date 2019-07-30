@@ -23,14 +23,19 @@ class BasicFollowApp(AgentThread):
 
     def loop_body(self):
         time.sleep(4)
+
         other_vehicle = 0
         if self.pid() == 0:
             other_vehicle = 1
+
         if self.read_from_shared('pointnum', None) > 3:
             self.stop()
+
         if not self.lock('singlelock'):
             return
+
         print("available point is", self.read_from_shared('pointnum', None))
+
         if self.read_from_shared('pos', other_vehicle) is not None:
             self.locals['obstacles'][0] = self.read_from_shared('pos', other_vehicle)
 
@@ -41,7 +46,6 @@ class BasicFollowApp(AgentThread):
                                                          self.locals['obstacles'])
             if path is None:
                 print("no path for current point, sending to other vehicle ")
-                self.locals['tries'] = 2
                 return
 
             print("path is", path)
