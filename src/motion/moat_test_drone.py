@@ -2,7 +2,7 @@ import numpy as np
 
 from src.motion.motionautomaton import MotionAutomaton
 from src.motion.pos import Pos
-
+import time
 
 class MoatTestDrone(MotionAutomaton):
 
@@ -29,6 +29,10 @@ class MoatTestDrone(MotionAutomaton):
 
     def moat_init_action(self):
         self.takeoff()
+        while not self.reached:
+            time.sleep(0.1)
+        pass
+
 
     def moat_exit_action(self):
         # TODO: maybe incorporate call to best here?
