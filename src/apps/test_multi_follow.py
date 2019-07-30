@@ -4,7 +4,6 @@ from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_star import RRT as RRT_CAR
 from src.motion.rrt_star_drone import RRT as RRT_DRONE
 
-
 bots = 1
 mhargs = [[False,0], [True, 1], [False,2], [False,3]]
 plist = []
