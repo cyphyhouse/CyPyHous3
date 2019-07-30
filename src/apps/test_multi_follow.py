@@ -18,7 +18,7 @@ a2 = AgentConfig(2, bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[2
 a3 = AgentConfig(3, bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[3], is_leader=mhargs[3][0])
 
 m0 = default_car_moat_config('hotdec_car')
-m1 = default_car_moat_config('ficar')
+m1 = default_car_moat_config('f1car')
 m2 = default_qc_moat_config('cyphyhousecopter')
 m3 = default_qc_moat_config('cyphyhousecopter1')
 m0.planner = RRT_CAR(goal_sample_rate=30)
