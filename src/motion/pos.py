@@ -227,7 +227,7 @@ class RoundObs(object):
     obstacle object.
     """
 
-    def __init__(self, x, y, radius, z=0):
+    def __init__(self, x, y, radius, z=0.0):
         self.x = x
         self.y = y
         self.z = z
