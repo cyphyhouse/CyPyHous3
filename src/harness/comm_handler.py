@@ -36,6 +36,7 @@ class CommHandler(Thread):
         self.__stop_event = Event()
         self.__timeout = timeout
         self.__msgs = []
+        self.receiver_socket = None
         self.start()
 
     @property
@@ -127,18 +128,18 @@ class CommHandler(Thread):
         create receiver socket, receive messages.
         :return:
         """
-        receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
         try:
-            receiver_socket.bind((self.ip, self.r_port))
-            receiver_socket.settimeout(self.timeout)
+            self.receiver_socket.bind((self.ip, self.r_port))
+            self.receiver_socket.settimeout(self.timeout)
         except OSError:
             print("perhaps already created socket")
 
         while not self.stopped():
             try:
-                data, addr = receiver_socket.recvfrom(4096)
+                data, addr = self.receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
             except socket.timeout:
@@ -147,7 +148,7 @@ class CommHandler(Thread):
             except OSError:
                 print("unexpected os error on agent", self.agent_gvh.pid)
 
-        receiver_socket.close()
+        self.receiver_socket.close()
 
     def handle_msgs(self) -> None:
         """
