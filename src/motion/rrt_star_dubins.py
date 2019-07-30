@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos import Obs, Node, to_node
+from src.motion.pos import RoundObs, Node, to_node
 
 
 class RRT_DUBINS():

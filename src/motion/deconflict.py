@@ -1,11 +1,20 @@
 # File contains all the functions used in de-conflicting paths
 
+from typing import Union
+
 import numpy as np
 
 import src.motion.pos as pos
 
 
-def is_collinear(p1: pos.Pos, p2: pos.Pos, p3: pos.Pos):
+def is_collinear(p1: pos.Pos, p2: pos.Pos, p3: pos.Pos) -> bool:
+    """
+    function to check whether three points are collinear
+    :param p1: point 1
+    :param p2: point 2
+    :param p3: point 3
+    :return: true if collinear, false otherwise
+    """
     n1 = pos.Pos(np.array([p2.x - p1.x, p2.y - p1.y, p2.z - p3.z]))
     n2 = pos.Pos(np.array([p3.x - p1.x, p3.y - p1.y, p3.z - p1.z]))
     n3 = pos.cross(n1, n2)
@@ -14,7 +23,13 @@ def is_collinear(p1: pos.Pos, p2: pos.Pos, p3: pos.Pos):
     return False
 
 
-def line_to_pt_dist(l: pos.Seg, p: pos.Pos):
+def line_to_pt_dist(l: pos.Seg, p: pos.Pos) -> float:
+    """
+    function to compute distance of line segment to a point
+    :param l: line segment
+    :param p: point
+    :return: float distance
+    """
     if not is_collinear(l.start, l.end, p):
         ab = l.end - l.start
         ac = p - l.start
@@ -26,7 +41,14 @@ def line_to_pt_dist(l: pos.Seg, p: pos.Pos):
         return min(pos.distance(l.start, p), pos.distance(l.end, p))
 
 
-def seg_distance_3d(l1: pos.Seg, l2: pos.Seg, tol=0.000001):
+def seg_distance_3d(l1: pos.Seg, l2: pos.Seg, tol=0.000001) -> float:
+    """
+    distance between two line segments in 3d
+    :param l1: line segment 1
+    :param l2: line segment 2
+    :param tol: parameter to avoid 0 division
+    :return: float distance between segments
+    """
     u = l1.end - l1.start
     v = l2.end - l2.start
     w = l1.start - l2.start
@@ -82,7 +104,14 @@ def seg_distance_3d(l1: pos.Seg, l2: pos.Seg, tol=0.000001):
     return dP.magnitude()
 
 
-def is_close(l1, l2, tolerance):
+def is_close(l1: Union[pos.Seg, pos.Pos], l2: Union[pos.Pos, pos.Seg], tolerance: float) -> bool:
+    """
+    function to define closeness of two objects, point, or segment
+    :param l1: line or segment
+    :param l2: line or segment
+    :param tolerance: tolerance
+    :return: boolean
+    """
     if isinstance(l1, pos.Seg) and isinstance(l2, pos.Seg):
         if seg_distance_3d(l1, l2) < tolerance:
             return True
@@ -98,7 +127,12 @@ def is_close(l1, l2, tolerance):
     return False
 
 
-def get_path_segs(p: list):
+def get_path_segs(p: list) -> list:
+    """
+    return segments of a path formed by points
+    :param p: list of points
+    :return: list of segments
+    """
     path_segs = []
     if len(p) > 1:
         for i in range(1, len(p)):
@@ -108,7 +142,14 @@ def get_path_segs(p: list):
     return path_segs
 
 
-def path_is_close(l1, l2, tolerance=0.5):
+def path_is_close(l1: list, l2: list, tolerance=0.5) -> bool:
+    """
+    function to check whether any two segments of given paths are close.
+    :param l1:
+    :param l2:
+    :param tolerance:
+    :return:
+    """
     l1 = get_path_segs(l1)
     l2 = get_path_segs(l2)
     for path_seg_1 in l1:
@@ -118,18 +159,19 @@ def path_is_close(l1, l2, tolerance=0.5):
     return False
 
 
-def clear_path(paths, proposed_path, ignore=None):
-    print("ignoring", ignore)
+def clear_path(paths: list, proposed_path: list, ignore=None, tolerance=0.5) -> bool:
+    """
+    function to determine if a list of paths doesn't conflict with a proposed path
+    :param paths: list of existing paths
+    :param proposed_path: proposed path
+    :param ignore: ignore path pids to deconflict
+    :param tolerance: closeness parameter
+    :return: true if clear, false otherwise
+    """
+    # print("ignoring", ignore)
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:
-            if path_is_close(paths[i], proposed_path):
+            if path_is_close(paths[i], proposed_path, tolerance):
                 # print(paths[i], proposed_path, "are the conflicting paths")
                 return False
     return True
-
-
-def to_path(myList):
-    return_path = []
-    for point in myList:
-        return_path.append(pos.Pos(np.array[(point[0], point[1], 0)]))
-    return return_path

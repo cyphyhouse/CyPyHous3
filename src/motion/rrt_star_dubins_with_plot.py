@@ -13,7 +13,7 @@ import src.motion.dubins_path_planning as dubins_path_planning
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.motion.pos import Obs, Node
+from src.motion.pos import RoundObs, Node
 
 show_animation = True
 
@@ -253,12 +253,12 @@ def main():
 
     # ====Search Path with RRT====
     obstacle_list = [
-        Obs(5, 5, 1),
-        Obs(3, 6, 2),
-        Obs(3, 8, 2),
-        Obs(3, 10, 2),
-        Obs(7, 5, 2),
-        Obs(9, 5, 2)
+        RoundObs(5, 5, 1),
+        RoundObs(3, 6, 2),
+        RoundObs(3, 8, 2),
+        RoundObs(3, 10, 2),
+        RoundObs(7, 5, 2),
+        RoundObs(9, 5, 2)
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters

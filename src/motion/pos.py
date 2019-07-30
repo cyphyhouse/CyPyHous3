@@ -6,7 +6,7 @@ from scipy.spatial.distance import pdist
 
 class Pos(object):
     """
-    vector object, 3d point. Has x, y and z components.
+    vector object, 3d point. Has x, y and z components, and possibly an orientation (yaw)
     """
 
     def __init__(self, vector: np.ndarray = np.array([])):
@@ -144,7 +144,7 @@ class Seg(object):
         """
         len = self.length()
         if len == 0.0:
-            uvec = Pos(np.transpose(np.array([0,0,0])))
+            uvec = Pos(np.transpose(np.array([0, 0, 0])))
         else:
             uvec = Pos(np.transpose(np.array([(self.end.x - self.start.x) / len,
                                               (self.end.y - self.start.y) / len,
@@ -153,6 +153,9 @@ class Seg(object):
 
 
 class Node(Pos):
+    """
+    node object, primarily for optimized path planning.
+    """
     def __init__(self, x, y, z=0, yaw=0.0):
         super(Node, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
@@ -208,13 +211,19 @@ def to_node(p: Pos) -> Node:
 
 
 class pos3d(Pos):
-    def __init__(self, x: float, y: float, z: float, yaw =0.0):
+    """
+    object used in Koord.
+    """
+    def __init__(self, x: float, y: float, z: float, yaw=0.0):
         super(pos3d, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
 
 
-class Obs(object):
-    def __init__(self, x, y, radius, z = 0):
+class RoundObs(object):
+    """
+    obstacle object.
+    """
+    def __init__(self, x, y, radius, z=0):
         self.x = x
         self.y = y
         self.z = z
