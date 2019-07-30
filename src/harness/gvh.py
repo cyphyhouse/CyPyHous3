@@ -137,9 +137,13 @@ class Gvh(object):
                 if var.owner == 0:
                     return var.value
                 else:
-                    if pid == -1:
-                        return var.value
-                    return var.value[pid]
+                    try:
+                        if pid == -1:
+                            return var.value
+                        return var.value[pid]
+                    except IndexError:
+                        print("trying to read an allread variable with invalid pid, returning None")
+                        return None
 
     def put(self, varname: str, value: Union[int, bool, float, list, object, tuple], pid: int = -1) -> None:
         """
