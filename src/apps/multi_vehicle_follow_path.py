@@ -37,8 +37,10 @@ class BasicFollowApp(AgentThread):
 
         if self.read_from_shared('pos', other_vehicle) is not None:
             self.locals['obstacles'][0] = self.read_from_shared('pos', other_vehicle)
+            print("continuing")
 
         if not self.locals['going']:
+            print("trying to compute path")
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                          self.locals['dest'][self.read_from_shared('pointnum', None)],
