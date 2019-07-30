@@ -40,7 +40,7 @@ class BasicFollowApp(AgentThread):
 
         if not self.locals['going']:
             print("trying to go to point", self.read_from_shared('pointnum', None))
-            '''
+
 
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                          self.locals['dest'][self.read_from_shared('pointnum', None)],
@@ -51,8 +51,8 @@ class BasicFollowApp(AgentThread):
 
             print("path is", path)
             self.agent_gvh.moat.follow_path(path)
-            '''
-            self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
+
+            #self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
             self.locals['going'] = True
 
         if self.agent_gvh.moat.reached:
