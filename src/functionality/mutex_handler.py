@@ -1,8 +1,5 @@
-import time
-from threading import Thread, Event
 from abc import ABC, abstractmethod
-from typing import Union
-
+from threading import Thread, Event
 
 
 class MutexHandler(Thread, ABC):

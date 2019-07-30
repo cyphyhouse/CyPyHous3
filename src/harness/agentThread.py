@@ -18,9 +18,9 @@ class AgentThread(ABC, Thread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: Union[MoatConfig, None]) -> None:
         """
-        init method for for agent application thread object.
-        :param agent_gvh: agent global variable holder object
-        :param agent_comm_handler: agent communication handler thread object
+
+        :param agent_config:
+        :param moat_config:
         """
         super(AgentThread, self).__init__()
         self.__agent_gvh = Gvh(agent_config, moat_config)
@@ -53,16 +53,16 @@ class AgentThread(ABC, Thread):
         self.req_nums[key] = 0
 
     def lock(self, key: str):
-        #print("checking locking")
+        # print("checking locking")
         if not self.requestedlocks[key]:
             self.baselocks[key].request_mutex(self.req_nums[key])
             self.requestedlocks[key] = True
             self.req_nums[key] += 1
-            #print("requesting")
+            # print("requesting")
             return False
         else:
             if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
-                #print("requested not granted")
+                # print("requested not granted")
                 return False
         return True
 
@@ -119,9 +119,9 @@ class AgentThread(ABC, Thread):
         :return: None
         """
         if self.agent_gvh.moat is not None:
-                self.agent_gvh.moat.moat_exit_action()
-                # todo: msg = tERMINATE_MSG() best termination message
-                # TODO: send(msg,"",best_post,time.time()) best termination message.
+            self.agent_gvh.moat.moat_exit_action()
+            # todo: msg = tERMINATE_MSG() best termination message
+            # TODO: send(msg,"",best_post,time.time()) best termination message.
         if self.agent_gvh.mutex_handler is not None:
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
@@ -201,13 +201,13 @@ class AgentThread(ABC, Thread):
 
     def write_to_shared(self, var_name, index, value):
         if index is not None:
-            self.agent_gvh.put(var_name,value,index)
+            self.agent_gvh.put(var_name, value, index)
         else:
-            self.agent_gvh.put(var_name,value)
+            self.agent_gvh.put(var_name, value)
 
     def read_from_shared(self, var_name, index):
         if index is not None:
-            return self.agent_gvh.get(var_name,index)
+            return self.agent_gvh.get(var_name, index)
         else:
             return self.agent_gvh.get(var_name)
         pass

@@ -2,18 +2,24 @@
 from enum import Enum, unique
 from typing import Union
 
-from src.functionality.base_mutex_handler import BaseMutexHandler
-
 
 class AgentConfig(object):
-    def __init__(self, pid: int, bots: int, rip: str, rport: int, plist: list = [],
-                 mh: Union[BaseMutexHandler, None] = None, is_leader=False, moat_class=None):
+    def __init__(self, pid: int, bots: int, rip: str, rport: int, plist: Union[list, None] = None,
+                 mh: Union[None, classmethod] = None, is_leader=False, moat_class=None,
+                 mhargs: Union[list, None] = None):
+        if plist is None:
+            plist = []
+        if mhargs is None:
+            mhargs = []
         self.pid = pid
         self.bots = bots
         self.rip = rip
         self.rport = rport
         self.plist = plist
-        self.mutex_handler = mh
+        if mh is not None:
+            self.mutex_handler = mh(*mhargs)
+        else:
+            self.mutex_handler = None
         self.is_leader = is_leader
         self.moat_class = moat_class
 

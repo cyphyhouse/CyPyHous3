@@ -16,7 +16,7 @@ class BaseMutex(Mutex):
     __agent_comm_handler : "reference" to agent comm handler
     """
 
-    def __init__(self, mutex_id: int, ip_port_list: list = []):
+    def __init__(self, mutex_id: int, ip_port_list: Union[list, None] = None):
         """
         base init method for mutex
         :param mutex_id: mutex id
@@ -26,6 +26,8 @@ class BaseMutex(Mutex):
         self.__mutex_id = mutex_id
         self.__mutex_request_list = []
         self.__mutex_holder = None
+        if ip_port_list is None:
+            ip_port_list = []
         self.__ip_port_list = ip_port_list
         self.__agent_comm_handler = None
 
@@ -121,9 +123,9 @@ class BaseMutex(Mutex):
         :return:
         """
         msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
-        print(self.ip_port_list)
+        # print(self.ip_port_list)
         if not self.ip_port_list == []:
-            print("here")
+            # print("here")
             for port in self.ip_port_list:
                 send(msg, '<broadcast>', port)
         else:
@@ -143,10 +145,10 @@ class BaseMutex(Mutex):
 
             if not self.ip_port_list == []:
                 for port in self.ip_port_list:
-                    print("sending grant mutex message to", self.__mutex_holder,"on port",port)
+                    # print("sending grant mutex message to", self.__mutex_holder, "on port", port)
                     send(msg, '<broadcast>', port)
             else:
-                print("sending grant mutex message to", self.__mutex_holder, "on port", self.agent_comm_handler.r_port)
+                # print("sending grant mutex message to", self.__mutex_holder, "on port", self.agent_comm_handler.r_port)
                 send(msg, '<broadcast>', self.agent_comm_handler.r_port)
         else:
             pass
