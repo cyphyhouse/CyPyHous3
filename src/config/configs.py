@@ -122,7 +122,7 @@ def default_car_moat_config(bot_name) -> MoatConfig:
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
 
-    queue_size = 1
+    queue_size = 10
     bot_name = bot_name
     pos_node = 'vrpn_client_node/'
     pos_msg_type = PoseStamped
@@ -142,7 +142,7 @@ def default_qc_moat_config(bot_name) -> MoatConfig:
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
 
-    queue_size = 1
+    queue_size = 10
     bot_name = bot_name
     pos_node = 'vrpn_client_node/'
     pos_msg_type = PoseStamped
