@@ -314,8 +314,8 @@ a = RRT()
 p1 = Pos(np.array([-1, 0, 1]))
 p2 = Pos(np.array([1, 0, 1]))
 
-from src.motion.pos import Obs
-o1 = Obs(0,0,0.5,1)
+from src.motion.pos import RoundObs
+o1 = RoundObs(0,0,0.5,1)
 c = a.find_path(p1, p2, [o1])
 print(c)
 '''
