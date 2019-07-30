@@ -15,12 +15,12 @@ class BasicFollowApp(AgentThread):
         self.create_ar_var('pos', Pos, self.agent_gvh.moat.position)
         self.create_aw_var('pointnum', int, 0)
         self.initialize_lock('singlelock')
-        self.locals['obstacles'] = [RoundObs(0., 0., 0.5)]
+        self.locals['obstacles'] = []
         self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(2., -2., 1.), pos3d(-2., -2., 1.), pos3d(-2., 2., 1.)]
         self.locals['going'] = False
 
     def loop_body(self):
-        time.sleep(4)
+        time.sleep(2)
 
         other_vehicle = 0
         if self.pid() == 0:
@@ -34,9 +34,6 @@ class BasicFollowApp(AgentThread):
 
         print("available point is", self.read_from_shared('pointnum', None))
 
-        if self.read_from_shared('pos', other_vehicle) is not None:
-            self.locals['obstacles'][0] = self.read_from_shared('pos', other_vehicle)
-            print("continuing")
 
         if not self.locals['going']:
             print("trying to go to point", self.read_from_shared('pointnum', None))
