@@ -21,6 +21,7 @@ class BasicFollowApp(AgentThread):
         self.locals['going'] = False
 
     def loop_body(self):
+        time.sleep(1)
         other_vehicle = 0
         if self.pid() == 0:
             other_vehicle = 1
