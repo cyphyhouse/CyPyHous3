@@ -3,6 +3,7 @@ from src.config.configs import AgentConfig, default_car_moat_config, default_qc_
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_star import RRT as RRT_CAR
 from src.motion.rrt_star_drone import RRT as RRT_DRONE
+from src.motion.simpleplanner import SimplePlanner
 from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.moat_test_car import MoatTestCar
 
@@ -27,7 +28,7 @@ m2 = default_qc_moat_config('cyphyhousecopter')
 m3 = default_qc_moat_config('cyphyhousecopter1')
 m0.planner = RRT_CAR(goal_sample_rate=30)
 m1.planner = RRT_CAR(goal_sample_rate=30)
-m2.planner = RRT_DRONE()
+m2.planner = SimplePlanner
 m3.planner = RRT_DRONE()
 
 #change this line
