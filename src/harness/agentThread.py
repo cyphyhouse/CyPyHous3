@@ -126,6 +126,7 @@ class AgentThread(ABC, Thread):
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
+            #todo : send stop message to comm_handler
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
         if not self.stopped():

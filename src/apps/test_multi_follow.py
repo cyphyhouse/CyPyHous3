@@ -28,7 +28,7 @@ m2 = default_qc_moat_config('cyphyhousecopter')
 m3 = default_qc_moat_config('cyphyhousecopter1')
 m0.planner = RRT_CAR(goal_sample_rate=30)
 m1.planner = RRT_CAR(goal_sample_rate=30)
-m2.planner = SimplePlanner
+m2.planner = RRT_DRONE()
 m3.planner = RRT_DRONE()
 
 #change this line
