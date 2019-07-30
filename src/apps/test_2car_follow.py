@@ -1,4 +1,4 @@
-from src.apps.two_car_follow_path import BasicFollowApp
+from src.apps.multi_vehicle_follow_path import BasicFollowApp
 from src.config.configs import AgentConfig, default_car_moat_config
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_star import RRT
