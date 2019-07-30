@@ -18,6 +18,7 @@ class BasicFollowApp(AgentThread):
         self.initialize_lock('singlelock')
         self.locals['obstacles'] = [RoundObs(0., 0., 0.5)]
         self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(2., -2., 1.), pos3d(-2., -2., 1.), pos3d(-2., 2., 1.)]
+        print(self.locals['dest'][0])
         self.locals['going'] = False
 
     def loop_body(self):
