@@ -4,8 +4,8 @@ from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_star import RRT
 bots = 2
 
-a1 = AgentConfig(0, bots, "", 2000, [], BaseMutexHandler(False, 0), is_leader=False)
-a2 = AgentConfig(1, bots, "", 2000, [], BaseMutexHandler(True, 1), is_leader=True)
+a1 = AgentConfig(0, bots, "", 2000, [], BaseMutexHandler, is_leader=False, mhargs=[False,0])
+a2 = AgentConfig(1, bots, "", 2000, [], BaseMutexHandler, is_leader=True, mhargs=[True, 1])
 m1 = default_car_moat_config('hotdec_car')
 m2 = default_car_moat_config('ficar')
 m2.planner = RRT(goal_sample_rate=30)

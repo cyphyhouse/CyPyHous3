@@ -308,3 +308,4 @@ p2 = Pos(np.array([1, 1, 0]))
 c = a.find_path(p1, p2, [])
 print(c)
 '''
+
