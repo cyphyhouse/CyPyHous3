@@ -7,7 +7,7 @@ from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.moat_test_car import MoatTestCar
 
 bots = 1
-mhargs = [[False,0], [True, 1], [False,2], [False,3]]
+mhargs = [[True,0], [False, 1], [False,2], [False,3]]
 plist = []
 r_port = 2000
 r_ip = ""
@@ -31,6 +31,6 @@ m2.planner = RRT_DRONE()
 m3.planner = RRT_DRONE()
 
 #change this line
-a, m = a1, m2
+a, m = a0, m2
 a.moat_class = MoatTestDrone
 app = BasicFollowApp(a,m)
