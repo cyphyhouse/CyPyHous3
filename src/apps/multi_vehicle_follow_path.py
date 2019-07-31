@@ -64,7 +64,7 @@ class BasicFollowApp(AgentThread):
             self.locals['going'] = True
 
         if self.agent_gvh.moat.reached:
-            print()
+            print("here, next point")
             self.write_to_shared('pos', self.pid(), self.agent_gvh.moat.position)
 
             time.sleep(0.1)
