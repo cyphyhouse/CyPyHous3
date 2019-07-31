@@ -28,7 +28,7 @@ class BasicFollowApp(AgentThread):
         if self.pid() == 0:
             other_vehicle = 1
 
-        if sum(self.read_from_shared('pointnum', None)) == 6:
+        if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
             self.stop()
 
         if not self.lock('singlelock'):
