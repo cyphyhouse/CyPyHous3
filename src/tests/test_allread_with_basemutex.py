@@ -62,7 +62,7 @@ class AllReadTest(unittest.TestCase):
         self.b, self.c, self.d, self.e, self.f = TestAR(c1), TestAR(c2), TestAR(c3), TestAR(c4), TestAR(c5)
 
     def test_write_to_shared(self):
-        time.sleep(5)
+        time.sleep(8)
         self.finalsum = self.b.locals['finalsum']
         # self.numvoted = self.b.read_from_shared('numvoted', None)
         self.assertEqual(self.finalsum, 10)
