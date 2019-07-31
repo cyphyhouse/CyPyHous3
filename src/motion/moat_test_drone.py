@@ -10,7 +10,6 @@ class MoatTestDrone(MotionAutomaton):
         super(MoatTestDrone, self).__init__(config)
 
     def _getPositioning(self, data) -> None:
-        print("this function just got called")
         self.position = Pos(np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z]))
 
     def _getReached(self, data) -> None:
