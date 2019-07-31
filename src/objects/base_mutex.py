@@ -122,6 +122,7 @@ class BaseMutex(Mutex):
         :param req_num: request number
         :return:
         """
+        print("giff mutex i am agent ", self.agent_comm_handler.agent_gvh.pid)
         msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         # print(self.ip_port_list)
         if not self.ip_port_list == []:
