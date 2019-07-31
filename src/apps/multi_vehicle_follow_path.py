@@ -36,6 +36,7 @@ class BasicFollowApp(AgentThread):
             return
 
         if not self.locals['going']:
+            print("list is",self.read_from_shared('pointnum', None))
             for i in range(len(self.read_from_shared('pointnum', None))):
                 if self.read_from_shared('pointnum', None)[i] == 0:
                     self.locals['current_dest'] = i
