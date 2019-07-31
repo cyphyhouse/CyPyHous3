@@ -17,10 +17,10 @@ class BasicFollowApp(AgentThread):
         self.initialize_lock('singlelock')
         self.locals['current_dest'] = -1
         self.locals['obstacles'] = []
-        self.locals['dest'] = [pos3d(2., 1.5, 0.), pos3d(1., -1., 1), pos3d(-0.75, 2., 0), pos3d(2., -0.5, 0.),
-                               pos3d(-2., -2., 1.), pos3d(-2., 1., 0.), pos3d(2, 0, 0), pos3d(1., 1.5, 0.),
+        self.locals['dest'] = [pos3d(2., 1.5, 0.), pos3d(1., -1., 1), pos3d(-0.75, 0., 0), pos3d(2., -0.5, 0.),
+                               pos3d(-2., -2., 1.), pos3d(0.0, 1., 0.), pos3d(2, 0, 0), pos3d(1., 1.5, 0.),
                                pos3d(0, -1.5, 0), pos3d(-2., .75, 1), pos3d(2., -2., 0.),
-                               pos3d(-2., -0.75, 0.), pos3d(-1., 0., 0.), pos3d(2, -1, 1)]
+                               pos3d(-1., -0.75, 0.), pos3d(-1., 0., 0.), pos3d(2, -1, 1)]
         self.create_aw_var('pointnum', list, [0 for i in range(len(self.locals['dest']))])
         self.locals['going'] = False
         self.locals['path'] = None
