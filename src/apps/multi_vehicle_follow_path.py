@@ -36,9 +36,12 @@ class BasicFollowApp(AgentThread):
             return
 
         if not self.locals['going']:
+            print("list is",self.read_from_shared('pointnum', None))
             for i in range(len(self.read_from_shared('pointnum', None))):
                 if self.read_from_shared('pointnum', None)[i] == 0:
                     self.locals['current_dest'] = i
+                else:
+                    continue
 
                 self.locals['path'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                             self.locals['dest'][
@@ -57,13 +60,14 @@ class BasicFollowApp(AgentThread):
             print("path is", self.locals['path'])
             self.locals['pointnum'] = self.read_from_shared('pointnum',None)
             self.locals['pointnum'][self.locals['current_dest']] = 1
-            self.write_to_shared('pointnum',None, self.locals['pointnum'])
+            self.write_to_shared('pointnum', None, self.locals['pointnum'])
             self.agent_gvh.moat.follow_path(self.locals['path'])
 
             # self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
             self.locals['going'] = True
 
         if self.agent_gvh.moat.reached:
+            print("here, next point")
             self.write_to_shared('pos', self.pid(), self.agent_gvh.moat.position)
 
             time.sleep(0.1)
