@@ -38,6 +38,8 @@ class BaseMutexHandler(MutexHandler):
         i = self.find_mutex_index(index)
         if i is not None:
             if (pid, req_num) not in self.__mutexes[i].mutex_request_list:
+                if self.__leader:
+                    print("adding mutex request from", pid)
                 self.__mutexes[i].mutex_request_list.append((pid, req_num))
         else:
             pass
