@@ -28,7 +28,7 @@ class BasicFollowApp(AgentThread):
         time.sleep(1)
         self.locals['obstacles'] = []
         for vehicle in range(self.num_agents()):
-            if vehicle == self.pid()
+            if vehicle == self.pid():
                 continue
             if self.read_from_shared('pos', vehicle) is None:
                 pass
