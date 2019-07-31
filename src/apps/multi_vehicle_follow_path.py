@@ -30,6 +30,7 @@ class BasicFollowApp(AgentThread):
 
         if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
             self.stop()
+            return
 
         if not self.lock('singlelock'):
             return
