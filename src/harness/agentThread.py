@@ -5,8 +5,10 @@ from threading import Thread, Event
 from typing import Union
 
 from src.config.configs import AgentConfig, MoatConfig
+from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
+from src.harness.message_handler import stop_comm_msg_create
 from src.objects.base_mutex import BaseMutex
 
 
@@ -36,6 +38,8 @@ class AgentThread(ABC, Thread):
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)
+        # create init messages, and keep sending until leader acks, then start app thread.
+        # leader only starts once everyone has received an ack.
 
     def create_ar_var(self, name, dtype, initial_value=None):
         self.agent_gvh.create_ar_var(name, dtype, initial_value)
@@ -126,9 +130,11 @@ class AgentThread(ABC, Thread):
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
-            #todo : send stop message to comm_handler
+            send(msg=stop_comm_msg_create(self.pid(), time.time()), ip="", port=self.agent_comm_handler.r_port)
+            # todo : send stop message to comm_handler
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
+
         if not self.stopped():
             self.__stop_event.set()
             print("stopped application thread on agent", self.pid())

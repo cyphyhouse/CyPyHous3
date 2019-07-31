@@ -26,5 +26,4 @@ class AgentConfigTest(unittest.TestCase):
         self.config.mutex_handler.stop()
 
 
-if __name__ == '__main__':
-    unittest.main()
+

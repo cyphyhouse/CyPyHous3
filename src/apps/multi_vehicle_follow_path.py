@@ -2,7 +2,7 @@ import time
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
-from src.motion.pos import pos3d, Pos, RoundObs
+from src.motion.pos import pos3d, Pos
 
 
 class BasicFollowApp(AgentThread):
@@ -13,12 +13,14 @@ class BasicFollowApp(AgentThread):
 
     def initialize_vars(self):
         self.create_ar_var('pos', Pos, self.agent_gvh.moat.position)
-        self.create_aw_var('pointnum', int, 0)
+        self.create_aw_var('pointnum', list, [0, 0, 0, 0, 0, 0, 0])
         self.initialize_lock('singlelock')
+        self.locals['current_dest'] = -1
         self.locals['obstacles'] = []
         self.locals['dest'] = [pos3d(2., 2., 1.), pos3d(1., 1., 0), pos3d(2., 2., 0), pos3d(2., -2., 1.),
                                pos3d(-2., -2., 1.), pos3d(-2., 2., 1.), pos3d(-2, 1, 0)]
         self.locals['going'] = False
+        self.locals['path'] = None
 
     def loop_body(self):
         time.sleep(1)
@@ -26,27 +28,33 @@ class BasicFollowApp(AgentThread):
         if self.pid() == 0:
             other_vehicle = 1
 
-        if self.read_from_shared('pointnum', None) > 6:
+        if sum(self.read_from_shared('pointnum', None)) == 6:
             self.stop()
 
         if not self.lock('singlelock'):
             return
 
-        print("available point is", self.read_from_shared('pointnum', None))
-
         if not self.locals['going']:
-            print("trying to go to point", self.read_from_shared('pointnum', None))
+            for i in range(len(self.read_from_shared('pointnum', None))):
+                if self.read_from_shared('pointnum', None)[i] == 0:
+                    self.locals['current_dest'] = i
 
-            path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
-                                                         self.locals['dest'][self.read_from_shared('pointnum', None)],
-                                                         self.locals['obstacles'])
-            if path is None:
-                print("no path for current point, sending to other vehicle ")
+                self.locals['path'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
+                                                                            self.locals['dest'][
+                                                                                self.locals['current_dest']],
+                                                                            self.locals['obstacles'])
+                if self.locals['path'] is None:
+                    print("no path for current point, trying next ")
+                else:
+                    break
+
+            if self.locals['path'] is None:
                 self.unlock('singlelock')
+                print('no path found')
                 return
 
-            print("path is", path)
-            self.agent_gvh.moat.follow_path(path)
+            print("path is", self.locals['path'])
+            self.agent_gvh.moat.follow_path(self.locals['path'])
 
             # self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
             self.locals['going'] = True

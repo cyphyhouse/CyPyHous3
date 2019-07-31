@@ -5,7 +5,7 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.functionality.comm_funcs import send
 from src.functionality.synchronizer import Synchronizer
-from src.objects.dsm import dsmvar
+from src.objects.dsm import DSM
 from src.objects.message import Message
 
 
@@ -101,7 +101,7 @@ class Gvh(object):
         :param value:
         :return:
         """
-        a = dsmvar(varname, dtype, self.participants, self.pid, value)
+        a = DSM(varname, dtype, self.participants, self.pid, value)
         if self.__dsm is None:
             self.__dsm = []
         self.__dsm.append(a)
@@ -114,7 +114,7 @@ class Gvh(object):
         :param value:
         :return:
         """
-        a = dsmvar(varname, dtype, self.participants, self.pid, value, 1)
+        a = DSM(varname, dtype, self.participants, self.pid, value, 1)
         if self.__dsm is None:
             self.__dsm = []
         self.__dsm.append(a)

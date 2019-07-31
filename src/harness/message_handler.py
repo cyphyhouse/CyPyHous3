@@ -5,6 +5,16 @@ from src.functionality.basic_synchronizer import RoundSyncError
 from src.harness.gvh import Gvh
 
 
+def stop_comm_msg_create(pid: int, ts: float) -> message.Message:
+    """
+    create a message to stop the comm_handler
+    :param pid:
+    :param ts:
+    :return:
+    """
+    return message.Message(pid, 5, None, ts)
+
+
 def round_update_create(pid: int, round_num: int, ts: float) -> message.Message:
     """
     creates an end of round message to let other agents know i have reached my end
@@ -114,6 +124,16 @@ def base_mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
         pass
 
 
+def stop_comm_msg_handle(msg: message.Message, agent_gvh: Gvh) -> None:
+    """
+    stop comm handler on receiving this message
+    :param msg:
+    :param agent_gvh:
+    :return:
+    """
+    pass
+
+
 def message_update_handle(msg: message.Message, agent_gvh: Gvh):
     var = msg.content
     updater = msg.sender
@@ -147,3 +167,4 @@ message_handler[1] = base_mutex_request_handle
 message_handler[2] = base_mutex_grant_handle
 message_handler[3] = base_mutex_release_handle
 message_handler[4] = message_update_handle
+message_handler[5] = stop_comm_msg_handle

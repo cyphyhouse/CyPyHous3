@@ -1,4 +1,4 @@
-class dsmvar(object):
+class DSM(object):
 
     def __init__(self, name, dtype, size, pid, value=None, owner=0, last_updated=0.0):
         # owner 0 for aw, 1 for ar
