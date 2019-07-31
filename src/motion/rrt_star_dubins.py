@@ -2,13 +2,15 @@
 Path Planning Sample Code with RRT and Dubins path
 
 author: AtsushiSakai(@Atsushi_twi)
+Modifications for use in CyPhyHouse made by Ritwika Ghosh and Amelia Gosse
 
 """
+# TODO: Complete documentation
 
 import copy
 import math
 import random
-
+from typing import Union
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
@@ -17,7 +19,7 @@ from src.motion.pos import Node, to_node, Pos, RoundObs
 
 class RRT_DUBINS():
     """
-    Class for RRT Planning
+    Class for RRT* Planning with Dubins Car Dynamics
     """
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 15,
@@ -31,14 +33,14 @@ class RRT_DUBINS():
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
 
-    def find_path(self, start_point, end_point, obstacle_list, animation=True):
+    def find_path(self, start_point: Pos, end_point: Pos, obstacle_list: list) -> list:
         """
-        Pathplanning
-
-        animation: flag for animation on or off
+        Path Planning
+        :param start_point: initial position of vehicle
+        :param end_point: desired final position of vehicle
+        :param obstacle_list: list of obstacles for planner to avoid
+        :return: planned path
         """
-        #print("start point is", start_point)
-
         start_point = to_node(start_point)
         end_point = to_node(end_point)
 
@@ -66,7 +68,15 @@ class RRT_DUBINS():
         path = self.gen_final_course(start_point, end_point, lastIndex, node_list)
         return path
 
-    def choose_parent(self, newNode, nearinds, node_list, obstacle_list):
+    def choose_parent(self, newNode: Node, nearinds: list, node_list: list, obstacle_list: list) -> Node:
+        """
+
+        :param newNode:
+        :param nearinds:
+        :param node_list:
+        :param obstacle_list:
+        :return:
+        """
         if not nearinds:
             return newNode
 
@@ -89,10 +99,22 @@ class RRT_DUBINS():
 
         return newNode
 
-    def pi_2_pi(self, angle):
+    def pi_2_pi(self, angle: float) -> float:
+        """
+
+        :param angle:
+        :return:
+        """
         return (angle + math.pi) % (2 * math.pi) - math.pi
 
-    def steer(self, rnd, nind, node_list):
+    def steer(self, rnd: Node, nind: int, node_list: list) -> Node:
+        """
+
+        :param rnd:
+        :param nind:
+        :param node_list:
+        :return:
+        """
         #  print(rnd)
         curvature = 1.0
 
@@ -114,8 +136,12 @@ class RRT_DUBINS():
 
         return newNode
 
-    def get_random_point(self, end_point):
+    def get_random_point(self, end_point: Node) -> Node:
+        """
 
+        :param end_point:
+        :return:
+        """
         if random.randint(0, 100) > self.goal_sample_rate:
             rnd = [random.uniform(self.min_rand, self.max_rand),
                    random.uniform(self.min_rand, self.max_rand),
@@ -128,9 +154,13 @@ class RRT_DUBINS():
 
         return node
 
-    def get_best_last_index(self, end_point, node_list):
-        #  print("get_best_last_index")
+    def get_best_last_index(self, end_point: Node, node_list: list) -> Union[int, None]:
+        """
 
+        :param end_point:
+        :param node_list:
+        :return:
+        """
         YAWTH = np.deg2rad(1.0)
         XYTH = 0.5
 
@@ -155,7 +185,15 @@ class RRT_DUBINS():
 
         return None
 
-    def gen_final_course(self, start_point, end_point, goalind, node_list):
+    def gen_final_course(self, start_point: Node, end_point: Node, goalind: int, node_list: list) -> list:
+        """
+
+        :param start_point:
+        :param end_point:
+        :param goalind:
+        :param node_list:
+        :return:
+        """
         path = [Pos(np.array([end_point.x, end_point.y, 0.0]))]
         while node_list[goalind].parent is not None:
             node = node_list[goalind]
@@ -166,10 +204,23 @@ class RRT_DUBINS():
         path.append(Pos(np.array([start_point.x, start_point.y, 0.0])))
         return path
 
-    def calc_dist_to_goal(self, x, y, end_point):
+    def calc_dist_to_goal(self, x: float, y: float, end_point: Node) -> float:
+        """
+
+        :param x:
+        :param y:
+        :param end_point:
+        :return:
+        """
         return np.linalg.norm([x - end_point.x, y - end_point.y])
 
-    def find_near_nodes(self, newNode, node_list):
+    def find_near_nodes(self, newNode: Node, node_list: list) -> list:
+        """
+
+        :param newNode:
+        :param node_list:
+        :return:
+        """
         nnode = len(node_list)
         r = 50.0 * math.sqrt((math.log(nnode) / nnode))
         #  r = self.expandDis * 5.0
@@ -180,8 +231,13 @@ class RRT_DUBINS():
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
 
-    def rewire(self, newNode, nearinds, node_list, obstacle_list):
+    def rewire(self, nearinds: list, node_list: list, obstacle_list: list) -> None:
+        """
 
+        :param nearinds:
+        :param node_list:
+        :param obstacle_list:
+        """
         nnode = len(node_list)
 
         for i in nearinds:
@@ -195,7 +251,13 @@ class RRT_DUBINS():
                 #  print("rewire")
                 node_list[i] = tNode
 
-    def GetNearestListIndex(self, node_list, rnd):
+    def GetNearestListIndex(self, node_list: list, rnd: Node) -> int:
+        """
+
+        :param node_list:
+        :param rnd:
+        :return:
+        """
         dlist = []
         for node in node_list:
             if node is not None:
@@ -206,8 +268,13 @@ class RRT_DUBINS():
 
         return minind
 
-    def CollisionCheck(self, node, obstacle_list):
+    def CollisionCheck(self, node: Node, obstacle_list: list) -> bool:
+        """
 
+        :param node:
+        :param obstacle_list:
+        :return:
+        """
         for obstacle in obstacle_list:
             for (ix, iy) in zip(node.path_x, node.path_y):
                 dx = obstacle.x - ix
@@ -219,6 +286,7 @@ class RRT_DUBINS():
         return True  # safe
 
 
+'''
 def main():
     print("Start rrt star with dubins planning")
 
@@ -243,3 +311,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+'''

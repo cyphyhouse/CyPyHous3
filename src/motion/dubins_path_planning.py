@@ -6,6 +6,8 @@ author Atsushi Sakai (@Atsushi_twi)
 modified by ritwika ghosh for cyphyhouse
 
 """
+# TODO: Complete documentation
+
 import math
 
 #import matplotlib.pyplot as plt
@@ -14,17 +16,17 @@ import numpy as np
 from src.motion.pos import Pos
 
 
-def mod2pi(theta):
+def mod2pi(theta: float) -> float:
     return theta - 2.0 * math.pi * math.floor(theta / 2.0 / math.pi)
 
 
-def pi_2_pi(angle):
+def pi_2_pi(angle: float) -> float:
     return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
-def LSL(alpha, beta, d):
+def LSL(alpha: float, beta: float, d: float):
     """
-    left to straight to left.
+    Left to straight to left
     :param alpha:
     :param beta:
     :param d:
@@ -51,7 +53,7 @@ def LSL(alpha, beta, d):
     return t, p, q, mode
 
 
-def RSR(alpha, beta, d):
+def RSR(alpha: float, beta: float, d: float):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -71,7 +73,7 @@ def RSR(alpha, beta, d):
     return t, p, q, mode
 
 
-def LSR(alpha, beta, d):
+def LSR(alpha: float, beta: float, d: float):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -90,7 +92,7 @@ def LSR(alpha, beta, d):
     return t, p, q, mode
 
 
-def RSL(alpha, beta, d):
+def RSL(alpha: float, beta: float, d: float):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -109,7 +111,7 @@ def RSL(alpha, beta, d):
     return t, p, q, mode
 
 
-def RLR(alpha, beta, d):
+def RLR(alpha: float, beta: float, d: float):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -127,7 +129,7 @@ def RLR(alpha, beta, d):
     return t, p, q, mode
 
 
-def LRL(alpha, beta, d):
+def LRL(alpha: float, beta: float, d: float):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -146,7 +148,7 @@ def LRL(alpha, beta, d):
     return t, p, q, mode
 
 
-def dubins_path_planning_from_origin(ex, ey, eyaw, c):
+def dubins_path_planning_from_origin(ex: float, ey: float, eyaw: float, c: float):
     # nomalize
     dx = ex
     dy = ey
@@ -181,7 +183,7 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
     return px, py, pyaw, path1, bmode, bcost
 
 
-def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
+def dubins_path_planning(sx: float, sy: float, syaw: float, ex: float, ey: float, eyaw: float, c: float):
     """
     Dubins path plannner
 
@@ -231,7 +233,7 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     return px, py, pyaw, path2, mode, clen
 
 
-def generate_course(length, mode, c):
+def generate_course(length: list, mode: str, c: float):
     px = [0.0]
     py = [0.0]
     pyaw = [0.0]
