@@ -55,6 +55,9 @@ class BasicFollowApp(AgentThread):
                 return
 
             print("path is", self.locals['path'])
+            self.locals['pointnum'] = self.read_from_shared('pointnum',None)
+            self.locals['pointnum'][self.locals['current_dest']] = 1
+            self.write_to_shared('pointnum',None, self.locals['pointnum'])
             self.agent_gvh.moat.follow_path(self.locals['path'])
 
             # self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
@@ -62,7 +65,7 @@ class BasicFollowApp(AgentThread):
 
         if self.agent_gvh.moat.reached:
             self.write_to_shared('pos', self.pid(), self.agent_gvh.moat.position)
-            self.write_to_shared('pointnum', None, self.read_from_shared('pointnum', None) + 1)
+
             time.sleep(0.1)
             self.locals['going'] = False
             self.unlock('singlelock')
