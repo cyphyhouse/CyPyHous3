@@ -36,6 +36,7 @@ class BasicFollowApp(AgentThread):
             else:
                 self.locals['obstacles'].append(
                     self.read_from_shared('pos', vehicle).to_obs(0.5, self.agent_gvh.moat.position.z))
+        print("my obstacle list is", self.locals['obstacles'])
 
         if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
             self.stop()
