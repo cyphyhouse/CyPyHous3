@@ -239,7 +239,7 @@ class RRT(Planner):
         for obs in obstacle_list:
             try:
                 obs_seg = Seg(node.to_pos(), obs.to_pos())
-                d = obs_seg.length()
+                d = obs_seg.length_xy()
                 if d <= obs.radius:
                     return False  # collision
             except AttributeError:
