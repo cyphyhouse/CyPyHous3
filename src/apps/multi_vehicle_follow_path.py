@@ -13,12 +13,11 @@ class BasicFollowApp(AgentThread):
 
     def initialize_vars(self):
         self.create_ar_var('pos', Pos, self.agent_gvh.moat.position)
-        self.create_aw_var('pointnum', list, [0, 0, 0, 0, 0, 0, 0, 0])
         self.initialize_lock('singlelock')
         self.locals['current_dest'] = -1
         self.locals['obstacles'] = []
         self.locals['dest'] = [pos3d(2., 1.5, 0.), pos3d(1., -1., 1), pos3d(-0.75, 0., 0), pos3d(2., -0.5, 0.),
-                               pos3d(-2., -2., 1.), pos3d(0.0, 1., 0.), pos3d(2, 0, 0), pos3d(1., 1.5, 0.),
+                               pos3d(-2., -2., 1.), pos3d(2, 0, 0), pos3d(1., 1.5, 0.),
                                pos3d(0, -1.5, 0), pos3d(-2., .75, 1), pos3d(2., -2., 0.),
                                pos3d(-1., -0.75, 0.), pos3d(-1., 0., 0.), pos3d(2, -1, 1)]
         self.create_aw_var('pointnum', list, [0 for i in range(len(self.locals['dest']))])
