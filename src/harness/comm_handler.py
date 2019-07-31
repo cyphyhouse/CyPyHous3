@@ -141,9 +141,6 @@ class CommHandler(Thread):
             try:
                 data, addr = self.receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
-                if msg.message_type == 5:
-                    self.stop()
-                    continue
                 self.agent_gvh.add_recv_msg(msg)
             except socket.timeout:
                 print("agent", self.agent_gvh.pid, "timed out")
@@ -164,6 +161,9 @@ class CommHandler(Thread):
         current_list = self.agent_gvh.recv_msg_list.copy()
 
         for msg in current_list:
+            if msg.message_type == 5:
+                print("received stop message")
+                self.join()
             if msg.message_type in list(message_handler.keys()):
                 message_handler[msg.message_type](msg, self.agent_gvh)
         self.agent_gvh.recv_msg_list = self.agent_gvh.recv_msg_list[len(current_list):]
