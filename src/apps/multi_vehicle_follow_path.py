@@ -28,6 +28,12 @@ class BasicFollowApp(AgentThread):
         if self.pid() == 0:
             other_vehicle = 1
 
+        if self.read_from_shared('pos', other_vehicle) is None:
+            pass
+        else:
+            self.locals['obstacles'] = [
+                self.read_from_shared('pos', other_vehicle).to_obs(0.5, self.agent_gvh.moat.position.z)]
+
         if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
             self.stop()
             return
@@ -36,7 +42,7 @@ class BasicFollowApp(AgentThread):
             return
 
         if not self.locals['going']:
-            print("list is",self.read_from_shared('pointnum', None))
+            print("list is", self.read_from_shared('pointnum', None))
             for i in range(len(self.read_from_shared('pointnum', None))):
                 if self.read_from_shared('pointnum', None)[i] == 0:
                     self.locals['current_dest'] = i
@@ -58,7 +64,7 @@ class BasicFollowApp(AgentThread):
                 return
 
             print("path is", self.locals['path'])
-            self.locals['pointnum'] = self.read_from_shared('pointnum',None)
+            self.locals['pointnum'] = self.read_from_shared('pointnum', None)
             self.locals['pointnum'][self.locals['current_dest']] = 1
             self.write_to_shared('pointnum', None, self.locals['pointnum'])
             self.agent_gvh.moat.follow_path(self.locals['path'])
