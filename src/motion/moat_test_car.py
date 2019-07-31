@@ -10,6 +10,7 @@ class MoatTestCar(MotionAutomaton):
         super(MoatTestCar, self).__init__(config)
 
     def _getPositioning(self, data) -> None:
+        print("this function just got called")
         quat = data.pose.orientation
         import math
         yaw = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), pow(quat.w, 2) + pow(quat.x,2) - pow(quat.y,2) - pow(quat.z,2))
