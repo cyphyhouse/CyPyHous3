@@ -26,15 +26,15 @@ class BasicFollowApp(AgentThread):
 
     def loop_body(self):
         time.sleep(1)
-        other_vehicle = 0
-        if self.pid() == 0:
-            other_vehicle = 1
-
-        if self.read_from_shared('pos', other_vehicle) is None:
-            pass
-        else:
-            self.locals['obstacles'] = [
-                self.read_from_shared('pos', other_vehicle).to_obs(0.5, self.agent_gvh.moat.position.z)]
+        self.locals['obstacles'] = []
+        for vehicle in range(self.num_agents()):
+            if vehicle == self.pid()
+                continue
+            if self.read_from_shared('pos', vehicle) is None:
+                pass
+            else:
+                self.locals['obstacles'].append(
+                    self.read_from_shared('pos', vehicle).to_obs(0.5, self.agent_gvh.moat.position.z))
 
         if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
             self.stop()
