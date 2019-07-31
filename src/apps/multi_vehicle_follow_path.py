@@ -59,7 +59,8 @@ class BasicFollowApp(AgentThread):
 
             print("path is", self.locals['path'])
             self.locals['pointnum'] = self.read_from_shared('pointnum',None)
-            self.write_to_shared('pointnum',None, self.locals['pointnum'])
+            self.locals['pointnum'][self.locals['current_dest']] = 1
+            self.write_to_shared('pointnum', None, self.locals['pointnum'])
             self.agent_gvh.moat.follow_path(self.locals['path'])
 
             # self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
