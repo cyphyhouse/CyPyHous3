@@ -141,6 +141,9 @@ class Seg(object):
         """
         return distance(self.start, self.end)
 
+    def length_xy(self) -> float:
+        return (self.end.x - self.start.x) ** 2 + (self.end.y - self.start.y)
+
     def direction(self):
         """
         unit vector of direction
