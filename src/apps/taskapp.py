@@ -2,7 +2,7 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
 from src.objects.udt import get_tasks
-
+import time
 
 class TaskApp(AgentThread):
 
@@ -19,8 +19,10 @@ class TaskApp(AgentThread):
         self.locals['doing'] = False
 
     def loop_body(self):
+        time.sleep(0.1)
 
         if not self.locals['doing']:
+            print("still alive")
             if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
                 self.stop()
