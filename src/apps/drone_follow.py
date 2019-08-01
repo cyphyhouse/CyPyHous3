@@ -1,22 +1,17 @@
-import numpy as np
-
-from src.config.configs import AgentConfig, MoatConfig, default_qc_moat_config
 from src.harness.agentThread import AgentThread
-from src.motion.moat_test_drone import MoatTestDrone
-from src.motion.pos_types import Pos
+from src.motion.pos_types import pos3d
 
 
 class BasicFollowApp(AgentThread):
 
-    def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
+    def __init__(self, agent_config, moat_config):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
-        self.agent_gvh.moat = MoatTestDrone(moat_config)
         self.start()
 
     def initialize_vars(self):
-        self.locals['dest1'] = Pos(np.array([2., 1., 1., 0.0]))
-        self.locals['dest2'] = Pos(np.array([-2., 1., 1., 0.0]))
-        self.locals['dest3'] = Pos(np.array([2., -1., 1., 0.0]))
+        self.locals['dest1'] = pos3d(2., 1., 0.)
+        self.locals['dest2'] = pos3d(-2., 1., 0.)
+        self.locals['dest3'] = pos3d(2., -1., 0.)
         self.locals['tries'] = 1
 
     def loop_body(self):
@@ -33,5 +28,3 @@ class BasicFollowApp(AgentThread):
             self.locals['tries'] = 4
             self.stop()
             return
-
-

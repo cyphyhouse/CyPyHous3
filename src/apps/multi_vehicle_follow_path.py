@@ -1,13 +1,12 @@
 import time
 
-from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos
 
 
 class BasicFollowApp(AgentThread):
 
-    def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
+    def __init__(self, agent_config, moat_config):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
         self.start()
 
@@ -31,13 +30,12 @@ class BasicFollowApp(AgentThread):
             if vehicle == self.pid():
                 continue
             if self.read_from_shared('pos', vehicle) is None:
-                print("vehicle",vehicle,"hasn't published its position")
+                print("vehicle", vehicle, "hasn't published its position")
                 pass
             else:
                 self.locals['obstacles'].append(
                     self.read_from_shared('pos', vehicle).to_obs(0.5, self.agent_gvh.moat.position.z))
-        #print("my obstacle list is", [i.to_pos() for i in self.locals['obstacles']])
-
+        # print("my obstacle list is", [i.to_pos() for i in self.locals['obstacles']])
 
         if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
             self.stop()

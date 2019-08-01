@@ -1,18 +1,13 @@
 import time
 
-from src.config.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.harness.agentThread import AgentThread
-from src.motion.moat_test_car import MoatTestCar
-from src.motion.pos_types import pos3d, RoundObs
-from src.motion.rrt_star import RRT
-from src.motion.rrt_star_dubins import RRT_DUBINS
+from src.motion.pos_types import pos3d
 
 
 class BasicFollowApp(AgentThread):
 
-    def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
+    def __init__(self, agent_config, moat_config):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
-        self.agent_gvh.moat = MoatTestCar(moat_config)
         self.start()
 
     def initialize_vars(self):
@@ -119,13 +114,10 @@ class BasicFollowApp(AgentThread):
             self.locals['tries'] = 10
             return
         if self.locals['tries'] == 10 and self.agent_gvh.moat.reached:
-            print("going to point 8")
             path = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position, self.locals['dest1'], obstacles)
             if path is None:
-                print("no path for 1 to 2 ")
                 self.locals['tries'] = 11
                 return
-            print("first path from -2,1,0 to 2, -1 , 0", path)
             self.agent_gvh.moat.follow_path(path)
             time.sleep(3)
             self.locals['tries'] = 11
@@ -170,5 +162,3 @@ class BasicFollowApp(AgentThread):
             time.sleep(3)
             self.locals['tries'] = 13
             return
-
-

@@ -1,7 +1,4 @@
-from src.config.configs import AgentConfig
-from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
-
 
 class Leader(AgentThread):
 
