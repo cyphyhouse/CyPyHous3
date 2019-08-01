@@ -33,5 +33,5 @@ m3.planner = RRT_DRONE()
 
 #change this line
 a, m = a0, m2
-a.moat_class = MoatTestDrone
+a.moat_class = MoatTestCar
 app = BasicFollowApp(a,m)
