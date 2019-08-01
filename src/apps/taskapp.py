@@ -30,6 +30,7 @@ class TaskApp(AgentThread):
 
             if self.lock('pick_route'):
                 tasks = self.read_from_shared('tasks',None)
+                print(tasks)
                 for i in range(len(tasks)):
                     if not self.read_from_shared('tasks', None)[i].assigned:
                         self.locals['my_task'] = tasks[i]
