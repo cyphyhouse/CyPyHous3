@@ -1,5 +1,5 @@
 from src.motion.planner import Planner
-from src.motion.pos import Pos, Seg, distance
+from src.motion.pos_types import Pos, Seg, distance
 
 
 class SimplePlanner(Planner):

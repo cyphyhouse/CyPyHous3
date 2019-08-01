@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from src.motion.pos import Pos
+from src.motion.pos_types import Pos
 
 
 class Planner(ABC):

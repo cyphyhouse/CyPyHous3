@@ -15,7 +15,7 @@ from typing import Union
 import numpy as np
 
 from src.motion.planner import Planner
-from src.motion.pos import Pos, Node, to_node, Seg
+from src.motion.pos_types import Pos, Node, to_node, Seg
 
 
 class RRT(Planner):

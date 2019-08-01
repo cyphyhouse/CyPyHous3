@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy as np
 
-import src.motion.pos as pos
+import src.motion.pos_types as pos
 
 
 def is_collinear(p1: pos.Pos, p2: pos.Pos, p3: pos.Pos) -> bool:

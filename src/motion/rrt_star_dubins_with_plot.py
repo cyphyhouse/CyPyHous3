@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos import RoundObs, Node, Pos
+from src.motion.pos_types import RoundObs, Node, Pos
 
 show_animation = True
 

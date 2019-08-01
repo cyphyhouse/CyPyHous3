@@ -2,7 +2,7 @@ import time
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
-from src.motion.pos import pos3d, Pos
+from src.motion.pos_types import pos3d, Pos
 
 
 class BasicFollowApp(AgentThread):

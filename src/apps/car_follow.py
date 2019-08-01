@@ -3,7 +3,7 @@ import time
 from src.config.configs import AgentConfig, MoatConfig, default_car_moat_config
 from src.harness.agentThread import AgentThread
 from src.motion.moat_test_car import MoatTestCar
-from src.motion.pos import pos3d
+from src.motion.pos_types import pos3d
 
 
 class BasicFollowApp(AgentThread):

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Union
 
 from src.config.configs import MoatConfig, gen_positioning_params,gen_reached_params, gen_waypoint_params
-from src.motion.pos import Pos
+from src.motion.pos_types import Pos
 
 
 class MotionAutomaton(threading.Thread, ABC):

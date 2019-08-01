@@ -5,7 +5,7 @@ demo path planner
 import numpy as np
 
 from src.motion.planner import Planner
-from src.motion.pos import Pos
+from src.motion.pos_types import Pos
 
 
 class DemoPlan(Planner):

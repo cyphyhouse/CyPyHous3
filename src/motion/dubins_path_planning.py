@@ -13,7 +13,7 @@ import math
 #import matplotlib.pyplot as plt
 import numpy as np
 
-from src.motion.pos import Pos
+from src.motion.pos_types import Pos
 
 
 def mod2pi(theta: float) -> float:

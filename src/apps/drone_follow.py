@@ -3,7 +3,7 @@ import numpy as np
 from src.config.configs import AgentConfig, MoatConfig, default_qc_moat_config
 from src.harness.agentThread import AgentThread
 from src.motion.moat_test_drone import MoatTestDrone
-from src.motion.pos import Pos
+from src.motion.pos_types import Pos
 
 
 class BasicFollowApp(AgentThread):

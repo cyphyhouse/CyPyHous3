@@ -3,16 +3,16 @@ class Task(object):
     task object, has a location, a task id, whether or not its assigned, and agent pid its assigned to.
     """
 
-    def __init__(self, location, id, assigned, assigned_to):
+    def __init__(self, location, task_id, assigned, assigned_to):
         """
 
         :param location:
-        :param id:
+        :param task_id:
         :param assigned:
         :param assigned_to:
         """
         self.location = location
-        self.id = id
+        self.id = task_id
         self.assigned = assigned
         self.assigned_to = assigned_to
 
@@ -25,11 +25,10 @@ def get_tasks(taskfile):
     TODO: add a repeated get_tasks.
     read a file to obtain tasks
     :param taskfile:
-    :param repeat:
     :return:
     """
     import numpy as np
-    from src.motion.pos import Pos
+    from src.motion.pos_types import Pos
 
     tasks = []
     tasklocs = open(taskfile, "r").readlines()

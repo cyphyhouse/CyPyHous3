@@ -110,7 +110,7 @@ class Pos(object):
         return return_pt
 
     def to_obs(self, size, z):
-        return RoundObs(self.x,  self.y, size, z )
+        return RoundObs(self.x, self.y, size, z)
 
 
 class Seg(object):

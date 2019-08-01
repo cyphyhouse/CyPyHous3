@@ -14,7 +14,7 @@ from typing import Union
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos import Node, to_node, Pos, RoundObs
+from src.motion.pos_types import Node, to_node, Pos, RoundObs
 
 
 class RRT_DUBINS():
