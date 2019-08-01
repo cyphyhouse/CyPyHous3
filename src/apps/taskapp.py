@@ -29,17 +29,19 @@ class TaskApp(AgentThread):
                 return
 
             if self.lock('pick_route'):
-                for i in range(len(self.read_from_shared('tasks', None))):
+                tasks = self.read_from_shared('tasks',None)
+                for i in range(len(tasks)):
                     if not self.read_from_shared('tasks', None)[i].assigned:
-                        self.locals['my_task'] = self.read_from_shared('tasks', None)[i]
+                        self.locals['my_task'] = tasks[i]
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location, [])
                         if clear_path([path for path in [self.read_from_shared('route', pid) for pid in range(self.num_agents())]], self.locals['test_route'], self.pid()):
                             print("i am doing task",self.locals['my_task'].id)
                             self.locals['doing'] = True
-                            self.read_from_shared('tasks', None)[i].assign(self.pid())
-                            self.agent_gvh.put('tasks', self.read_from_shared('tasks', None))
+                            self.locals['my_task'].assign(self.pid())
+                            tasks[i] = self.locals['my_task']
+                            self.agent_gvh.put('tasks', tasks)
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
                             self.agent_gvh.moat.follow_path(self.locals['test_route'])
                         else:
