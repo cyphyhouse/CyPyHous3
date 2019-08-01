@@ -135,6 +135,7 @@ def stop_comm_msg_handle(msg: message.Message, agent_gvh: Gvh) -> None:
 
 
 def message_update_handle(msg: message.Message, agent_gvh: Gvh):
+    print("got an update message",msg)
     var = msg.content
     updater = msg.sender
     for i in range(len(agent_gvh.dsm)):
