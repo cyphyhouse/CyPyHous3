@@ -413,6 +413,7 @@ def test():
     print("Test done")
 
 
+'''
 def main():
     print("Reeds Shepp path planner sample start!!")
 
@@ -450,3 +451,4 @@ def main():
 if __name__ == '__main__':
     test()
     main()
+'''
