@@ -11,27 +11,35 @@ class RoundObs(Obstacle):
         super(RoundObs, self).__init__(point, np.array([radius]))
 
     def _collision_point(self, point: Pos) -> bool:
-        print("collision point")
         d = (self.position.x - point.x) ** 2 + (self.position.y - point.y) ** 2 + (self.position.z - point.z) ** 2
 
         return math.sqrt(d) > self.size[0]
 
     def _collision_path(self, path: Seg) -> bool:
-        print("collision path")
-        ab = np.array([path.vector.x, path.vector.y, path.vector.z])
-        ac = np.array([self.position.x - path.start.x, self.position.y - path.start.y, self.position.z - path.start.z])
+        o = np.array([path.start.x, path.start.y, path.start.z])
+        path_uvec = path.direction().mk_arr()
+        d = path.length()
+        c = self.position.mk_arr()
+        r = self.size[0]
 
-        d = np.linalg.norm(np.cross(ac, ab)) / np.linalg.norm(ab)
+        s = np.dot(path_uvec, o - c) ** 2 - ( np.linalg.norm(o - c) ** 2 - r ** 2 )
 
-        return d > self.size[0]
+        if s < 0:
+            return True
+        else:
+            dist = np.array([-np.dot(path_uvec, o - c) + np.sqrt(s), -np.dot(path_uvec, o - c) - np.sqrt(s)])
+            if np.min(dist) > d:
+                return True
+            else:
+                return False
 
 
 '''
 p1 = Pos(np.array([-1, 0, 1]))
-p2 = Pos(np.array([1, 0, 1]))
-path = Seg(p1,p2)
+p2 = Pos(np.array([0.75, 0, 1]))
+path = Seg(p1, p2)
 
-o1 = RoundObs(Pos(np.array([0,0.1,1])), 0.5)
+o1 = RoundObs(Pos(np.array([0, 0, 1])), 0.5)
 
 b = o1.collision_check(path)
 print(b)
