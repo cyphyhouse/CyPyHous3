@@ -1,4 +1,4 @@
-from src.apps.multi_vehicle_follow_path import BasicFollowApp
+from src.apps.taskapp import TaskApp
 from src.config.configs import AgentConfig, default_car_moat_config, default_qc_moat_config
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_star import RRT as RRT_CAR
@@ -34,4 +34,4 @@ m3.planner = RRT_DRONE()
 #change this line
 a, m = a0, m0
 a.moat_class = MoatTestCar
-app = BasicFollowApp(a,m)
+app = TaskApp(a,m)
