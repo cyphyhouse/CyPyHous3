@@ -47,7 +47,7 @@ class TaskApp(AgentThread):
                             self.locals['doing'] = False
                             continue
                         self.unlock('pick_route')
-                        break
+                        return
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
