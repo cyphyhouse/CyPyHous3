@@ -36,8 +36,3 @@ class BasicFollowApp(AgentThread):
             self.locals['tries'] = 4
             self.stop()
             return
-
-
-m = default_car_moat_config('hotdec_car')
-a = AgentConfig(1, 1, "", 2000, moat_class=MoatTestCar)
-app = BasicFollowApp(a, m)

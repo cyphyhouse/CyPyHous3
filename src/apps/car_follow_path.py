@@ -172,9 +172,3 @@ class BasicFollowApp(AgentThread):
             return
 
 
-
-m = default_car_moat_config('f1car')
-obstacles = [RoundObs(1, 0, 0.75), RoundObs(0, -2, 0.75), RoundObs(-2, 0, 0.75)]
-m.planner = RRT(goal_sample_rate=15, max_iter=100)
-a = AgentConfig(1, 1, "", 2000)
-app = BasicFollowApp(a, m)

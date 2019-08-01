@@ -35,6 +35,3 @@ class BasicFollowApp(AgentThread):
             return
 
 
-m = default_qc_moat_config('cyphyhousecopter')
-a = AgentConfig(1, 1, "", 2000)
-app = BasicFollowApp(a, m)

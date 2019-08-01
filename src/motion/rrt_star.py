@@ -304,12 +304,4 @@ def calc_dist_to_goal(end: Node, x: float, y: float) -> float:
     return np.linalg.norm([x - end.x, y - end.y])
 
 
-'''
-a = RRT()
-p1 = Pos(np.array([0, 0, 0]))
-p2 = Pos(np.array([1, 1, 0]))
-
-c = a.find_path(p1, p2, [])
-print(c)
-'''
 

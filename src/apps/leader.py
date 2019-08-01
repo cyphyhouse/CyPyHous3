@@ -32,12 +32,3 @@ class Leader(AgentThread):
             return
 
 
-plist = [2000, 2001, 2002, 2003, 2004]
-bots = 5
-c1 = AgentConfig(2, bots, "", 2001, plist, BaseMutexHandler(False, 2))
-c2 = AgentConfig(1, bots, "", 2002, plist, BaseMutexHandler(False, 1))
-c4 = AgentConfig(4, bots, "", 2004, plist, BaseMutexHandler(False, 4))
-c5 = AgentConfig(5, bots, "", 2000, plist, BaseMutexHandler(False, 5))
-c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler(True, 0), is_leader=True)
-
-b, c, d, e, f = Leader(c1), Leader(c2), Leader(c3), Leader(c4), Leader(c5)
