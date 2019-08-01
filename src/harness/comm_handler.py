@@ -147,7 +147,6 @@ class CommHandler(Thread):
                 self.stop()
             except OSError:
                 print("unexpected os error on agent", self.agent_gvh.pid)
-
         self.receiver_socket.close()
 
     def handle_msgs(self) -> None:
@@ -162,8 +161,8 @@ class CommHandler(Thread):
 
         for msg in current_list:
             if msg.message_type == 5:
-                print("received stop message")
-                self.join()
+                print("stopping commhandler on agent", self.agent_gvh.pid)
+                # self.join()
             if msg.message_type in list(message_handler.keys()):
                 message_handler[msg.message_type](msg, self.agent_gvh)
         self.agent_gvh.recv_msg_list = self.agent_gvh.recv_msg_list[len(current_list):]

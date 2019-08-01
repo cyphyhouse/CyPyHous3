@@ -19,6 +19,10 @@ class Task(object):
     def __repr__(self):
         return str(self.id) + " assigned to " + str(self.assigned_to)
 
+    def assign(self, id: int) -> None:
+        self.assigned = True
+        self.assigned_to = id
+
 
 def get_tasks(taskfile):
     """

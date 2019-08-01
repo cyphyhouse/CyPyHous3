@@ -169,6 +169,8 @@ def clear_path(paths: list, proposed_path: list, ignore=None, tolerance=0.5) -> 
     :return: true if clear, false otherwise
     """
     # print("ignoring", ignore)
+    if proposed_path is None:
+        return False
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:
             if path_is_close(paths[i], proposed_path, tolerance):

@@ -1,7 +1,4 @@
-import time
-
 from src.config.configs import AgentConfig, MoatConfig
-from src.config.configs import BotType
 from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
 from src.objects.udt import get_tasks
@@ -11,74 +8,49 @@ class TaskApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(TaskApp, self).__init__(agent_config, moat_config)
-        self.rounds = 10
         self.start()
 
     def initialize_vars(self):
         self.initialize_lock('pick_route')
         self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='tasks.txt'))
-        self.agent_gvh.create_ar_var('route', list, [])
-        self.agent_gvh.put('route', [self.agent_gvh.moat.position], self.pid())
-        self.locals['mytask'] = None
-
-    def reset(self):
-        if self.locals['mytask'] is not None and not self.agent_gvh.moat.reached:
-            return False
-        elif self.locals['mytask'] is not None and self.agent_gvh.moat.reached:
-            self.agent_gvh.put('route', [self.agent_gvh.moat.position], self.pid())
-            self.locals['mytask'] = None
-            return True
+        self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position])
+        self.locals['my_task'] = None
+        self.locals['test_route'] = None
+        self.locals['doing'] = False
 
     def loop_body(self):
 
-        if self.reset():
+        if not self.locals['doing']:
+            if sum([a.assigned for a in self.read_from_shared('tasks', None)]) == len(
+                    self.read_from_shared('tasks', None)):
+                self.stop()
+                return
+
             if self.lock('pick_route'):
-                tasks = self.agent_gvh.get('tasks')
-                route = self.agent_gvh.get('route')
-                for i in range(len(tasks)):
-                    if not tasks[i].assigned:
-                        self.locals['mytask'] = tasks[i]
-
-                        if self.locals['mytask'].location.z > 0 and self.agent_gvh.moat.bot_type == BotType.CAR:
-                            continue
-                        if self.locals['mytask'].location.z <= 0 and self.agent_gvh.moat.bot_type == BotType.QUAD:
-                            continue
-
-                        testroute = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
-                                                                          self.locals['mytask'].location)
-                        if clear_path(route, testroute, self.pid()):
-                            tasks[i].assigned = True
-                            tasks[i].assigned_to = self.pid()
-                            route = testroute
-                            self.agent_gvh.put('tasks', tasks)
-                            self.agent_gvh.put('route', route, self.pid())
-                            self.agent_gvh.moat.follow_path(testroute)
+                for i in range(len(self.read_from_shared('tasks', None))):
+                    if not self.read_from_shared('tasks', None)[i].assigned:
+                        self.locals['my_task'] = self.read_from_shared('tasks', None)[i]
+                        self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
+                                                                                          self.locals[
+                                                                                              'my_task'].location,
+                                                                                          obstacles=[])
+                        if clear_path(self.read_from_shared('route', None), self.locals['test_route'], self.pid()):
+                            self.locals['doing'] = True
+                            self.read_from_shared('tasks', None)[i].assign(self.pid())
+                            self.agent_gvh.put('tasks', self.read_from_shared('tasks', None))
+                            self.agent_gvh.put('route', self.locals['test_route'], self.pid())
+                            self.agent_gvh.moat.follow_path(self.locals['test_route'])
                         else:
                             self.agent_gvh.put('route', [self.agent_gvh.moat.position],
                                                self.pid())
-                            self.locals['mytask'] = None
+                            self.locals['my_task'] = None
+                            self.locals['doing'] = False
                             continue
-
                         self.unlock('pick_route')
                         break
-
-                time.sleep(0.1)
-                self.rounds -= 1
-
-                if all(task.assigned for task in tasks):
-                    if self.locals['mytask'] is None:
-                        self.stop()
-                        return
-
-                    elif self.locals['mytask'] is not None and self.agent_gvh.moat.reached:
-                        self.stop()
-                        return
-                    else:
-                        return
-
-            if self.rounds <= 0:
-                if not self.agent_gvh.is_leader:
-                    self.stop()
-
-            if not self.agent_gvh.is_alive:
-                self.stop()
+        else:
+            if self.agent_gvh.moat.reached:
+                if self.locals['my_task'] is not None:
+                    self.locals['my_task'] = None
+                self.locals['doing'] = False
+                return
