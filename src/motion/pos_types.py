@@ -126,6 +126,7 @@ class Seg(object):
         """
         self.start = start
         self.end = end
+        self.vector = end - start
 
     def __repr__(self) -> str:
         """

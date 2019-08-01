@@ -290,8 +290,8 @@ def gen_final_course(node_list: list, start: Node, end: Node, goal_ind: int) -> 
 
     node = node_list[goal_ind]
     seg_last_two_points = Seg(Pos(np.array([node.x, node.y, node.z])), Pos(np.array([end.x, end.y, end.z])))
-    if (seg_last_two_points.length() <= 0.1): #magic number (change to something better later)
-        goal_ind = node.parent # skip last point because it is very close to end point
+    if seg_last_two_points.length() <= 0.1:  # magic number (change to something better later)
+        goal_ind = node.parent  # skip last point because it is very close to end point
 
     while node_list[goal_ind].parent is not None:
         node = node_list[goal_ind]

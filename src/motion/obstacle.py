@@ -1,17 +1,18 @@
 import typing
+from abc import ABC, abstractmethod
 import numpy as np
 
 from src.motion.pos_types import Pos, Seg, Node
 
 
-class Obstacle(object):
+class Obstacle(ABC):
     def __init__(self, point: Pos, size: np.ndarray):
         """
         initialize obs object
         """
         
-        __position = point
-        __size = size
+        self.__position = point
+        self.__size = size
 
     @property
     def position(self) -> Pos:
@@ -50,22 +51,23 @@ class Obstacle(object):
     def collision_check(self, obj) -> bool:
         """
         Collision check method
+        return true if safe, false if there is a collision
         """
-        if obj is Pos:
-            return self.__collision_point(obj)
-        elif obj is Seg:
-            return self.__collision_path(obj)
-        return False
+        if isinstance(obj, Pos):
+            return self._collision_point(obj)
+        elif isinstance(obj, Seg):
+            return self._collision_path(obj)
+        return True
 
     @abstractmethod
-    def __collision_point(self, point: Pos) -> bool:
+    def _collision_point(self, point: Pos) -> bool:
         """
         Collision check method for points
         """
         pass
 
     @abstractmethod
-    def __collision_path(self, path: Seg) -> bool:
+    def _collision_path(self, path: Seg) -> bool:
         """
         Collision check method for paths
         """
