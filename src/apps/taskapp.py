@@ -34,6 +34,7 @@ class TaskApp(AgentThread):
                                                                                           self.locals[
                                                                                               'my_task'].location, [])
                         if clear_path(self.read_from_shared('route', None), self.locals['test_route'], self.pid()):
+                            print("i am doing task",self.locals['mytask'].id)
                             self.locals['doing'] = True
                             self.read_from_shared('tasks', None)[i].assign(self.pid())
                             self.agent_gvh.put('tasks', self.read_from_shared('tasks', None))
