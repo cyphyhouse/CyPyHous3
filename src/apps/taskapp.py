@@ -1,8 +1,10 @@
+import time
+
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
 from src.objects.udt import get_tasks
-import time
+
 
 class TaskApp(AgentThread):
 
@@ -19,7 +21,7 @@ class TaskApp(AgentThread):
         self.locals['doing'] = False
 
     def loop_body(self):
-        time.sleep(3)
+        time.sleep(1)
 
         if not self.locals['doing']:
             print("still alive")
@@ -29,15 +31,17 @@ class TaskApp(AgentThread):
                 return
 
             if self.lock('pick_route'):
-                tasks = self.read_from_shared('tasks',None)
+                tasks = self.read_from_shared('tasks', None)
                 for i in range(len(tasks)):
                     if not self.read_from_shared('tasks', None)[i].assigned:
                         self.locals['my_task'] = tasks[i]
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location, [])
-                        if clear_path([path for path in [self.read_from_shared('route', pid) for pid in range(self.num_agents())]], self.locals['test_route'], self.pid()):
-                            print("i am doing task",self.locals['my_task'].id)
+                        if clear_path([path for path in
+                                       [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
+                                      self.locals['test_route'], self.pid()):
+                            print("i am doing task", self.locals['my_task'].id)
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
                             tasks[i] = self.locals['my_task']
