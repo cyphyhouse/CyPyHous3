@@ -12,7 +12,7 @@ class TaskApp(AgentThread):
 
     def initialize_vars(self):
         self.initialize_lock('pick_route')
-        self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='tasks.txt'))
+        self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='./tasks.txt'))
         self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position])
         self.locals['my_task'] = None
         self.locals['test_route'] = None
