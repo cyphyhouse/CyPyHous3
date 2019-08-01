@@ -49,7 +49,7 @@ class TaskApp(AgentThread):
                             self.locals['doing'] = False
                             continue
                         self.unlock('pick_route')
-                        time.sleep(0,5)
+                        time.sleep(0.5)
                         break
         else:
             if self.agent_gvh.moat.reached:
