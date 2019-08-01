@@ -7,7 +7,7 @@ from src.motion.simpleplanner import SimplePlanner
 from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.moat_test_car import MoatTestCar
 
-bots = 2
+bots = 1
 mhargs = [[True,0], [False, 1], [False,2], [False,3]]
 plist = []
 r_port = 2000
