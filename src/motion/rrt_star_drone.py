@@ -218,8 +218,9 @@ class RRT(Planner):
         :return:
         """
         tmp_node = copy.deepcopy(near_node)
-
-        for i in range(int(dir_seg.length() / self.expand_dis)):
+        
+        d = dir_seg.length()
+        for i in range(int(d / self.expand_dis)):
             dir_uvec = dir_seg.direction()
             tmp_node.x += self.expand_dis * dir_uvec.x
             tmp_node.y += self.expand_dis * dir_uvec.y
