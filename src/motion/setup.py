@@ -36,7 +36,7 @@ setup(
     name="reeds_shepp",
     version="0.1.1",
     description="Code to calculate analytic Reeds Shepp path",
-    long_description=read('README.rst'),
+    # long_description=read('README.rst'),
     author="Guan-Horng Liu",
     author_email="guanhorl@andrew.cmu.edu",
     license="BSD",
