@@ -35,6 +35,7 @@ class TaskApp(AgentThread):
                     if not self.read_from_shared('tasks', None)[i].assigned:
                         self.locals['my_task'] = self.locals['tasks'][i]
                         print(self.locals['my_task'].location)
+
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location)

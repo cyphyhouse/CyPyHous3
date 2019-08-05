@@ -26,6 +26,7 @@ moatcar = MoatTestCar
 moatdrone = MoatTestDrone
 a0 = AgentConfig(pid[0], bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[0], is_leader=mhargs[0][0])
 a1, m1 = get_configs(config_filename=sys.argv[1])
+m1.planner = RRT
 m0 = default_car_moat_config('hotdec_car')
 m0.planner = RRT
 a0.moat_class = MoatTestCar
