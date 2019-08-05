@@ -15,5 +15,3 @@ def send(msg: Message, ip: str, port: int) -> None:
     client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     client_sock.sendto(pickle.dumps(msg), (ip, port))
     client_sock.close()
-
-

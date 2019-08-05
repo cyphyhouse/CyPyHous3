@@ -1,8 +1,10 @@
+import time
+
 import numpy as np
 
 from src.motion.motionautomaton import MotionAutomaton
 from src.motion.pos_types import Pos
-import time
+
 
 class MoatTestDrone(MotionAutomaton):
 
@@ -33,7 +35,6 @@ class MoatTestDrone(MotionAutomaton):
             time.sleep(0.1)
         print("take off successful")
         pass
-
 
     def moat_exit_action(self):
         # TODO: maybe incorporate call to best here?

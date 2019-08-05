@@ -1,8 +1,9 @@
 from typing import Union
+
 import pyximport
+
 pyximport.install()
 import reeds_shepp
-import numpy as np
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node
 
