@@ -28,7 +28,6 @@ class BasicFollowApp(AgentThread):
             self.agent_gvh.moat.goTo(self.locals['dest2'])
             time.sleep(5)
             self.locals['tries'] = 3
-
             return
         if self.locals['tries'] == 3:
             self.agent_gvh.moat.goTo(self.locals['dest3'])

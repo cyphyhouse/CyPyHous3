@@ -19,33 +19,31 @@ class TaskApp(AgentThread):
         self.locals['my_task'] = None
         self.locals['test_route'] = None
         self.locals['doing'] = False
+        self.locals['tasks'] = []
 
     def loop_body(self):
         time.sleep(1)
-
         if not self.locals['doing']:
-            print("still alive")
             if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
                 self.stop()
                 return
 
             if self.lock('pick_route'):
-                tasks = self.read_from_shared('tasks', None)
-                for i in range(len(tasks)):
+                self.locals['tasks'] = self.read_from_shared('tasks', None)
+                for i in range(len(self.locals['tasks'])):
                     if not self.read_from_shared('tasks', None)[i].assigned:
-                        self.locals['my_task'] = tasks[i]
+                        self.locals['my_task'] = self.locals['tasks'][i]
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location, [])
                         if clear_path([path for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
                                       self.locals['test_route'], self.pid()):
-                            print("i am doing task", self.locals['my_task'].id)
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
-                            tasks[i] = self.locals['my_task']
-                            self.agent_gvh.put('tasks', tasks)
+                            self.locals['tasks'][i] = self.locals['my_task']
+                            self.agent_gvh.put('tasks', self.locals['tasks'])
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
                             self.agent_gvh.moat.follow_path(self.locals['test_route'])
                         else:

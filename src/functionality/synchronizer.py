@@ -36,7 +36,7 @@ class Synchronizer(ABC):
         self.__is_synced = sync
 
     @abstractmethod
-    def synchronize(self):
+    def synchronize_wait(self):
         """
         any synchronizer object must implement a synchronization method
         """

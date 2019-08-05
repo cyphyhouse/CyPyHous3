@@ -1,7 +1,9 @@
 from typing import Tuple, Optional
+
 import yaml
 
 from src.config.configs import AgentConfig, MoatConfig
+from src.config.config_dicts import *
 
 
 def __validate(cfg) -> bool:
@@ -22,15 +24,15 @@ def get_configs(config_filename: str) \
 
     # Make AgentConfig
     pid = agent_dict['pid']
-    is_leader=(cfg['leader_pid'] == agent_dict['pid'])
+    is_leader = (cfg['leader_pid'] == agent_dict['pid'])
     if not is_using_moat:
         moat_class = None
     else:
-        from .config_dicts import moat_class_dict
+        #from .config_dicts import moat_class_dict
         moat_class = moat_class_dict[agent_dict['motion_automaton']]
 
-    from .config_dicts import mutex_handler_dict
-    mh = mutex_handler_dict[cfg['mutex_handler']](pid, is_leader)
+    #from .config_dicts import mutex_handler_dict
+    mh = mutex_handler_dict[cfg['mutex_handler']]
 
     agent_conf = AgentConfig(
         # Shared configs
@@ -44,12 +46,13 @@ def get_configs(config_filename: str) \
         is_leader=is_leader,
         mh=mh,
         plist=agent_dict['plist'],
+        mhargs=[is_leader,pid]
     )
 
     if not is_using_moat:
         return agent_conf, None
     # else:
-    from .config_dicts import planner_dict, bot_type_dict, msg_type_dict
+    #from .config_dicts import planner_dict, bot_type_dict
     moat_conf = MoatConfig(
         bot_name=device_dict['bot_name'],
         bot_type=bot_type_dict[device_dict['bot_type']],

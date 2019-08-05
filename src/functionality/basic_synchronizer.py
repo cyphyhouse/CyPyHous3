@@ -1,5 +1,10 @@
-from src.objects.message import Message
+import time
+
+from src.config.configs import AgentConfig
+from src.functionality.comm_funcs import send
 from src.functionality.synchronizer import Synchronizer
+from src.harness.message_handler import round_update_create
+from src.objects.message import Message
 
 
 class BasicSynchronizer(Synchronizer):
@@ -12,17 +17,20 @@ class BasicSynchronizer(Synchronizer):
     __retries : integer number of retries to synchronize
     """
 
-    def __init__(self, pid: int, participants: int, ip_port_list: list):
+    def __init__(self, a: AgentConfig):
         """
         init method for basic synchronizer object
         :param participants: number of participants to synchronize
         """
         super(BasicSynchronizer, self).__init__()
-        self.pid = pid
-        self.__participants = participants
-        self.__synclist = []
+        self.pid = a.pid
+        self.__participants = a.bots
+        self.__sync_list = []
         self.__round_num = 0
-        self.__ip_port_list = ip_port_list
+        if not a.plist == []:
+            self.__ip_port_list = a.plist
+        else:
+            self.__ip_port_list = [a.rport]
         self.__retries = 100
 
     @property
@@ -38,21 +46,21 @@ class BasicSynchronizer(Synchronizer):
         return self.__ip_port_list
 
     @property
-    def synclist(self) -> list:
+    def sync_list(self) -> list:
         """
         getter method for the sync list
         :return:
         """
-        return self.__synclist
+        return self.__sync_list
 
-    @synclist.setter
-    def synclist(self, synclist: list) -> None:
+    @sync_list.setter
+    def sync_list(self, sync_list: list) -> None:
         """
-        setter method for synclist
-        :param synclist: list to be set
+        setter method for sync_list
+        :param sync_list: list to be set
         :return: none
         """
-        self.__synclist = synclist
+        self.__sync_list = sync_list
 
     @property
     def participants(self) -> int:
@@ -79,8 +87,12 @@ class BasicSynchronizer(Synchronizer):
         """
         self.__round_num = round_num
 
-    def synchronize(self):
-        #print("synchronizing", self.pid)
+    def send_sync_message(self):
+        for port in self.ip_port_list:
+            send(round_update_create(self.pid, self.round_num, time.time()), "<broadcast>", port)
+
+    def synchronize_wait(self):
+        # print("synchronizing", self.pid)
         tries = 0
         while not self.is_synced:
             tries += 1
@@ -89,7 +101,7 @@ class BasicSynchronizer(Synchronizer):
             if tries == self.retries:
                 print("giving up on sync")
                 break
-            if len(self.synclist) == self.participants - 1:
+            if len(self.sync_list) == self.participants - 1:
                 self.is_synced = True
                 self.round_num += 1
                 self.reset_synclist()
@@ -103,14 +115,14 @@ class BasicSynchronizer(Synchronizer):
         :param agent: agent
         :return:
         """
-        self.__synclist.append(agent)
+        self.__sync_list.append(agent)
 
     def reset_synclist(self) -> None:
         """
         reset synclist
         :return:
         """
-        self.synclist = []
+        self.sync_list = []
 
     def handle_sync_message(self, msg: Message):
         """
@@ -118,12 +130,13 @@ class BasicSynchronizer(Synchronizer):
         :param msg: message to be handled.
         :return:
         """
+        print("here")
         sender = msg.sender
         round_num = msg.content
         if round_num > self.round_num + 1:
-            raise RoundSyncError
+            print("error")
         else:
-            if sender in self.synclist or sender == self.pid:
+            if sender in self.sync_list or sender == self.pid:
                 pass
             else:
                 self.add_sync(sender)

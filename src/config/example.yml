@@ -1,17 +1,18 @@
 agent:
-  on_device: drone2
-  pid: 2
+  motion_automaton: MoatTestDrone
+  on_device: drone1
+  pid: 1
   plist:
-  - 2001
+  - 2002
   - 2003
 device:
-  bot_name: drone2
+  bot_name: drone1
   bot_type: QUAD
   ip: 127.0.0.1
   motion_automata:
   - MoatTestDrone
   planner: SimplePlanner
-  port: 2002
+  port: 2001
   positioning_topic:
     topic: /vrpn_client_node/
     type: PoseStamped

@@ -1,7 +1,6 @@
 # functions for message handling. use dictionary to call them
 
 import src.objects.message as message
-from src.functionality.basic_synchronizer import RoundSyncError
 from src.harness.gvh import Gvh
 
 
@@ -74,11 +73,8 @@ def round_update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     """
     try:
         agent_gvh.synchronizer.handle_sync_message(msg)
-    except RoundSyncError:
-        import time
-        time.sleep(0.01)
-        print("attempting to sync")
-
+    except:
+        print("error")
 
 def base_mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     """
@@ -135,7 +131,7 @@ def stop_comm_msg_handle(msg: message.Message, agent_gvh: Gvh) -> None:
 
 
 def message_update_handle(msg: message.Message, agent_gvh: Gvh):
-    print("got an update message",msg)
+    # print("got an update message",msg)
     var = msg.content
     updater = msg.sender
     for i in range(len(agent_gvh.dsm)):
