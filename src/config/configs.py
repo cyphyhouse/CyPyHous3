@@ -103,10 +103,13 @@ def gen_positioning_params(config: MoatConfig):
 
 
 def gen_reached_params(config: MoatConfig):
+    #todo : return config.bot_name + '/' + config.rospy_node + '/' + config.reached_topic, config.rchd_msg_type
     return config.rospy_node + '/' + config.reached_topic, config.rchd_msg_type
 
 
+
 def gen_waypoint_params(config: MoatConfig):
+    #todo : return config.bot_name + '/' + config.rospy_node + '/' + config.waypoint_topic, config.pos_msg_type
     return config.rospy_node + '/' + config.waypoint_topic, config.pos_msg_type
 
 
