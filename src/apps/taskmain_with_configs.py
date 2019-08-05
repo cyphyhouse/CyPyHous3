@@ -32,4 +32,4 @@ m0.planner = RRT
 a0.moat_class = MoatTestCar
 #print(m0,"\n\n",m1)
 # print(m1.pos_msg_type)
-TaskApp(a1, m1)
+TaskApp(a1, m0)
