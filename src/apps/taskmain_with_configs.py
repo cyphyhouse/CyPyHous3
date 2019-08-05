@@ -32,6 +32,7 @@ r_ip = ""
 pid = [0,1,2,3]
 
 a_c, m_c = get_configs(sys.argv[1])
+m_c.planner = RRT(goal_sample_rate=15)
 
 moatcar = MoatTestCar
 moatdrone = MoatTestDrone
@@ -45,7 +46,7 @@ m0 = default_car_moat_config('hotdec_car')
 m1 = default_car_moat_config('f1car')
 m2 = default_qc_moat_config('cyphyhousecopter')
 m3 = default_qc_moat_config('cyphyhousecopter1')
-m0.planner = Reeds_Shepp_Planner()
+m0.planner = RRT()
 m1.planner = RRT_CAR(goal_sample_rate=15)
 m2.planner = RRT_DRONE()
 m3.planner = RRT_DRONE()
@@ -54,5 +55,5 @@ m3.planner = RRT_DRONE()
 a, m = a0, m0
 a.moat_class = MoatTestCar
 a_c.moat_class = MoatTestCar
-app = TaskApp(a_c,m)
+app = TaskApp(a_c,m_c)
 
