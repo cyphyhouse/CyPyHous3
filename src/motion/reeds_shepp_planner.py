@@ -3,7 +3,7 @@ from typing import Union
 import pyximport
 
 pyximport.install()
-import reeds_shepp
+import src.motion.reeds_shepp.reeds_shepp as reeds_shepp
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node
 
