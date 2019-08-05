@@ -4,13 +4,15 @@
 from src.config.configs import BotType
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.demo_planner import DemoPlan
+#from src.motion.reeds_shepp_planner import Reeds_Shepp_Planner
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.rrt_star import RRT
 from src.motion.simpleplanner import SimplePlanner
 
 planner_dict = dict()
-planner_dict['SimplePlanner'] = SimplePlanner()
+planner_dict['SimplePlanner'] = SimplePlanner
+#planner_dict['Reeds_Shepp_Planner'] = Reeds_Shepp_Planner
 planner_dict['RRT'] = RRT
 planner_dict['DemoPlan'] = DemoPlan
 
