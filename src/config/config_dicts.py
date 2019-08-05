@@ -5,6 +5,9 @@ from src.config.configs import BotType
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.demo_planner import DemoPlan
 #from src.motion.reeds_shepp_planner import Reeds_Shepp_Planner
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import String
+
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.rrt_star import RRT
@@ -17,8 +20,10 @@ planner_dict['RRT'] = RRT
 planner_dict['DemoPlan'] = DemoPlan
 
 msg_type_dict = dict()
-msg_type_dict['PoseStamped'] = 'PoseStamped'
-msg_type_dict['String'] = 'String'
+
+
+msg_type_dict['PoseStamped'] = PoseStamped
+msg_type_dict['String'] = String
 
 bot_type_dict = dict()
 bot_type_dict['CAR'] = BotType.CAR
