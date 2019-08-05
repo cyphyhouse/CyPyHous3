@@ -5,4 +5,5 @@ from src.apps.taskapp import TaskApp
 
 a1, m1 = get_configs(config_filename=sys.argv[1])
 
-TaskApp(a1, m1)
+print(m1)
+#TaskApp(a1, m1)
