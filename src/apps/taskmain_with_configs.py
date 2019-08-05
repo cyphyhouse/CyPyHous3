@@ -29,6 +29,6 @@ a1, m1 = get_configs(config_filename=sys.argv[1])
 m0 = default_car_moat_config('hotdec_car')
 m0.planner = RRT
 a0.moat_class = MoatTestCar
-print(m0. == m1, a0 == a1)
+print( a0 == a1)
 # print(m1.pos_msg_type)
 #TaskApp(a1, m1)
