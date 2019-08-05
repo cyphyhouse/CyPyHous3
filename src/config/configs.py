@@ -23,6 +23,16 @@ class AgentConfig(object):
         self.is_leader = is_leader
         self.moat_class = moat_class
 
+    def __eq__(self, other):
+        return self.pid == other.pid and\
+               self.bots == other.bots and\
+               self.rip == other.rip and \
+               self.rport == other.rport and\
+               self.plist == other.plist and\
+               self.mutex_handler == other.mutex_handler and\
+               self.is_leader == other.is_leader and \
+               self.moat_class == other.moat_class
+
     def __repr__(self):
         s = ""
         s += "pid" + ":" + str(self.pid) + "\n"
@@ -104,12 +114,12 @@ def gen_positioning_params(config: MoatConfig):
 
 def gen_reached_params(config: MoatConfig):
     return config.bot_name + '/' + config.rospy_node + '/' + config.reached_topic, config.rchd_msg_type
-    #return config.rospy_node + '/' + config.reached_topic, config.rchd_msg_type
+    # return config.rospy_node + '/' + config.reached_topic, config.rchd_msg_type
 
 
 def gen_waypoint_params(config: MoatConfig):
     return config.bot_name + '/' + config.rospy_node + '/' + config.waypoint_topic, config.pos_msg_type
-    #return config.rospy_node + '/' + config.waypoint_topic, config.pos_msg_type
+    # return config.rospy_node + '/' + config.waypoint_topic, config.pos_msg_type
 
 
 # TODO generate default simulation moat car config
