@@ -53,5 +53,6 @@ m3.planner = RRT_DRONE()
 #change this line
 a, m = a0, m0
 a.moat_class = MoatTestCar
+a_c.moat_class = MoatTestCar
 app = TaskApp(a_c,m)
 
