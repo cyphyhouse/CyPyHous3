@@ -11,8 +11,7 @@ r_port = 2000
 r_ip = ""
 pid = [0, 1, 2, 3]
 
-a0 = AgentConfig(pid[0], bots, r_ip, r_port, plist, BaseMutexHandler, mhargs=mhargs[0], is_leader=mhargs[0][0])
 m0 = default_car_moat_config('hotdec_car')
 a1, m1 = get_configs(config_filename=sys.argv[1])
-print (a1,"\n\n",a0)
+print(m0,"\n\n",m1)
 # TaskApp(a1, m1)
