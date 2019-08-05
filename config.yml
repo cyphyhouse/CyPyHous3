@@ -6,7 +6,7 @@ agent:
 device:
   bot_name: hotdec_car
   bot_type: CAR
-  ip: 127.0.0.1
+  ip:
   motion_automata:
   - MoatTestCar
   planner: RRT
