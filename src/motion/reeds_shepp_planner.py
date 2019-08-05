@@ -11,7 +11,7 @@ class Reeds_Shepp_Planner(Planner):
     Class for Reeds Shepp Path Planning
     '''
 
-    def __init__(self, rho: float = 0.75, step_size: float = 0.8):
+    def __init__(self, rho: float = 0.75, step_size: float = 0.80):
         super(Reeds_Shepp_Planner, self).__init__()
         self.rho = rho
         self.step_size = step_size
