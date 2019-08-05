@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import copy
 
 from src.motion.obstacle import Obstacle
 from src.motion.pos_types import Pos, Seg
@@ -16,7 +17,8 @@ class CylObs(Obstacle):
 
         return math.sqrt(d) > self.size[0]
 
-    def _collision_path(self, path: Seg) -> bool:
+    def _collision_path(self, orig_path: Seg) -> bool:
+        path = copy.deepcopy(orig_path)
         path.start.z = 0
         path.end.z = 0
         path.vector.z = 0
