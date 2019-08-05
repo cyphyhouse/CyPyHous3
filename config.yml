@@ -12,7 +12,7 @@ device:
   planner: RRT
   port: 2000
   positioning_topic:
-    topic: /vrpn_client_node/
+    topic: vrpn_client_node/
     type: PoseStamped
   queue_size: 10
   reached_topic:
