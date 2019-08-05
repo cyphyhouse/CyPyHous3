@@ -1,13 +1,13 @@
 from typing import Union
 import pyximport
-
 pyximport.install()
-import src.motion.reeds_shepp.reeds_shepp as reeds_shepp
+import reeds_shepp
 import numpy as np
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node
 
 
+# Test comment hjbhk
 # TODO: Implement obstacle avoidance
 
 class Reeds_Shepp_Planner(Planner):
@@ -40,11 +40,14 @@ class Reeds_Shepp_Planner(Planner):
         final_path = []
         for tuple in computed_path:
             final_path.append(Node(tuple[0], tuple[1], 0))
+        final_path.append(end)
         return final_path
 
 
+'''
 # Test case
 start = Pos(np.array([0., 0., 0.]))
-end = Pos(np.array([2.5, 2.0, 0.]))
+end = Pos(np.array([2.0, 1.5, 0.]))
 rs = Reeds_Shepp_Planner().find_path(start, end)
 print(rs)
+'''
