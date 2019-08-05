@@ -5,5 +5,5 @@ from src.apps.taskapp import TaskApp
 
 a1, m1 = get_configs(config_filename=sys.argv[1])
 
-print(m1)
+print(type(m1.pos_msg_type))
 #TaskApp(a1, m1)
