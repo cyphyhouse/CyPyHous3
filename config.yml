@@ -9,7 +9,7 @@ device:
   ip: ""
   motion_automata:
   - MoatTestCar
-  planner: RRT
+  planner: Reeds_Shepp_Planner
   port: 2000
   positioning_topic:
     topic: /vrpn_client_node/
