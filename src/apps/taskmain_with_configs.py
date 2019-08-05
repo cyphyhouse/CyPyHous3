@@ -31,6 +31,7 @@ r_port = 2000
 r_ip = ""
 pid = [0,1,2,3]
 
+a_c, m_c = get_configs(sys.argv[1])
 
 moatcar = MoatTestCar
 moatdrone = MoatTestDrone
@@ -52,5 +53,5 @@ m3.planner = RRT_DRONE()
 #change this line
 a, m = a0, m0
 a.moat_class = MoatTestCar
-app = TaskApp(a,m)
+app = TaskApp(a,m_c)
 
