@@ -37,7 +37,7 @@ class TaskApp(AgentThread):
                         print(self.locals['my_task'].location)
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
-                                                                                              'my_task'].location, [])
+                                                                                              'my_task'].location)
                         if clear_path([path for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
                                       self.locals['test_route'], self.pid()):
