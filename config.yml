@@ -9,12 +9,12 @@ device:
   ip: ""
   motion_automata:
   - MoatTestCar
-  planner: Reeds_Shepp_Planner
+  planner: RRT
   port: 2000
   positioning_topic:
     topic: /vrpn_client_node/
     type: PoseStamped
-  queue_size: 1
+  queue_size: 10
   reached_topic:
     topic: reached
     type: String
@@ -24,4 +24,4 @@ device:
     type: PoseStamped
 leader_pid: 0
 mutex_handler: BaseMutexHandler
-num_agents: 2
+num_agents: 1
