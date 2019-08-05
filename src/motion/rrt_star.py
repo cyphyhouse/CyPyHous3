@@ -41,6 +41,7 @@ class RRT(Planner):
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
         """
+        print("testing",self,start, end)
         if obstacle_list is None:
             obstacle_list = []
         print("here, start:",start, "end:",end)
