@@ -49,8 +49,8 @@ class RRT(Planner):
             obstacle_list = []
         start = to_node(start)
         end = to_node(end)
-        print("Start ", start)
-        print("End", end)
+        #print("Start ", start)
+        #print("End", end)
         if end.z == 0:
             print("z = 0, point not valid for drone")
             return None
@@ -73,7 +73,6 @@ class RRT(Planner):
                 last_index = self.get_best_last_index(node_list, end)
                 if last_index:
                     path = gen_final_course(node_list, start, end, last_index)
-                    #path = path[::2]
                     return path[::-1]
 
         print("Reached max iteration")
@@ -81,7 +80,6 @@ class RRT(Planner):
         last_index = self.get_best_last_index(node_list, end)
         if last_index:
             path = gen_final_course(node_list, start, end, last_index)
-            #path = path[::2]
             return path[::-1]
 
         return None
@@ -95,15 +93,14 @@ class RRT(Planner):
         :param nearinds:
         :return:
         """
-
         if not nearinds:
             return new_node
 
         dlist = []
         for i in nearinds:
             d_seg = Seg(node_list[i], new_node)
-            d = d_seg.length()
-            if self.check_collision_extend(obstacle_list, node_list[i], d_seg):
+            if self.check_collision_extend(obstacle_list, d_seg):
+                d = d_seg.length()
                 dlist.append(node_list[i].cost + d)
             else:
                 dlist.append(float("inf"))
@@ -112,7 +109,7 @@ class RRT(Planner):
         minind = nearinds[dlist.index(mincost)]
 
         if mincost == float("inf"):
-            print("mincost is inf")
+            #print("mincost is inf")
             return new_node
 
         new_node.cost = mincost
@@ -128,7 +125,6 @@ class RRT(Planner):
         :param nind:
         :return:
         """
-
         # expand tree
         nearest_node = node_list[nind]
 
@@ -153,7 +149,6 @@ class RRT(Planner):
         :param end:
         :return:
         """
-
         if random.randint(0, 100) > self.goal_sample_rate:
             rnd = [random.uniform(self.min_xrand, self.max_xrand),
                    random.uniform(self.min_yrand, self.max_yrand),
@@ -170,7 +165,6 @@ class RRT(Planner):
         :param end:
         :return:
         """
-
         disglist = [calc_dist_to_goal(end,
                                       node.x, node.y, node.z) for node in node_list]
         goal_inds = [disglist.index(i) for i in disglist if i <= self.expand_dis]
@@ -199,16 +193,14 @@ class RRT(Planner):
             near_node = node_list[i]
 
             d_seg = Seg(near_node, new_node)
-
-
             scost = new_node.cost + d_seg.length()
 
             if near_node.cost > scost:
-                if self.check_collision_extend(obstacle_list, near_node, d_seg):
+                if self.check_collision_extend(obstacle_list, d_seg):
                     near_node.parent = nnode - 1
                     near_node.cost = scost
 
-    def check_collision_extend(self, obstacle_list: list, near_node: Node, dir_seg: Seg):
+    def check_collision_extend(self, obstacle_list: list, dir_seg: Seg):
         """
         extended check collision
         :param obstacle_list:
@@ -216,6 +208,7 @@ class RRT(Planner):
         :param theta:
         :param d:
         :return:
+        """
         """
         tmp_node = copy.deepcopy(near_node)
         
@@ -228,6 +221,12 @@ class RRT(Planner):
             if not self.__collision_check(tmp_node, obstacle_list):
                 return False
         return True
+        """
+        for obs in obstacle_list:
+            if not obs.collision_check(dir_seg):
+                return False
+
+        return True
 
     def __collision_check(self, node: Node, obstacle_list: list) -> bool:
         """
@@ -236,12 +235,9 @@ class RRT(Planner):
         :param obstacle_list:
         :return:
         """
-
         for obs in obstacle_list:
             try:
-                obs_seg = Seg(node.to_pos(), obs.to_pos())
-                d = obs_seg.length_xy()
-                if d <= obs.radius:
+                if not obs.collision_check(node.to_pos()):
                     return False  # collision
             except AttributeError:
                 print("obstacle might not be correctly formatted")
@@ -314,11 +310,18 @@ def calc_dist_to_goal(end: Node, x: float, y: float, z: float) -> float:
 
 '''
 a = RRT()
-p1 = Pos(np.array([-1, 0, 1]))
-p2 = Pos(np.array([1, 0, 1]))
+p1 = Pos(np.array([-2, 0, 1]))
+p2 = Pos(np.array([2, 0, 1]))
 
-from src.motion.pos import RoundObs
-o1 = RoundObs(0,0,0.5,1)
-c = a.find_path(p1, p2, [o1])
+from src.motion.cylobs import CylObs
+o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
+
+import time
+loops = 100
+start_time = time.time()
+for i in range(loops):
+    c = a.find_path(p1, p2, [o1])
+elapsed_time = time.time() - start_time
+print(elapsed_time/loops)
 print(c)
 '''
