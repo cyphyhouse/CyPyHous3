@@ -1,5 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import argparse
+
+from src.config.config_funcs import get_configs
 
 
 def get_opt_args():
@@ -22,15 +24,28 @@ def get_app_name(appfile):
 
 
 def import_app(appfile, appname):
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(appname, appfile)
-    foo = importlib.util.module_from_spec(spec)
-    return spec, foo
+    from importlib import machinery
+    loader = machinery.SourceFileLoader(appname, appfile)
+    mod = loader.load_module()
+    app = getattr(mod, appname)
+    return app
 
 
-def run_app(app_name):
-    pass
+def run_app(appfile, configfile):
+    appname = get_app_name(appfile)
+    app = import_app(appfile, appname)
+    ac, mc = get_configs(configfile)
+    app(ac, mc)
 
 
 if __name__ == '__main__':
-    appfile = get_opt_args()[0]
+    appfile = None
+    configfile = None
+    try:
+        appfile = get_opt_args()[0]
+        configfile = get_opt_args()[1]
+        run_app(appfile, configfile)
+    except IndexError:
+        print("invalid app and config input. Use -h for help")
+    if appfile is None or configfile is None:
+        print("invalid app and config input. Use -h for help")
