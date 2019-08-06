@@ -7,14 +7,10 @@ def get_opt_args():
     group = parser.add_argument_group()
     group.add_argument('-a', '--app', action='store')
     group.add_argument('-c', '--config', action='store')
-    group.add_argument('-b', '--bot', type=int, action='store')
-    group.add_argument('-m', '--moat', type=int, action='store')
     args = parser.parse_args()
     appfile = args.app
-    botnum = args.bot
-    moatnum = args.moat
     configfile = args.config
-    return (appfile, configfile, botnum, moatnum)
+    return (appfile, configfile)
 
 
 def get_app_name(appfile):
@@ -25,20 +21,16 @@ def get_app_name(appfile):
     return appname
 
 
-def mk_app_file(appfile, configfile=None, botnum=-1, moatnum=-1):
-    a = get_app_name(appfile)
-    appsrc = str(appfile[:-3]).replace("/", ".")
-    app_import_stmt = 'from ' + appsrc + " import " + str(a) + "\n"
-    config_import_stmt = "from src.config.config_funcs import get_configs\n"
-    import_stmt = app_import_stmt + config_import_stmt
-    app_config_stmt = str(a) + "(*get_configs(" + str(configfile) + "," + str(botnum) + "," + str(moatnum) + "))"
-    app_file_text = import_stmt + "\n" + app_config_stmt
-    app_file_name = "run_" + a + ".py"
-    f = open(app_file_name, 'w')
-    f.write(app_file_text)
-    f.close()
+def import_app(appfile, appname):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(appname, appfile)
+    foo = importlib.util.module_from_spec(spec)
+    return spec, foo
+
+
+def run_app(app_name):
+    pass
 
 
 if __name__ == '__main__':
     appfile = get_opt_args()[0]
-    mk_app_file(appfile)

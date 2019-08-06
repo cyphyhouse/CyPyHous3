@@ -140,7 +140,6 @@ def default_car_moat_config(bot_name) -> MoatConfig:
     pos_msg_type = PoseStamped
     rchd_msg_type = String
     from src.motion.simpleplanner import SimplePlanner
-
     return MoatConfig(waypoint_topic, reached_topic, rospy_node, bot_name, queue_size, bot_type, pos_node, pos_msg_type,
                       rchd_msg_type, SimplePlanner())
 
@@ -150,10 +149,8 @@ def default_qc_moat_config(bot_name) -> MoatConfig:
     bot_type = BotType.QUAD
     waypoint_topic = 'waypoint'
     reached_topic = 'reached'
-
     from geometry_msgs.msg import PoseStamped
     from std_msgs.msg import String
-
     queue_size = 10
     bot_name = bot_name
     pos_node = 'vrpn_client_node/'
