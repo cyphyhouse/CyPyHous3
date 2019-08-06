@@ -5,6 +5,10 @@ from src.config.config_funcs import get_configs
 
 
 def get_opt_args():
+    """
+    pass a config file and an appname as command line arguments.
+    :return:
+    """
     parser = argparse.ArgumentParser()
     group = parser.add_argument_group()
     group.add_argument('-a', '--app', action='store')
@@ -16,6 +20,11 @@ def get_opt_args():
 
 
 def get_app_name(appfile):
+    """
+    get the appname from the app file.
+    :param appfile:
+    :return:
+    """
     appcode = open(appfile).read()
     end = appcode.find("(AgentThread)")
     begin = appcode[:end].rfind("class ") + 6
@@ -24,6 +33,12 @@ def get_app_name(appfile):
 
 
 def import_app(appfile, appname):
+    """
+    dynamic import of the appname from the appfile.
+    :param appfile:
+    :param appname:
+    :return:
+    """
     from importlib import machinery
     loader = machinery.SourceFileLoader(appname, appfile)
     mod = loader.load_module()
@@ -32,6 +47,12 @@ def import_app(appfile, appname):
 
 
 def run_app(appfile, configfile):
+    """
+    run the app specified in the appfile , with configuration from the configfile.
+    :param appfile:
+    :param configfile:
+    :return:
+    """
     appname = get_app_name(appfile)
     app = import_app(appfile, appname)
     ac, mc = get_configs(configfile)
@@ -39,6 +60,9 @@ def run_app(appfile, configfile):
 
 
 if __name__ == '__main__':
+    """
+    script to call the run_app functions
+    """
     appfile = None
     configfile = None
     try:
