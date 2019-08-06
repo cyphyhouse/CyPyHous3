@@ -24,7 +24,7 @@ class RRT(Planner):
     """
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.5, goal_sample_rate: int = 15,
-                 max_iter: int = 200):
+                 max_iter: int = 500):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-2.5, 2.5, -2.5, 2.5, 0.5, 2.5]
@@ -66,8 +66,9 @@ class RRT(Planner):
                 self.node_list.append(new_node)
 
             if self.calc_dist_to_goal(end, new_node.x, new_node.y, new_node.z) <= self.expand_dis:
-                path = self.gen_final_course(start, end, new_node)
-                return self.path_smoothing(obstacle_list, path[::-1], 100)
+                if self.check_collision(obstacle_list, Seg(new_node, end)):
+                    path = self.gen_final_course(start, end, new_node)
+                    return self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
 
