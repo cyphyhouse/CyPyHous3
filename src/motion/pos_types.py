@@ -176,7 +176,7 @@ class Node(Pos):
         self.parent = None
 
     def to_pos(self):
-        return Pos(np.array([self.x, self.y, self.z]))
+        return Pos(np.array([self.x, self.y, self.z, self.yaw]))
 
 
 def distance(x: Pos, y: Pos) -> float:
