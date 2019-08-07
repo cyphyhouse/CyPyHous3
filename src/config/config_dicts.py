@@ -4,7 +4,6 @@
 from src.config.configs import BotType
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.demo_planner import DemoPlan
-from src.motion.reeds_shepp_planner import Reeds_Shepp_Planner
 
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.moat_test_drone import MoatTestDrone
