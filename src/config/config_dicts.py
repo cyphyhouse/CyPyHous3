@@ -15,7 +15,6 @@ from src.motion.simpleplanner import SimplePlanner
 
 planner_dict = dict()
 planner_dict['SimplePlanner'] = SimplePlanner
-planner_dict['Reeds_Shepp_Planner'] = Reeds_Shepp_Planner
 planner_dict['RRT_STAR_CAR'] = RRT_STAR_CAR
 planner_dict['RRT_DRONE'] = RRT_DRONE
 planner_dict['RRT_STAR_DRONE'] = RRT_STAR_DRONE
