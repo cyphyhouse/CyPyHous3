@@ -68,7 +68,7 @@ class RRT(Planner):
             if self.check_collision(obstacle_list, node_path):
                 self.node_list.append(new_node)
 
-            if self.calc_dist_to_goal(end, new_node.x, new_node.y) <= self.expand_dis/2:
+            if self.close_to_goal(end, new_node):
                 if self.check_collision(obstacle_list, Seg(new_node, end)):
                     path = self.gen_final_course(start, end, new_node)
                     # path = path[::-1]
@@ -95,7 +95,6 @@ class RRT(Planner):
             vel = self.expand_dis
         else:
             vel = -self.expand_dis
-            
 
         tmp_cost = []
         tmp_node = []
@@ -189,20 +188,33 @@ class RRT(Planner):
         path.append(Pos(np.array([start.x, start.y, 0, start.yaw])))
         return path
 
-    def calc_dist_to_goal(self, end: Node, x: float, y: float) -> float:
-        """
-        calculate the distance to goal
-        :param end:
-        :param x:
-        :param y:
-        :return:
-        """
-        return np.linalg.norm([x - end.x, y - end.y, 0])
+    def close_to_goal(self, end: Node, node: Node) -> bool:
+        dist = math.sqrt((end.x - node.x)**2 + (end.y - node.y)**2)
+        if dist <= self.expand_dis:
+            if dist <= 0.1:
+                return True
+
+            end_theta = math.atan2(end.y - node.y, end.x - node.x)
+            if end_theta < 0:
+                end_theta = end_theta + math.pi
+            tmp_yaw = node.yaw
+            if tmp_yaw < 0:
+                tmp_yaw = tmp_yaw + math.pi
+            theta_diff = tmp_yaw - end_theta
+
+            if abs(theta_diff) <= 0.3:
+                return True
+            else:
+                return False
+        else:
+            return False
     
-    def path_smoothing(self, obstacle_list: list, path: list, max_iter: int):
+    def path_smoothing(self, obstacle_list: list, path: list, max_iter: int) -> list:
         """
         smooth path
+        :param obstacle_list:
         :param path:
+        :param max_iter:
         :return:
         """
 
@@ -215,7 +227,7 @@ class RRT(Planner):
                 
                 point0 = path[pickPoints[0]]
                 point1 = path[pickPoints[1]]
-                if (pickPoints[1] == path_len-1):
+                if pickPoints[1] == (path_len-1):
                     end_theta = math.atan2(point1.y - point0.y, point1.x - point0.x)
                     theta_diff = point0.yaw - end_theta
                 else:
@@ -234,7 +246,7 @@ class RRT(Planner):
 '''
 a = RRT()
 p1 = Pos(np.array([-2, 0, 0]))
-p2 = Pos(np.array([-2, 0.5, 0]))
+p2 = Pos(np.array([2, 0, 0]))
 
 from src.motion.cylobs import CylObs
 o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
@@ -243,7 +255,7 @@ import time
 loops = 1
 start_time = time.time()
 for i in range(loops):
-    p = a.find_path(p1, p2)
+    p = a.find_path(p1, p2, [o1])
 elapsed_time = time.time() - start_time
 print(elapsed_time/loops)
 print(p)
