@@ -61,7 +61,7 @@ def get_configs(config_filename: str) \
         rchd_msg_type=msg_type_dict[device_dict['reached_topic']['type']],
         pos_node=device_dict['positioning_topic']['topic'],
         pos_msg_type=msg_type_dict[device_dict['positioning_topic']['type']],
-        planner=planner_dict[device_dict['planner']],
+        planner=planner_dict[device_dict['planner']](),
         queue_size=device_dict['queue_size'],
         rospy_node=device_dict['ros_node_prefix']
     )
