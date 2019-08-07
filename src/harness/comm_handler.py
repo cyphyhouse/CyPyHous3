@@ -30,6 +30,7 @@ class CommHandler(Thread):
         :param retries:
         """
         super(CommHandler, self).__init__()
+        self.setDaemon(True)
         self.__ip = a.rip
         self.__r_port = a.rport
         self.__agent_gvh = agent_gvh
@@ -142,6 +143,9 @@ class CommHandler(Thread):
                 data, addr = self.receiver_socket.recvfrom(4096)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
+            except KeyboardInterrupt:
+                print("interrupted")
+                self.stop()
             except socket.timeout:
                 print("agent", self.agent_gvh.pid, "timed out")
                 self.stop()
