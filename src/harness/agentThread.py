@@ -130,14 +130,9 @@ class AgentThread(ABC, Thread):
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
-            msg1 = stop_comm_msg_create(self.pid(), time.time())
-            if self.agent_gvh.port_list == []:
-                send(msg1, "", self.agent_comm_handler.r_port)
-            else:
-                for port in self.agent_gvh.port_list:
-                    send(msg1, "", port)
-            # todo : send stop message to comm_handler
+            import socket
             if not self.agent_comm_handler.stopped():
+                self.agent_comm_handler.receiver_socket.shutdown(socket.SHUT_WR)
                 self.agent_comm_handler.stop()
 
         if not self.stopped():
