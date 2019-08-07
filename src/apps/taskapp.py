@@ -24,7 +24,7 @@ class TaskApp(AgentThread):
         self.locals['test_route'] = None
         self.locals['doing'] = False
         self.locals['tasks'] = []
-        self.locals['obstacles'] = CylObs(Pos(np.array([0., 0., 0.])), 0.5)
+        self.locals['obstacles'] = [CylObs(Pos(np.array([0., 0., 0.])), 0.5)]
 
     def loop_body(self):
         time.sleep(1)
