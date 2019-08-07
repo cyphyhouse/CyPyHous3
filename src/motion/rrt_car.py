@@ -37,10 +37,9 @@ class RRT(Planner):
         self.max_iter = max_iter
         self.node_list = []
         self.d = 0.3
+        self.vel_steps = 2
         self.configs = [[expand_dis, 0], [expand_dis, 0.1], [expand_dis, 0.2], [expand_dis, 0.3],
-                        [expand_dis, -0.1], [expand_dis, -0.2], [expand_dis, -0.3],
-                        [-expand_dis, 0], [-expand_dis, 0.1], [-expand_dis, 0.2], [-expand_dis, 0.3],
-                        [-expand_dis, -0.1], [-expand_dis, -0.2], [-expand_dis, -0.3]]
+                        [expand_dis, -0.1], [expand_dis, -0.2], [expand_dis, -0.3]]
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
@@ -69,10 +68,13 @@ class RRT(Planner):
             if self.check_collision(obstacle_list, node_path):
                 self.node_list.append(new_node)
 
-            if self.calc_dist_to_goal(end, new_node.x, new_node.y) <= self.expand_dis:
+            if self.calc_dist_to_goal(end, new_node.x, new_node.y) <= self.expand_dis/2:
                 if self.check_collision(obstacle_list, Seg(new_node, end)):
                     path = self.gen_final_course(start, end, new_node)
-                    return path[::-1]
+                    # path = path[::-1]
+                    # for i in range(len(path)):
+                    #    print(path[i])
+                    return self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
         return None
@@ -86,33 +88,41 @@ class RRT(Planner):
         """
         # expand tree
         nearest_node = self.node_list[nind]
-
-        seg_nn_to_rnd = Seg(nearest_node, Pos(np.array(rnd)))
-        nn_to_rnd_uvec = seg_nn_to_rnd.direction()
+        
+        theta_rnd = math.atan2(rnd[1] - nearest_node.y, rnd[0] - nearest_node.x)
+        theta_diff = nearest_node.yaw - theta_rnd
+        if abs(theta_diff) <= math.pi/2:
+            vel = self.expand_dis
+        else:
+            vel = -self.expand_dis
+            
 
         tmp_cost = []
         tmp_node = []
 
         for cmd in self.configs:
-            if cmd[1] == 0:
-                x_next = cmd[0]*math.cos(nearest_node.yaw) + nearest_node.x
-                y_next = cmd[0]*math.sin(nearest_node.yaw) + nearest_node.y
-                yaw_next = nearest_node.yaw
-            else:
-                tan_theta = math.tan(cmd[1])
-                c = cmd[0]*tan_theta / self.d
-                x_next = self.d*(math.cos(nearest_node.yaw) - math.cos(c + nearest_node.yaw))/tan_theta + nearest_node.x
-                y_next = self.d*(math.sin(c + nearest_node.yaw) - math.sin(nearest_node.yaw))/tan_theta + nearest_node.y
-                yaw_next = c + nearest_node.yaw
-                if yaw_next > math.pi:
-                    yaw_next = yaw_next - 2*math.pi
-                if yaw_next < -math.pi:
-                    yaw_next = yaw_next + 2*math.pi
-            tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
-            tmp_node.append(Node(x_next, y_next, 0, yaw_next))
+            for i in range(1, self.vel_steps+1):
+                cmd_vel = (i/self.vel_steps)*vel
+                if cmd[1] == 0:
+                    x_next = cmd_vel*math.cos(nearest_node.yaw) + nearest_node.x
+                    y_next = cmd_vel*math.sin(nearest_node.yaw) + nearest_node.y
+                    yaw_next = nearest_node.yaw
+                else:
+                    tan_theta = math.tan(cmd[1])
+                    c = cmd_vel*tan_theta / self.d
+                    x_next = self.d*(math.cos(nearest_node.yaw) - math.cos(c + nearest_node.yaw))/tan_theta + nearest_node.x
+                    y_next = self.d*(math.sin(c + nearest_node.yaw) - math.sin(nearest_node.yaw))/tan_theta + nearest_node.y
+                    yaw_next = c + nearest_node.yaw
+                    if yaw_next > math.pi:
+                        yaw_next = yaw_next - 2*math.pi
+                    elif yaw_next < -math.pi:
+                        yaw_next = yaw_next + 2*math.pi
+                tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
+                tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
         minind = tmp_cost.index(min(tmp_cost))
         new_node = tmp_node[minind]
+        
 
         new_node.parent = nearest_node
         return new_node
@@ -175,10 +185,10 @@ class RRT(Planner):
 
         node = last_node
         while node.parent is not None:
-            print(node.to_pos())
-            path.append(Pos(np.array([node.x, node.y, 0])))
+            # print(node.to_pos())
+            path.append(Pos(np.array([node.x, node.y, 0, node.yaw])))
             node = node.parent
-        path.append(Pos(np.array([start.x, start.y, 0])))
+        path.append(Pos(np.array([start.x, start.y, 0, start.yaw])))
         return path
 
     def calc_dist_to_goal(self, end: Node, x: float, y: float) -> float:
@@ -190,7 +200,33 @@ class RRT(Planner):
         :return:
         """
         return np.linalg.norm([x - end.x, y - end.y, 0])
+    
+    def path_smoothing(self, obstacle_list: list, path: list, max_iter: int):
+        """
+        smooth path
+        :param path:
+        :return:
+        """
 
+        for _ in range(max_iter):
+            path_len = len(path)
+            pickPoints = [random.randint(0, path_len-1), random.randint(0, path_len-1)]
+            if not ((pickPoints[0] == pickPoints[1]) or (abs(pickPoints[0] - pickPoints[1]) == 1)):
+                # don't waste cpu time if points are the same or sequential
+                pickPoints.sort()
+                
+                point0 = path[pickPoints[0]]
+                point1 = path[pickPoints[1]]
+                theta_diff = point0.yaw - point1.yaw
+                if (abs(theta_diff) <= 0.3) or (pickPoints[1] == path_len-1):
+                    pass
+                else:
+                    continue
+                sub_seg = Seg(point0, point1)
+                if not self.check_collision(obstacle_list, sub_seg):
+                    continue
+                path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
+        return path
 
 '''
 a = RRT()
@@ -208,4 +244,6 @@ for i in range(loops):
 elapsed_time = time.time() - start_time
 print(elapsed_time/loops)
 print(p)
+for i in range(len(p)):
+    print(p[i])
 '''

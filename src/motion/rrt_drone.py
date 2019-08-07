@@ -174,13 +174,13 @@ class RRT(Planner):
         for _ in range(max_iter):
             path_len = len(path)
             pickPoints = [random.randint(0, path_len-1), random.randint(0, path_len-1)]
-            if not (pickPoints[0] == pickPoints[1]):
+            if not ((pickPoints[0] == pickPoints[1]) or (abs(pickPoints[0] - pickPoints[1]) == 1)):
+                # don't waste cpu time if points are the same or sequential
                 pickPoints.sort()
-                if not (pickPoints[0]+1 == pickPoints[1]):
-                    sub_seg = Seg(path[pickPoints[0]], path[pickPoints[1]])
-                    if not self.check_collision(obstacle_list, sub_seg):
-                        continue
-                    path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
+                sub_seg = Seg(path[pickPoints[0]], path[pickPoints[1]])
+                if not self.check_collision(obstacle_list, sub_seg):
+                    continue
+                path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
         return path
 
 
