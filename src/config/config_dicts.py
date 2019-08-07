@@ -11,6 +11,7 @@ from src.motion.rrt_star import RRT as RRT_STAR_CAR
 from src.motion.rrt_drone import RRT as RRT_DRONE
 from src.motion.rrt_star_drone import RRT as RRT_STAR_DRONE
 from src.motion.rrt_star_dubins import RRT_DUBINS as RRT_DUB_CAR
+from src.motion.rrt_car import RRT as RRT_CAR
 from src.motion.simpleplanner import SimplePlanner
 
 planner_dict = dict()
@@ -19,6 +20,7 @@ planner_dict['RRT_STAR_CAR'] = RRT_STAR_CAR
 planner_dict['RRT_DRONE'] = RRT_DRONE
 planner_dict['RRT_STAR_DRONE'] = RRT_STAR_DRONE
 planner_dict['RRT_DUB_CAR'] = RRT_DUB_CAR
+planner_dict['RRT_CAR'] = RRT_CAR
 planner_dict['DemoPlan'] = DemoPlan
 
 msg_type_dict = dict()
