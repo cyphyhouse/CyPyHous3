@@ -65,7 +65,6 @@ def get_configs(config_filename: str) \
         queue_size=device_dict['queue_size'],
         rospy_node=device_dict['ros_node_prefix']
     )
-
     return agent_conf, moat_conf
 
 
