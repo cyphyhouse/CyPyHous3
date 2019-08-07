@@ -1,12 +1,8 @@
 import time
 
-import numpy as np
-
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
-from src.motion.cylobs import CylObs
 from src.motion.deconflict import clear_path
-from src.motion.pos_types import Pos
 from src.objects.udt import get_tasks
 
 
@@ -24,7 +20,7 @@ class TaskApp(AgentThread):
         self.locals['test_route'] = None
         self.locals['doing'] = False
         self.locals['tasks'] = []
-        self.locals['obstacles'] = [CylObs(Pos(np.array([0., 0., 0.])), 0.5)]
+        self.locals['obstacles'] = []
 
     def loop_body(self):
         time.sleep(1)
