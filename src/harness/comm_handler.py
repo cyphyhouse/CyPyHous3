@@ -147,7 +147,10 @@ class CommHandler(Thread):
                 self.stop()
             except OSError:
                 print("unexpected os error on agent", self.agent_gvh.pid)
-        self.receiver_socket.close()
+        try:
+            self.receiver_socket.close()
+        except:
+            print("maybe socket already closed")
 
     def handle_msgs(self) -> None:
         """
