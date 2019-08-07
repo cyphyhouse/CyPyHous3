@@ -73,7 +73,7 @@ class RRT(Planner):
                     path = self.gen_final_course(start, end, new_node)
                     # path = path[::-1]
                     # for i in range(len(path)):
-                    #    print(path[i])
+                    #   print(path[i])
                     return self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
@@ -122,7 +122,6 @@ class RRT(Planner):
 
         minind = tmp_cost.index(min(tmp_cost))
         new_node = tmp_node[minind]
-        
 
         new_node.parent = nearest_node
         return new_node
@@ -185,7 +184,6 @@ class RRT(Planner):
 
         node = last_node
         while node.parent is not None:
-            # print(node.to_pos())
             path.append(Pos(np.array([node.x, node.y, 0, node.yaw])))
             node = node.parent
         path.append(Pos(np.array([start.x, start.y, 0, start.yaw])))
@@ -217,8 +215,13 @@ class RRT(Planner):
                 
                 point0 = path[pickPoints[0]]
                 point1 = path[pickPoints[1]]
-                theta_diff = point0.yaw - point1.yaw
-                if (abs(theta_diff) <= 0.3) or (pickPoints[1] == path_len-1):
+                if (pickPoints[1] == path_len-1):
+                    end_theta = math.atan2(point1.y - point0.y, point1.x - point0.x)
+                    theta_diff = point0.yaw - end_theta
+                else:
+                    theta_diff = point0.yaw - point1.yaw
+                
+                if abs(theta_diff) <= 0.3:
                     pass
                 else:
                     continue
@@ -231,7 +234,7 @@ class RRT(Planner):
 '''
 a = RRT()
 p1 = Pos(np.array([-2, 0, 0]))
-p2 = Pos(np.array([2, 0, 0]))
+p2 = Pos(np.array([-2, 0.5, 0]))
 
 from src.motion.cylobs import CylObs
 o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
@@ -240,7 +243,7 @@ import time
 loops = 1
 start_time = time.time()
 for i in range(loops):
-    p = a.find_path(p1, p2, [o1])
+    p = a.find_path(p1, p2)
 elapsed_time = time.time() - start_time
 print(elapsed_time/loops)
 print(p)
