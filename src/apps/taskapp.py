@@ -46,15 +46,18 @@ class TaskApp(AgentThread):
                         if clear_path([path for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
                                       self.locals['test_route'], self.pid(), tolerance=0.75):
+                        '''
+                        if True:
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
                             self.locals['tasks'][i] = self.locals['my_task']
                             self.agent_gvh.put('tasks', self.locals['tasks'])
-                            self.agent_gvh.put('route', self.locals['test_route'], self.pid())
-                            self.agent_gvh.moat.follow_path(self.locals['test_route'])
+                            #self.agent_gvh.put('route', self.locals['test_route'], self.pid())
+                            #self.agent_gvh.moat.follow_path(self.locals['test_route'])
+                        '''
                         
                         else:
-                            
+
                             self.agent_gvh.put('route', [self.agent_gvh.moat.position],
                                                self.pid())
                             self.locals['my_task'] = None
