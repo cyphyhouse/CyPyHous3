@@ -14,7 +14,7 @@ class TaskApp(AgentThread):
 
     def initialize_vars(self):
         self.initialize_lock('pick_route')
-        self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='src/apps/tasks_old.txt'))
+        self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='src/apps/tasks.txt'))
         self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position])
         self.locals['my_task'] = None
         self.locals['test_route'] = None
@@ -35,7 +35,7 @@ class TaskApp(AgentThread):
                 for i in range(len(self.locals['tasks'])):
                     if not self.read_from_shared('tasks', None)[i].assigned:
                         self.locals['my_task'] = self.locals['tasks'][i]
-                        print(self.locals['my_task'].location)
+                        print("going to task", i, "at", self.locals['my_task'].location)
 
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
@@ -43,7 +43,7 @@ class TaskApp(AgentThread):
                                                                                           self.locals['obstacles'])
                         if clear_path([path for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
-                                      self.locals['test_route'], self.pid(),tolerance=0.75):
+                                      self.locals['test_route'], self.pid(), tolerance=0.75):
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
                             self.locals['tasks'][i] = self.locals['my_task']
