@@ -24,7 +24,7 @@ class RRT(Planner):
     """
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.5, goal_sample_rate: int = 15,
-                 max_iter: int = 500):
+                 max_iter: int = 2000):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-2.5, 2.5, -2.5, 2.5]
@@ -36,10 +36,12 @@ class RRT(Planner):
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
         self.node_list = []
-        self.d = 0.3
-        self.vel_steps = 2
-        self.configs = [[expand_dis, 0], [expand_dis, 0.1], [expand_dis, 0.2], [expand_dis, 0.3],
-                        [expand_dis, -0.1], [expand_dis, -0.2], [expand_dis, -0.3]]
+        self.d = 0.33
+        self.dt = 0.1
+        self.max_vel = 4
+        self.vel_steps = 4
+        self.steer_configs = [0, 0.1, 0.2, 0.3]
+        self.vel_configs = [1, 2, 3, 4]
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
@@ -74,7 +76,7 @@ class RRT(Planner):
                     # path = path[::-1]
                     # for i in range(len(path)):
                     #   print(path[i])
-                    return self.path_smoothing(obstacle_list, path[::-1], 100)
+                    return path[::-1] #self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
         return None
@@ -89,29 +91,41 @@ class RRT(Planner):
         # expand tree
         nearest_node = self.node_list[nind]
         
-        theta_rnd = math.atan2(rnd[1] - nearest_node.y, rnd[0] - nearest_node.x)
-        theta_diff = nearest_node.yaw - theta_rnd
+        nnx = nearest_node.x
+        nny = nearest_node.y
+        nnyaw = nearest_node.yaw
+        
+        theta_rnd = math.atan2(rnd[1] - nny, rnd[0] - nnx)
+        theta_diff = nnyaw - theta_rnd
         if abs(theta_diff) <= math.pi/2:
-            vel = self.expand_dis
+            vel = 1
+            if theta_diff <= 0:
+                dir = 1
+            else:
+                dir = -1
         else:
-            vel = -self.expand_dis
+            vel = -1
+            if theta_diff <= 0:
+                dir = -1
+            else:
+                dir = 1
 
         tmp_cost = []
         tmp_node = []
 
-        for cmd in self.configs:
-            for i in range(1, self.vel_steps+1):
-                cmd_vel = (i/self.vel_steps)*vel
-                if cmd[1] == 0:
-                    x_next = cmd_vel*math.cos(nearest_node.yaw) + nearest_node.x
-                    y_next = cmd_vel*math.sin(nearest_node.yaw) + nearest_node.y
-                    yaw_next = nearest_node.yaw
+        for steer in self.steer_configs:
+            for speed in self.vel_configs:
+                cmd_vel = speed*self.dt*vel
+                if steer == 0:
+                    x_next = cmd_vel*math.cos(nnyaw) + nnx
+                    y_next = cmd_vel*math.sin(nnyaw) + nny
+                    yaw_next = nnyaw
                 else:
-                    tan_theta = math.tan(cmd[1])
+                    tan_theta = math.tan(dir*steer)
                     c = cmd_vel*tan_theta / self.d
-                    x_next = self.d*(math.cos(nearest_node.yaw) - math.cos(c + nearest_node.yaw))/tan_theta + nearest_node.x
-                    y_next = self.d*(math.sin(c + nearest_node.yaw) - math.sin(nearest_node.yaw))/tan_theta + nearest_node.y
-                    yaw_next = c + nearest_node.yaw
+                    x_next = self.d*(math.sin(c + nnyaw) - math.sin(nnyaw))/tan_theta + nnx
+                    y_next = self.d*(math.cos(nnyaw) - math.cos(c + nnyaw))/tan_theta + nny
+                    yaw_next = c + nnyaw
                     if yaw_next > math.pi:
                         yaw_next = yaw_next - 2*math.pi
                     elif yaw_next < -math.pi:
@@ -159,17 +173,20 @@ class RRT(Planner):
         :param rnd:
         :return:
         """
-        dlist = []
-        for node in self.node_list:
-            node_theta = math.atan2(rnd[1] - node.y, rnd[0] - node.x)
-            if node_theta < 0:
-                node_theta = node_theta + math.pi
-            tmp_yaw = node.yaw
-            if tmp_yaw < 0:
-                tmp_yaw = tmp_yaw + math.pi
-            dlist.append((node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 + (tmp_yaw - node_theta) ** 2)
-        minind = dlist.index(min(dlist))
-        return minind
+        if random.randint(0, 100) < 5:
+            return random.randint(0, len(self.node_list)-1)
+        else:
+            dlist = []
+            for node in self.node_list:
+                node_theta = math.atan2(rnd[1] - node.y, rnd[0] - node.x)
+                if node_theta < 0:
+                    node_theta = node_theta + math.pi
+                tmp_yaw = node.yaw
+                if tmp_yaw < 0:
+                    tmp_yaw = tmp_yaw + math.pi
+                dlist.append((node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 + (tmp_yaw - node_theta) ** 2)
+            minind = dlist.index(min(dlist))
+            return minind
 
     def gen_final_course(self, start: Node, end: Node, last_node) -> list:
         """
@@ -191,7 +208,7 @@ class RRT(Planner):
     def close_to_goal(self, end: Node, node: Node) -> bool:
         dist = math.sqrt((end.x - node.x)**2 + (end.y - node.y)**2)
         if dist <= self.expand_dis:
-            if dist <= 0.1:
+            if dist <= 0.2:
                 return True
 
             end_theta = math.atan2(end.y - node.y, end.x - node.x)
@@ -202,7 +219,7 @@ class RRT(Planner):
                 tmp_yaw = tmp_yaw + math.pi
             theta_diff = tmp_yaw - end_theta
 
-            if abs(theta_diff) <= 0.3:
+            if abs(theta_diff) <= 0.2:
                 return True
             else:
                 return False
@@ -246,7 +263,7 @@ class RRT(Planner):
 '''
 a = RRT()
 p1 = Pos(np.array([-2, 0, 0]))
-p2 = Pos(np.array([2, 0, 0]))
+p2 = Pos(np.array([-2, 0.5, 0]))
 
 from src.motion.cylobs import CylObs
 o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
