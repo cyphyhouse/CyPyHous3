@@ -130,8 +130,8 @@ class AgentThread(ABC, Thread):
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
-            #signal.pthread_kill(self.agent_comm_handler.ident, signal.SIGINT)
-            import socket
+            send(stop_comm_msg_create(self.pid(), time.time()), "<broadcast>", self.receiver_port())
+            # signal.pthread_kill(self.agent_comm_handler.ident, signal.SIGINT)
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
         if not self.stopped():

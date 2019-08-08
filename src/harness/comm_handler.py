@@ -30,7 +30,6 @@ class CommHandler(Thread):
         :param retries:
         """
         super(CommHandler, self).__init__()
-        self.setDaemon(True)
         self.__ip = a.rip
         self.__r_port = a.rport
         self.__agent_gvh = agent_gvh
@@ -167,9 +166,9 @@ class CommHandler(Thread):
         current_list = self.agent_gvh.recv_msg_list.copy()
 
         for msg in current_list:
-            if msg.message_type == 5:
+            if msg.message_type == 5 and msg.sender == self.agent_gvh.pid:
                 print("stopping commhandler on agent", self.agent_gvh.pid)
-                # self.join()
+                self.stop()
             if msg.message_type in list(message_handler.keys()):
                 message_handler[msg.message_type](msg, self.agent_gvh)
         self.agent_gvh.recv_msg_list = self.agent_gvh.recv_msg_list[len(current_list):]
