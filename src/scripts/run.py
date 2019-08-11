@@ -2,6 +2,7 @@
 import argparse
 
 from src.config.config_funcs import get_configs
+from src.harness.agentThread import AgentThread
 
 
 def get_opt_args():
@@ -46,17 +47,17 @@ def import_app(appfile, appname):
     return app
 
 
-def run_app(appfile, configfile):
+def run_app(appfile, configfile) -> AgentThread:
     """
     run the app specified in the appfile , with configuration from the configfile.
     :param appfile:
     :param configfile:
-    :return:
+    :return: instantiated AgentThread
     """
     appname = get_app_name(appfile)
     app = import_app(appfile, appname)
     ac, mc = get_configs(configfile)
-    app(ac, mc)
+    return app(ac, mc)
 
 
 if __name__ == '__main__':
