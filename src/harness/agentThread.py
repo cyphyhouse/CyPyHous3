@@ -65,14 +65,14 @@ class AgentThread(ABC, Thread):
             return False
         else:
             if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
-                #if self.agent_gvh.ack_nums[key] == self.agent_gvh.req_nums[key] - 1:
+                # if self.agent_gvh.ack_nums[key] == self.agent_gvh.req_nums[key] - 1:
                 #    print("acked")
                 #    pass
-                #else:
+                # else:
                 #    print("requesting")
                 #    self.baselocks[key].request_mutex(self.agent_gvh.req_nums[key] - 1)
                 return False
-            #print("i have mutex", self.pid())
+            # print("i have mutex", self.pid())
         return True
 
     def unlock(self, key: str):
@@ -233,14 +233,13 @@ class AgentThread(ABC, Thread):
         while not self.agent_gvh.init:
             print("sending init", self.pid())
             self.msg_handle()
+            self.initialize_vars()
             if len(self.agent_gvh.port_list) is not 0:
                 for port in self.agent_gvh.port_list:
                     send(init_msg, "<broadcast>", port)
             else:
                 send(init_msg, "<broadcast>", self.receiver_port())
             time.sleep(0.05)
-
-        self.initialize_vars()
 
         while not self.stopped():
             self.msg_handle()
