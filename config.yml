@@ -1,27 +1,6 @@
-agent:
-  motion_automaton: MoatTestCar
-  on_device: hotdec_car
-  pid: 0
-  plist: []
-device:
-  bot_name: hotdec_car
-  bot_type: CAR
-  ip: ""
-  motion_automata:
-  - MoatTestCar
-  planner: RRT_CAR
-  port: 2000
-  positioning_topic:
-    topic: vrpn_client_node/
-    type: PoseStamped
-  queue_size: 10
-  reached_topic:
-    topic: reached
-    type: String
-  ros_node_prefix: waypoint_node
-  waypoint_topic:
-    topic: waypoint
-    type: PoseStamped
-leader_pid: 0
-mutex_handler: BaseMutexHandler
-num_agents: 1
+{agent: {motion_automaton: MoatTestCar, on_device: hotdec_car, pid: 0, plist: []},
+  device: {bot_name: hotdec_car, bot_type: CAR, ip: '', motion_automata: [MoatTestCar],
+    planner: RRT_CAR, port: 2000, positioning_topic: {topic: /vrpn_client_node/, type: PoseStamped},
+    queue_size: 10, reached_topic: {topic: reached, type: String}, ros_node_prefix: waypoint_node,
+    waypoint_topic: {topic: waypoint, type: PoseStamped}}, leader_pid: 0, mutex_handler: BaseMutexHandler,
+  num_agents: 1}

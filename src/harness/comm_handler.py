@@ -1,4 +1,5 @@
 import pickle
+import select
 import socket
 from threading import Thread, Event
 
@@ -123,37 +124,41 @@ class CommHandler(Thread):
         """
         return self.__stop_event.is_set()
 
+    def __check_receiving_buffer(self) -> bool:
+        """
+        Check if there are messages in the buffer
+        :return: True if there are messages
+        """
+        r, _, _ = select.select([self.receiver_socket], [], [], 0.001)
+        return bool(r)
+
     def run(self):
         """
         create receiver socket, receive messages.
         :return:
         """
-        self.receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as self.receiver_socket:
+            self.receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-        try:
-            self.receiver_socket.bind((self.ip, self.r_port))
-            self.receiver_socket.settimeout(self.timeout)
-        except OSError:
-            print("perhaps already created socket")
-
-        while not self.stopped():
             try:
-                data, addr = self.receiver_socket.recvfrom(4096)
-                msg = pickle.loads(data)
-                self.agent_gvh.add_recv_msg(msg)
-            except KeyboardInterrupt:
-                print("interrupted")
-                self.stop()
-            except socket.timeout:
-                print("agent", self.agent_gvh.pid, "timed out")
-                self.stop()
+                self.receiver_socket.bind((self.ip, self.r_port))
+                self.receiver_socket.settimeout(self.timeout)
             except OSError:
-                print("unexpected os error on agent", self.agent_gvh.pid)
-        try:
-            self.receiver_socket.close()
-        except:
-            print("maybe socket already closed")
+                print("perhaps already created socket")
+
+            while not self.stopped():
+                try:
+                    if not self.__check_receiving_buffer():  # No message recieved
+                        continue  # TODO Yield to other threads?
+                    else:
+                        data, addr = self.receiver_socket.recvfrom(4096)
+                        msg = pickle.loads(data)
+                        self.agent_gvh.add_recv_msg(msg)
+                except socket.timeout:
+                    print("agent", self.agent_gvh.pid, "timed out")
+                    self.stop()
+                except OSError:
+                    print("unexpected os error on agent", self.agent_gvh.pid)
 
     def handle_msgs(self) -> None:
         """
