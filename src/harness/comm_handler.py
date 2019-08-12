@@ -35,8 +35,8 @@ class CommHandler(Thread):
         self.__agent_gvh = agent_gvh
         self.__stop_event = Event()
         self.__timeout = timeout
-        self.__msgs = []
         self.receiver_socket = None
+
         self.start()
 
     @property

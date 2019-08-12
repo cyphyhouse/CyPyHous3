@@ -32,7 +32,6 @@ class AgentThread(ABC, Thread):
         self.__stop_event = Event()
         self.__mutex_handler = self.__agent_gvh.mutex_handler
         self.requestedlocks = {}
-        self.req_nums = {}
         self.baselocks = {}
         self.locals = {}
 
@@ -50,24 +49,30 @@ class AgentThread(ABC, Thread):
         pass
 
     def initialize_lock(self, key):
-        self.baselocks[key] = BaseMutex(1, self.agent_gvh.port_list)
+        self.baselocks[key] = BaseMutex(key, self.agent_gvh.port_list)
         self.agent_gvh.mutex_handler.add_mutex(self.baselocks[key])
         self.baselocks[key].agent_comm_handler = self.agent_comm_handler
         self.requestedlocks[key] = False
-        self.req_nums[key] = 0
+        self.agent_gvh.req_nums[key] = 0
+        self.agent_gvh.ack_nums[key] = -1
 
     def lock(self, key: str):
         # print("checking locking")
         if not self.requestedlocks[key]:
-            self.baselocks[key].request_mutex(self.req_nums[key])
+            self.baselocks[key].request_mutex(self.agent_gvh.req_nums[key])
             self.requestedlocks[key] = True
-            self.req_nums[key] += 1
-            # print("requesting")
+            self.agent_gvh.req_nums[key] += 1
             return False
         else:
             if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
-                # print("requested not granted")
+                #if self.agent_gvh.ack_nums[key] == self.agent_gvh.req_nums[key] - 1:
+                #    print("acked")
+                #    pass
+                #else:
+                #    print("requesting")
+                #    self.baselocks[key].request_mutex(self.agent_gvh.req_nums[key] - 1)
                 return False
+            #print("i have mutex", self.pid())
         return True
 
     def unlock(self, key: str):
@@ -223,10 +228,20 @@ class AgentThread(ABC, Thread):
         needs to be implemented for any agenThread
         :return:
         """
+        from src.harness.message_handler import init_msg_create
+        init_msg = init_msg_create(self.pid(), time.time())
+        while not self.agent_gvh.init:
+            self.msg_handle()
+            if len(self.agent_gvh.port_list) is not 0:
+                for port in self.agent_gvh.port_list:
+                    send(init_msg, "<broadcast>", port)
+            else:
+                send(init_msg, "<broadcast>", self.receiver_port())
+            time.sleep(0.05)
+
         self.initialize_vars()
 
         while not self.stopped():
-
             self.msg_handle()
             try:
                 self.loop_body()

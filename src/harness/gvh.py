@@ -50,6 +50,29 @@ class Gvh(object):
             self.__moat = a.moat_class(m)
         else:
             self.__moat = None
+        self.req_nums = {}
+        self.ack_nums = {}
+        self.init = False
+        self.init_counter = []
+        if self.is_leader:
+            self.init_counter.append(a.pid)
+
+    @property
+    def rport(self):
+        """
+        getter method for rport
+        :return:
+        """
+        return self.__rport
+
+    @rport.setter
+    def rport(self, rport):
+        """
+        setter method for rport.
+        :param rport:
+        :return:
+        """
+        self.__rport = rport
 
     def start_moat(self):
         if self.moat is not None:
