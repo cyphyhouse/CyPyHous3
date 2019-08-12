@@ -231,6 +231,7 @@ class AgentThread(ABC, Thread):
         from src.harness.message_handler import init_msg_create
         init_msg = init_msg_create(self.pid(), time.time())
         while not self.agent_gvh.init:
+            print("sending init", self.pid())
             self.msg_handle()
             if len(self.agent_gvh.port_list) is not 0:
                 for port in self.agent_gvh.port_list:
