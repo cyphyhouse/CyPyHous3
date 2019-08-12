@@ -43,7 +43,7 @@ class Gvh(object):
         self.__rport = a.rport
         self.__is_leader = a.is_leader
         self.__is_alive = True
-        self.__dsm = None
+        self.__dsm = []
         self.__synchronizer = None
         self.__mutex_handler = a.mutex_handler
         if a.moat_class is not None:
