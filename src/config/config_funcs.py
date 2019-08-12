@@ -1,6 +1,4 @@
-from typing import Tuple, Optional
-
-import yaml
+from typing import Dict, Tuple, Optional
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.config.config_dicts import *
@@ -11,12 +9,10 @@ def __validate(cfg) -> bool:
     return True
 
 
-def get_configs(config_filename: str) \
+def get_configs(cfg: Dict) \
         -> Tuple[AgentConfig, Optional[MoatConfig]]:
-    with open(config_filename) as f:
-        cfg = yaml.load(f)
     if not __validate(cfg):
-        raise ValueError("Invalid YAML file" + config_filename)
+        raise ValueError("Invalid local config value")
 
     agent_dict = cfg['agent']
     device_dict = cfg['device']
@@ -28,10 +24,8 @@ def get_configs(config_filename: str) \
     if not is_using_moat:
         moat_class = None
     else:
-        #from .config_dicts import moat_class_dict
         moat_class = moat_class_dict[agent_dict['motion_automaton']]
 
-    #from .config_dicts import mutex_handler_dict
     mh = mutex_handler_dict[cfg['mutex_handler']]
 
     agent_conf = AgentConfig(
@@ -52,7 +46,6 @@ def get_configs(config_filename: str) \
     if not is_using_moat:
         return agent_conf, None
     # else:
-    #from .config_dicts import planner_dict, bot_type_dict
     moat_conf = MoatConfig(
         bot_name=device_dict['bot_name'],
         bot_type=bot_type_dict[device_dict['bot_type']],
@@ -70,5 +63,9 @@ def get_configs(config_filename: str) \
 
 if __name__ == "__main__":
     import sys
-    new_conf = get_configs(sys.argv[1])
+    import yaml
+
+    with open(sys.argv[1], 'r') as f:
+        cfg = yaml.safe_load(f)
+        new_conf = get_configs(cfg)
     print(new_conf)

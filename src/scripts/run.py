@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import yaml
 
 from src.config.config_funcs import get_configs
 from src.harness.agentThread import AgentThread
@@ -47,17 +48,28 @@ def import_app(appfile, appname):
     return app
 
 
-def run_app(appfile, configfile) -> AgentThread:
+def run_app(appfile, cfg) -> AgentThread:
     """
     run the app specified in the appfile , with configuration from the configfile.
     :param appfile:
-    :param configfile:
+    :param cfg:
     :return: instantiated AgentThread
     """
     appname = get_app_name(appfile)
     app = import_app(appfile, appname)
-    ac, mc = get_configs(configfile)
+    ac, mc = get_configs(cfg)
     return app(ac, mc)
+
+
+def main(appfile, cfg) -> None:
+    try:
+        agent_thread = run_app(appfile, cfg)
+        agent_thread.join()
+    except KeyboardInterrupt:
+        print("User sent SIGINT. Stopping agent thread")
+        agent_thread.stop()
+    finally:
+        agent_thread.join()
 
 
 if __name__ == '__main__':
@@ -69,8 +81,14 @@ if __name__ == '__main__':
     try:
         appfile = get_opt_args()[0]
         configfile = get_opt_args()[1]
-        run_app(appfile, configfile)
+        # TODO Both exception handling and loading files should be integrated to ArgParser
+        if appfile is None or configfile is None:
+            print("invalid app and config input. Use -h for help")
+        else:
+            with open(configfile, 'r') as f:
+                cfg = yaml.safe_load(f)
+                main(appfile, cfg)
     except IndexError:
         print("invalid app and config input. Use -h for help")
-    if appfile is None or configfile is None:
-        print("invalid app and config input. Use -h for help")
+
+
