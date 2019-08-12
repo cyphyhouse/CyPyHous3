@@ -40,8 +40,6 @@ class AgentThread(ABC, Thread):
         self.locals = {}
         self.initialize_vars()
 
-        # create a signal handler to handle ctrl + c
-        signal.signal(signal.SIGINT, self.signal_handler)
         # create init messages, and keep sending until leader acks, then start app thread.
         # leader only starts once everyone has received an ack.
 
@@ -143,9 +141,9 @@ class AgentThread(ABC, Thread):
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
             send(stop_comm_msg_create(self.pid(), time.time()), "<broadcast>", self.receiver_port())
-            # signal.pthread_kill(self.agent_comm_handler.ident, signal.SIGINT)
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
+                self.agent_comm_handler.join()  # Wait until comm_handler finishes
         if not self.stopped():
             self.__stop_event.set()
             print("stopped application thread on agent", self.pid())
@@ -185,15 +183,6 @@ class AgentThread(ABC, Thread):
         :return: string ip of receiver
         """
         return self.agent_comm_handler.ip
-
-    def signal_handler(self, sig, frame):
-        """
-        method for handling ctrl + C safely to stop agent thread.
-        :param sig:
-        :param frame:
-        :return:
-        """
-        self.stop()
 
     def msg_handle(self):
         time.sleep(0.1)
