@@ -2,6 +2,9 @@ import time
 
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d
+import sys
+
+from src.config.config_funcs import get_configs
 
 
 class BasicFollowApp(AgentThread):
@@ -174,3 +177,6 @@ class BasicFollowApp(AgentThread):
             time.sleep(3)
             self.locals['tries'] = 13
             return
+
+a_c, m_c = get_configs(sys.argv[1])
+app = BasicFollowApp(a_c, m_c)

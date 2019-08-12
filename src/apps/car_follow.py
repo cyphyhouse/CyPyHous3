@@ -5,8 +5,6 @@ import sys
 
 from src.config.config_funcs import get_configs
 
-
-
 class BasicFollowApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
@@ -35,7 +33,6 @@ class BasicFollowApp(AgentThread):
                 self.locals['tries'] = 2
                 self.locals['i'] += 1
                 return
-
 
 
 a_c, m_c = get_configs(sys.argv[1])
