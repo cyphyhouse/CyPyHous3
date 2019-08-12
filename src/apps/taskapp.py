@@ -23,7 +23,7 @@ class TaskApp(AgentThread):
         self.locals['obstacles'] = []
 
     def loop_body(self):
-        time.sleep(2)
+        time.sleep(0.1)
         if not self.locals['doing']:
             if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
@@ -58,12 +58,10 @@ class TaskApp(AgentThread):
                             self.locals['doing'] = False
                             continue
                         self.unlock('pick_route')
-                        time.sleep(0.5)
                         break
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
                     self.locals['my_task'] = None
                 self.locals['doing'] = False
-                time.sleep(0.5)
                 return
