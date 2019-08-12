@@ -44,7 +44,7 @@ class TaskApp(AgentThread):
                                                                                           self.locals['obstacles'])
                         if clear_path([path for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
-                                      self.locals['test_route'], self.pid(), tolerance=0.75):
+                                      self.locals['test_route'], self.pid(), tolerance=1.0):
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
                             self.locals['tasks'][i] = self.locals['my_task']
