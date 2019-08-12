@@ -12,6 +12,7 @@ setup(name='src',
           'matplotlib',
           'numpy',
           'scipy',
+          'pyyaml',
       ],
 )
 
