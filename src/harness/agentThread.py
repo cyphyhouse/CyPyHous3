@@ -27,7 +27,6 @@ class AgentThread(ABC, Thread):
         super(AgentThread, self).__init__()
         self.__agent_gvh = Gvh(agent_config, moat_config)
         self.__agent_comm_handler = CommHandler(agent_config, self.__agent_gvh)
-        self.initialize_vars()
         self.__agent_gvh.start_moat()
         self.__agent_gvh.start_mh()
         self.__stop_event = Event()
@@ -35,6 +34,8 @@ class AgentThread(ABC, Thread):
         self.requestedlocks = {}
         self.baselocks = {}
         self.locals = {}
+        self.initialize_vars()
+
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)
