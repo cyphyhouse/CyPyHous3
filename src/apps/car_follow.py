@@ -19,11 +19,10 @@ class BasicFollowApp(AgentThread):
         self.locals['dest3'] = pos3d(2., -1., 0.)
         self.locals['tries'] = 1
         self.locals['i'] = 1
-        self.agent_gvh.moat.reached = True
 
     def loop_body(self):
         while (self.locals['i'] < 5):
-            if self.locals['tries'] == 1 and self.agent_gvh.moat.reached:
+            if self.locals['tries'] == 1:
                 self.agent_gvh.moat.goTo(self.locals['dest1'])
                 self.locals['tries'] = 2
                 return
@@ -33,7 +32,7 @@ class BasicFollowApp(AgentThread):
                 return
             if self.locals['tries'] == 3 and self.agent_gvh.moat.reached:
                 self.agent_gvh.moat.goTo(self.locals['dest3'])
-                self.locals['tries'] = 1
+                self.locals['tries'] = 2
                 self.locals['i'] += 1
                 return
 
