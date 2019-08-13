@@ -23,7 +23,6 @@ class TaskApp(AgentThread):
         self.locals['obstacles'] = []
 
     def loop_body(self):
-        time.sleep(0.1)
         if not self.locals['doing']:
             if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
