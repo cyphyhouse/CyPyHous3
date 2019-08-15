@@ -6,7 +6,7 @@ from threading import Thread, Event
 from src.config.configs import AgentConfig
 from src.harness.gvh import Gvh
 from src.harness.message_handler import message_handler
-
+import time
 # TODO: move to a base config file.
 RETRY_VAL = 10
 
@@ -147,6 +147,7 @@ class CommHandler(Thread):
                 print("perhaps already created socket")
 
             while not self.stopped():
+                time.sleep(0.01)
                 try:
                     if not self.__check_receiving_buffer():  # No message recieved
                         continue  # TODO Yield to other threads?
