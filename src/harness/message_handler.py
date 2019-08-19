@@ -126,6 +126,18 @@ def round_update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     except:
         print("error")
 
+def test_mesg_create(seqnum:int, pid:int):
+    return message.Message(pid,9,seqnum,time.time())
+
+def test_mesg_update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
+    """
+    update number of agents reaching barrier
+    :param msg:
+    :param agent_gvh: agent gvh handling updates
+    :return:
+    """
+    print("received message id", int(msg.content))
+
 
 def base_mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     """
@@ -219,3 +231,4 @@ message_handler[5] = stop_comm_msg_handle
 message_handler[6] = base_mutex_ack_handle
 message_handler[7] = init_msg_handle
 message_handler[8] = init_msg_confirm_handle
+message_handler[9] = test_mesg_update_handle
