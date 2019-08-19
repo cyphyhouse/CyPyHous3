@@ -20,7 +20,7 @@ class AddNums(AgentThread):
 
     def loop_body(self):
         import time
-        time.sleep(0.1)
+        time.sleep(1)
         print("numadded, should be 4 at the end",self.read_from_shared('numadded', None))
 
         if not self.locals['added'] >= 2:
@@ -34,7 +34,7 @@ class AddNums(AgentThread):
             self.unlock('adding')
             print("releasing lock")
             return
-        if self.read_from_shared('numadded', None) == 2* self.num_agents():
+        if self.read_from_shared('numadded', None) == 2 * self.num_agents():
             self.locals['finalsum'] = self.read_from_shared('sum', None)
             print("final sum is", self.locals['finalsum'],"\n")
             self.stop()
