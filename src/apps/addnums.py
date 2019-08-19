@@ -19,6 +19,8 @@ class AddNums(AgentThread):
         self.initialize_lock('adding')
 
     def loop_body(self):
+        import time
+        time.sleep(0.1)
 
         if not self.locals['added'] >= 2:
             if not self.lock('adding'):
