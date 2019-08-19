@@ -153,7 +153,7 @@ class CommHandler(Thread):
                         continue  # TODO Yield to other threads?
                     else:
                         data, addr = self.receiver_socket.recvfrom(4096)
-                        print("packet length",len(data))
+                        #print("packet length",len(data))
                         msg = pickle.loads(data)
                         self.agent_gvh.add_recv_msg(msg)
                 except socket.timeout:

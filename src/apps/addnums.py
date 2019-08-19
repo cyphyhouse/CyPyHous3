@@ -12,7 +12,6 @@ class AddNums(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        print("initing")
         self.locals['added'] = 0
         self.locals['finalsum'] = None
         self.create_aw_var('sum', int, 0)
@@ -20,9 +19,12 @@ class AddNums(AgentThread):
         self.initialize_lock('adding')
 
     def loop_body(self):
+
         if not self.locals['added'] >= 2:
             if not self.lock('adding'):
+                print("checking lock, don't have it")
                 return
+            print(self.locals['added'], "time add")
             self.write_to_shared('sum', None, self.read_from_shared('sum', None) + self.pid() * 2)
             self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
             self.locals['added'] += 1
