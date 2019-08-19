@@ -20,7 +20,7 @@ class AddNums(AgentThread):
 
     def loop_body(self):
         import time
-        #time.sleep(2)
+        time.sleep(1)
         print("numadded, should be 4 at the end",self.read_from_shared('numadded', None))
 
         if not self.locals['added'] >= 2:
