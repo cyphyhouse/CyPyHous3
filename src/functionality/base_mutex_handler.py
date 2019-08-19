@@ -55,6 +55,7 @@ class BaseMutexHandler(MutexHandler):
     def grant_available_mutexes(self, mutex_nums: list):
         if self.__leader:
             for i in range(len(self.__mutexes)):
+                print("mutex",self.__mutexes[i].mutex_id,"holder is",self.__mutexes[i].mutex_holder)
                 if self.__mutexes[i].mutex_holder is None:
                     self.__mutex_nums[i] += 1
                     self.__mutexes[i].grant_mutex(mutex_nums[i])
