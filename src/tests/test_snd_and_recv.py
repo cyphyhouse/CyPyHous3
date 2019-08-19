@@ -21,25 +21,24 @@ class TestSndRecv(AgentThread):
 
     def loop_body(self):
         msg = test_mesg_create(self.locals['seqnum'], self.pid())
-        if self.pid() == 0:
-            if not self.agent_gvh.port_list == []:
-                for port in self.agent_gvh.port_list:
-                    send(msg, "<broadcast>", port)
-            else:
-                send(msg, "<broadcast>", self.agent_gvh.rport)
+        if not self.agent_gvh.port_list == []:
+            for port in self.agent_gvh.port_list:
+                send(msg, "<broadcast>", port)
+        else:
+            send(msg, "<broadcast>", self.agent_gvh.rport)
 
-            self.locals['seqnum'] += 1
+        self.locals['seqnum'] += 1
 
-            if self.locals['seqnum'] == 20:
-                self.stop()
+        if self.locals['seqnum'] == 40:
+            self.stop()
 
 
 bots = 3
 
-a1 = AgentConfig(0, bots, "", rport=2001, plist=[4001,2002,2003], mh=BaseMutexHandler, is_leader=False, mhargs=[False,0])
+a1 = AgentConfig(0, bots, "", rport=2001, plist=[2001,2002,2003], mh=BaseMutexHandler, is_leader=False, mhargs=[False,0])
 a2 = AgentConfig(1, bots, "", rport=2002, plist=[2001,2002,2003], mh=BaseMutexHandler, is_leader=True, mhargs=[True,1])
 a3 = AgentConfig(2, bots, "", rport=2003, plist=[2001,2002,2003], mh=BaseMutexHandler, is_leader=False, mhargs=[False,2])
 
-app1 = TestSndRecv(a1)
-app2 = TestSndRecv(a2)
+#app1 = TestSndRecv(a1)
+#app2 = TestSndRecv(a2)
 app3 = TestSndRecv(a3)

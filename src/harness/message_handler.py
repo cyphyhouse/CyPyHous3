@@ -136,7 +136,7 @@ def test_mesg_update_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     :param agent_gvh: agent gvh handling updates
     :return:
     """
-    print("received message id", int(msg.content))
+    print("received message id", int(msg.content), "from ",int(msg.sender))
 
 
 def base_mutex_request_handle(msg: message.Message, agent_gvh: Gvh) -> None:
