@@ -29,6 +29,7 @@ class AddNums(AgentThread):
             self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
             self.locals['added'] += 1
             self.unlock('adding')
+            print("releasing lock")
             return
         if self.read_from_shared('numadded', None) == 2* self.num_agents():
             self.locals['finalsum'] = self.read_from_shared('sum', None)
