@@ -1,11 +1,9 @@
-import time
-
 from src.config.configs import AgentConfig
-from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
 from src.functionality.comm_funcs import send
 from src.harness.message_handler import test_mesg_create
 
+from src.functionality.base_mutex_handler import BaseMutexHandler
 
 class TestSndRecv(AgentThread):
     """
@@ -20,8 +18,6 @@ class TestSndRecv(AgentThread):
     def initialize_vars(self):
         self.locals['seqnum'] = 0
         self.create_aw_var('seqnum', int, 0)
-        self.initialize_lock('adding')
-        self.locals['loopno'] = 0
 
     def loop_body(self):
         msg = test_mesg_create(self.locals['seqnum'], self.pid())
@@ -37,3 +33,13 @@ class TestSndRecv(AgentThread):
             if self.locals['seqnum'] == 20:
                 self.stop()
 
+
+bots = 3
+
+a1 = AgentConfig(0, bots, "", rport=2001, plist=[4001,2002,2003], mh=BaseMutexHandler, is_leader=False, mhargs=[False,0])
+a2 = AgentConfig(1, bots, "", rport=2002, plist=[2001,2002,2003], mh=BaseMutexHandler, is_leader=True, mhargs=[True,1])
+a3 = AgentConfig(2, bots, "", rport=2003, plist=[2001,2002,2003], mh=BaseMutexHandler, is_leader=False, mhargs=[False,2])
+
+app1 = TestSndRecv(a1)
+app2 = TestSndRecv(a2)
+app3 = TestSndRecv(a3)
