@@ -30,7 +30,7 @@ class TaskApp(AgentThread):
                 return
 
             if self.lock('pick_route'):
-                time.sleep(0.2)
+                time.sleep(1)
                 self.locals['tasks'] = self.read_from_shared('tasks', None)
                 print("Tasks are", self.locals['tasks'])
                 for i in range(len(self.locals['tasks'])):
