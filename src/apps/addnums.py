@@ -20,14 +20,14 @@ class AddNums(AgentThread):
 
     def loop_body(self):
         import time
-        time.sleep(2)
-        print("numadded, should be 4 at the end",self.read_from_shared('numadded', None))
+        #time.sleep(1)
+        #print("numadded, should be",self.num_agents()*2 ,"at the end",self.read_from_shared('numadded', None))
 
         if not self.locals['added'] >= 2:
             if not self.lock('adding'):
-                print("checking lock, don't have it")
+                #print("checking lock, don't have it")
                 return
-            print(self.locals['added'], "time add")
+            print(self.locals['added'], "time add", self.pid())
             self.write_to_shared('sum', None, self.read_from_shared('sum', None) + self.pid() * 2)
             self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
             self.locals['added'] += 1

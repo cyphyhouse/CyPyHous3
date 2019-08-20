@@ -46,6 +46,7 @@ class Gvh(object):
         self.__dsm = []
         self.__synchronizer = None
         self.__mutex_handler = a.mutex_handler
+        self.__window = 1
         if a.moat_class is not None:
             self.__moat = a.moat_class(m)
         else:
@@ -56,6 +57,7 @@ class Gvh(object):
         self.init_counter = []
         if self.is_leader:
             self.init_counter.append(a.pid)
+
 
     @property
     def rport(self):
@@ -144,9 +146,9 @@ class Gvh(object):
         msg = dsm_update_create(self.pid, a, a.owner, time.time())
         if not self.__port_list == []:
             for port in self.__port_list:
-                send(msg, "<broadcast>", port)
+                send(msg, "<broadcast>", port, self.__window)
         else:
-            send(msg, "<broadcast>", self.__rport)
+            send(msg, "<broadcast>", self.__rport,self.__window)
 
     def get(self, varname: str, pid: int = -1) -> Union[int, bool, float, list, object, tuple]:
         """
@@ -188,9 +190,9 @@ class Gvh(object):
             msg = dsm_update_create(self.pid, var, var.owner, time.time())
             if not self.__port_list == []:
                 for port in self.__port_list:
-                    send(msg, "<broadcast>", port)
+                    send(msg, "<broadcast>", port,self.__window)
             else:
-                send(msg, "<broadcast>", self.__rport)
+                send(msg, "<broadcast>", self.__rport,self.__window)
 
     @property
     def port_list(self):

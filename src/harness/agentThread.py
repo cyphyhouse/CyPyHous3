@@ -31,11 +31,13 @@ class AgentThread(ABC, Thread):
         self.__agent_gvh.start_mh()
         self.__stop_event = Event()
         self.__mutex_handler = self.__agent_gvh.mutex_handler
+
         self.requestedlocks = {}
+        self.ackedlocks = {}
+
         self.baselocks = {}
         self.locals = {}
         self.initialize_vars()
-
 
         # create a signal handler to handle ctrl + c
         signal.signal(signal.SIGINT, self.signal_handler)
@@ -55,26 +57,28 @@ class AgentThread(ABC, Thread):
         self.agent_gvh.mutex_handler.add_mutex(self.baselocks[key])
         self.baselocks[key].agent_comm_handler = self.agent_comm_handler
         self.requestedlocks[key] = False
+        self.ackedlocks[key] = False
         self.agent_gvh.req_nums[key] = 0
         self.agent_gvh.ack_nums[key] = -1
 
     def lock(self, key: str):
+        if self.agent_gvh.ack_nums[key] == self.agent_gvh.req_nums[key]:
+            self.ackedlocks[key] = True
+
         # print("checking locking")
         if not self.requestedlocks[key]:
             self.baselocks[key].request_mutex(self.agent_gvh.req_nums[key])
             self.requestedlocks[key] = True
-            self.agent_gvh.req_nums[key] += 1
             return False
+        elif not self.ackedlocks[key]:
+            if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
+                self.baselocks[key].request_mutex(self.agent_gvh.req_nums[key])
+                return False
         else:
             if not self.agent_gvh.mutex_handler.has_mutex(self.baselocks[key].mutex_id):
-                # if self.agent_gvh.ack_nums[key] == self.agent_gvh.req_nums[key] - 1:
-                #    print("acked")
-                #    pass
-                # else:
-                #    print("requesting")
-                #    self.baselocks[key].request_mutex(self.agent_gvh.req_nums[key] - 1)
                 return False
-            # print("i have mutex", self.pid())
+
+        self.agent_gvh.req_nums[key] += 1
         return True
 
     def unlock(self, key: str):
@@ -225,6 +229,12 @@ class AgentThread(ABC, Thread):
             return self.agent_gvh.get(var_name)
         pass
 
+    def release_unnecessary_mutexes(self):
+        for i in list(self.baselocks.keys()):
+            if self.agent_gvh.mutex_handler.has_mutex(self.baselocks[i].mutex_id):
+                if not self.requestedlocks[i]:
+                    self.baselocks[i].release_mutex()
+
     def run(self) -> None:
         """
         needs to be implemented for any agenThread
@@ -233,7 +243,7 @@ class AgentThread(ABC, Thread):
         from src.harness.message_handler import init_msg_create
         init_msg = init_msg_create(self.pid(), time.time())
         while not self.agent_gvh.init:
-            print("sending init", self.pid())
+            #print("sending init", self.pid())
             self.initialize_vars()
             self.msg_handle()
             if len(self.agent_gvh.port_list) is not 0:
@@ -243,9 +253,9 @@ class AgentThread(ABC, Thread):
                 send(init_msg, "<broadcast>", self.receiver_port())
             time.sleep(0.05)
 
-
         while not self.stopped():
             self.msg_handle()
+            self.release_unnecessary_mutexes()
             try:
                 self.loop_body()
             except OSError:

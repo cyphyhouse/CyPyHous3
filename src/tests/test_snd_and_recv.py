@@ -6,6 +6,7 @@ import time
 from src.functionality.base_mutex_handler import BaseMutexHandler
 
 class TestSndRecv(AgentThread):
+
     """
     test class to test that agent thread objects are created
     and fields are accessed safely and correctly .
@@ -28,11 +29,8 @@ class TestSndRecv(AgentThread):
                     send(msg, "<broadcast>", port)
             else:
                 send(msg, "<broadcast>", self.agent_gvh.rport)
-
-
-
         else:
-            if self.locals['seqnum'] == 20:
+            if self.locals['seqnum'] == 11:
                 self.stop()
 
         self.locals['seqnum'] += 1

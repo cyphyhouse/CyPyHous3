@@ -47,9 +47,7 @@ def base_mutex_ack_create(pid, grantee, mutex_name, reqnum, ts: float) -> messag
 def base_mutex_ack_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     mutex_name, reqnum, grantee = msg.content
     if grantee == agent_gvh.pid:
-        if agent_gvh.req_nums[mutex_name] - 1 == reqnum:
-            agent_gvh.ack_nums[mutex_name] = reqnum
-        print(agent_gvh.req_nums[mutex_name], agent_gvh.ack_nums[mutex_name], reqnum)
+        agent_gvh.ack_nums[mutex_name] = int(reqnum)
 
     pass
 
@@ -179,6 +177,7 @@ def base_mutex_release_handle(msg: message.Message, agent_gvh: Gvh) -> None:
     if agent_gvh.is_leader:
         if agent_gvh.mutex_handler.mutexes[i].mutex_holder == releaser:
             agent_gvh.mutex_handler.mutexes[i].mutex_holder = None
+            agent_gvh.mutex_handler.mutexes[i].mutex_request_list = agent_gvh.mutex_handler.mutexes[i].mutex_request_list[1:]
     else:
         pass
 

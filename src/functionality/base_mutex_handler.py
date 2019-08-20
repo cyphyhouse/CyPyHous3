@@ -13,6 +13,7 @@ class BaseMutexHandler(MutexHandler):
         self.__pid = pid
         self.__mutex_nums = []
         self.__mutexes = []
+        self.__grant_acked = []
         # self.start()
 
     @property
@@ -39,11 +40,11 @@ class BaseMutexHandler(MutexHandler):
         i = self.find_mutex_index(index)
         if i is not None:
             if (pid, req_num) not in self.__mutexes[i].mutex_request_list:
-                print("request from",pid,"added")
+                #print("request from",pid,"added")
                 self.__mutexes[i].mutex_request_list.append((pid, req_num))
+            self.__mutexes[i].ack_request(pid, req_num)
             if self.__leader:
-                pass
-                # self.__mutexes[i].ack_request(pid, req_num)
+                print(self.__mutexes[i].mutex_request_list)
         else:
             pass
 
@@ -55,9 +56,12 @@ class BaseMutexHandler(MutexHandler):
 
     def grant_available_mutexes(self, mutex_nums: list):
         if self.__leader:
+
             for i in range(len(self.__mutexes)):
-                #print("mutex",self.__mutexes[i].mutex_id,"holder is",self.__mutexes[i].mutex_holder)
+
+                #print("mutex",self.__mutexes[i].mutex_id,"holder is",self.__mutexes[i].mutex_holder,self.pid)
                 if self.__mutexes[i].mutex_holder is None:
+
                     self.__mutex_nums[i] += 1
                     self.__mutexes[i].grant_mutex(mutex_nums[i])
 

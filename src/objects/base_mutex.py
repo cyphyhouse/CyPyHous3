@@ -31,6 +31,7 @@ class BaseMutex(Mutex):
         self.__ip_port_list = ip_port_list
         self.__agent_comm_handler = None
 
+
     @property
     def mutex_id(self) -> int:
         """
@@ -143,10 +144,11 @@ class BaseMutex(Mutex):
         method to grant mutex, if leader
         :return:
         """
-        if self.mutex_holder is None and len(self.mutex_request_list) is not 0:
+        if len(self.mutex_request_list) is not 0:
             agent_id = self.mutex_request_list[0][0]
+
             self.__mutex_holder = agent_id
-            self.__mutex_request_list = self.mutex_request_list[1:]
+            #self.__mutex_request_list = self.mutex_request_list[1:]
             msg = base_mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
                                           time.time())
 
@@ -159,6 +161,7 @@ class BaseMutex(Mutex):
             pass
 
     def release_mutex(self):
+        print("releasing mutex",self.agent_comm_handler.agent_gvh.pid)
         msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
         if not self.ip_port_list == []:
             for port in self.ip_port_list:
