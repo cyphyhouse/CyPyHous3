@@ -201,22 +201,22 @@ def message_update_handle(msg: message.Message, agent_gvh: Gvh):
         if agent_gvh.dsm[i].name == var.name:
             if var.owner == 0:
 
-                if agent_gvh.dsm[i].updated is not None and agent_gvh.dsm[i].updated > msg.timestamp:
+                if agent_gvh.dsm[i].updated is not None and agent_gvh.dsm[i].updated > float(msg.timestamp):
                     pass
                 else:
                     agent_gvh.dsm[i] = var
-                    agent_gvh.dsm[i].updated = msg.timestamp
+                    agent_gvh.dsm[i].updated = float(msg.timestamp)
 
             else:
                 if agent_gvh.dsm[i].get_val(updater) is None or agent_gvh.dsm[i].last_update(updater) is None:
                     agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
-                    agent_gvh.dsm[i].set_update(msg.timestamp, updater)
+                    agent_gvh.dsm[i].set_update(float(msg.timestamp), updater)
 
-                elif agent_gvh.dsm[i].last_update(updater) > msg.timestamp:
+                elif agent_gvh.dsm[i].last_update(updater) > float(msg.timestamp):
                     pass
                 else:
                     agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
-                    agent_gvh.dsm[i].set_update(msg.timestamp, updater)
+                    agent_gvh.dsm[i].set_update(float(msg.timestamp), updater)
 
 
 message_handler = dict()
