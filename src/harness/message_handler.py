@@ -6,7 +6,6 @@ import src.objects.message as message
 from src.functionality.comm_funcs import send
 from src.harness.gvh import Gvh
 
-
 def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
     initing = msg.sender
     if agent_gvh.is_leader:
@@ -29,6 +28,7 @@ def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
 def init_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
     if msg.sender == msg.content:
         agent_gvh.init = True
+        agent_gvh.start_time = time.time()
 
 
 def init_msg_create(pid, ts: float):

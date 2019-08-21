@@ -57,6 +57,8 @@ class Gvh(object):
         self.init_counter = []
         if self.is_leader:
             self.init_counter.append(a.pid)
+        self.start_time = 0.0
+
 
 
     @property
@@ -143,7 +145,7 @@ class Gvh(object):
         if self.__dsm is None:
             self.__dsm = []
         self.__dsm.append(a)
-        msg = dsm_update_create(self.pid, a, a.owner, time.time())
+        msg = dsm_update_create(self.pid, a, a.owner, time.time()- self.start_time)
         if not self.__port_list == []:
             for port in self.__port_list:
                 send(msg, "<broadcast>", port, self.__window)
@@ -187,7 +189,7 @@ class Gvh(object):
                     var.value[self.pid] = value
                 var.value[pid] = value
 
-            msg = dsm_update_create(self.pid, var, var.owner, time.time())
+            msg = dsm_update_create(self.pid, var, var.owner, time.time() - self.start_time)
             if not self.__port_list == []:
                 for port in self.__port_list:
                     send(msg, "<broadcast>", port,self.__window)
@@ -397,4 +399,5 @@ def dsm_update_create(pid: int, dsmvar_updated, owner, ts):
     :param ts:
     :return:
     """
+
     return Message(pid, 4, dsmvar_updated, ts)
