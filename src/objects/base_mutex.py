@@ -161,7 +161,7 @@ class BaseMutex(Mutex):
             pass
 
     def release_mutex(self):
-        print("releasing mutex",self.agent_comm_handler.agent_gvh.pid)
+        #print("releasing mutex",self.agent_comm_handler.agent_gvh.pid)
         msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
         if not self.ip_port_list == []:
             for port in self.ip_port_list:

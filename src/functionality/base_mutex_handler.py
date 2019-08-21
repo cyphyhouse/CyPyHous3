@@ -44,7 +44,8 @@ class BaseMutexHandler(MutexHandler):
                 self.__mutexes[i].mutex_request_list.append((pid, req_num))
             self.__mutexes[i].ack_request(pid, req_num)
             if self.__leader:
-                print(self.__mutexes[i].mutex_request_list)
+                pass
+                #print(self.__mutexes[i].mutex_request_list)
         else:
             pass
 

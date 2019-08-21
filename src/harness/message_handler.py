@@ -193,17 +193,20 @@ def stop_comm_msg_handle(msg: message.Message, agent_gvh: Gvh) -> None:
 
 
 def message_update_handle(msg: message.Message, agent_gvh: Gvh):
-    # print("got an update message",msg)
+    #print("got an update message",msg)
     var = msg.content
     updater = msg.sender
     for i in range(len(agent_gvh.dsm)):
+
 
         if agent_gvh.dsm[i].name == var.name:
             if var.owner == 0:
 
                 if agent_gvh.dsm[i].updated is not None and agent_gvh.dsm[i].updated > float(msg.timestamp):
                     pass
+
                 else:
+                    #print("updated, updating", agent_gvh.dsm[i].updated, float(msg.timestamp))
                     agent_gvh.dsm[i] = var
                     agent_gvh.dsm[i].updated = float(msg.timestamp)
 

@@ -149,13 +149,10 @@ class CommHandler(Thread):
             while not self.stopped():
                 time.sleep(0.01)
                 try:
-                    if not self.__check_receiving_buffer():  # No message recieved
-                        continue  # TODO Yield to other threads?
-                    else:
-                        data, addr = self.receiver_socket.recvfrom(4096)
-                        #print("packet length",len(data))
-                        msg = pickle.loads(data)
-                        self.agent_gvh.add_recv_msg(msg)
+                    data, addr = self.receiver_socket.recvfrom(4096)
+                    #print("packet length",len(data))
+                    msg = pickle.loads(data)
+                    self.agent_gvh.add_recv_msg(msg)
                 except socket.timeout:
                     print("agent", self.agent_gvh.pid, "timed out")
                     self.stop()
