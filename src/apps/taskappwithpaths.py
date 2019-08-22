@@ -2,7 +2,6 @@ import time
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
-from src.motion.deconflict import clear_path
 from src.objects.udt import get_tasks
 
 
@@ -44,16 +43,17 @@ class TaskApp(AgentThread):
                                                                                               'my_task'].location,
                                                                                           self.locals['obstacles'])
 
-                        self.locals['doing'] = True
-                        self.locals['my_task'].assign(self.pid())
-                        self.locals['tasklist'][i] = self.locals['my_task']
-                        self.locals['tasks'][i] = 1
-                        self.agent_gvh.put('tasks', self.locals['tasks'])
-                        self.agent_gvh.put('route', self.locals['test_route'], self.pid())
-                        #self.agent_gvh.moat.follow_path(self.locals['test_route'])
+                        if self.locals['test_route'] is not None:
+                            self.locals['doing'] = True
+                            self.locals['my_task'].assign(self.pid())
+                            self.locals['tasklist'][i] = self.locals['my_task']
+                            self.locals['tasks'][i] = 1
+                            self.agent_gvh.put('tasks', self.locals['tasks'])
+                            self.agent_gvh.put('route', self.locals['test_route'], self.pid())
+                            # self.agent_gvh.moat.follow_path(self.locals['test_route'])
+                            self.unlock('pick_route')
+                            break
 
-                        self.unlock('pick_route')
-                        break
         else:
             if self.locals['my_task'] is not None:
                 self.locals['my_task'] = None
