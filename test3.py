@@ -1,4 +1,4 @@
-from src.apps.taskappwithpaths import TaskApp
+from src.apps.taskwithoutgoing import TaskApp
 from src.config.configs import AgentConfig, default_qc_moat_config, default_car_moat_config
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_drone import RRT as RRT_DRONE
