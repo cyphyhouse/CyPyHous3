@@ -20,4 +20,4 @@ m1.planner = RRT_CAR(goal_sample_rate=15)
 m2.planner = RRT_DRONE()
 m3.planner = RRT_DRONE()
 
-app3 = TaskApp(a3,m1)
+app3 = TaskApp(a3)
