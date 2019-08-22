@@ -1,4 +1,4 @@
-from src.apps.taskappwithpaths import TaskApp
+from src.apps.taskwithoutgoing import TaskApp
 from src.config.configs import AgentConfig, default_qc_moat_config, default_car_moat_config
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_drone import RRT as RRT_DRONE
@@ -20,4 +20,4 @@ m1.planner = RRT_CAR(goal_sample_rate=15)
 m2.planner = RRT_DRONE()
 m3.planner = RRT_DRONE()
 
-app3 = TaskApp(a3,m1)
+app3 = TaskApp(a3)
