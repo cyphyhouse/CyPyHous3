@@ -25,7 +25,7 @@ class TaskApp(AgentThread):
 
     def loop_body(self):
         if not self.locals['doing']:
-            if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
+            if sum([int(a) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
                 self.stop()
                 return
@@ -49,6 +49,7 @@ class TaskApp(AgentThread):
                         self.locals['tasklist'][i] = self.locals['my_task']
                         self.locals['tasks'][i] = 1
                         self.agent_gvh.put('tasks', self.locals['tasks'])
+                        print(self.locals['test_'])
                         self.agent_gvh.put('route', self.locals['test_route'], self.pid())
                         #self.agent_gvh.moat.follow_path(self.locals['test_route'])
 
