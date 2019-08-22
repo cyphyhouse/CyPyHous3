@@ -1,5 +1,7 @@
 from src.apps.taskappwithpaths import TaskApp
 from src.config.configs import AgentConfig, default_qc_moat_config, default_car_moat_config
+from src.motion.moat_test_car import MoatTestCar
+from src.motion.moat_test_drone import MoatTestDrone
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.motion.rrt_drone import RRT as RRT_DRONE
 from src.motion.rrt_car import RRT as RRT_CAR
@@ -7,10 +9,10 @@ from src.motion.rrt_car import RRT as RRT_CAR
 
 bots = 1
 
-a1 = AgentConfig(1, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,1])
-a2 = AgentConfig(2, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=True, mhargs=[True,2])
-a3 = AgentConfig(3, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,3])
-a4 = AgentConfig(4, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,4])
+a1 = AgentConfig(1, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,1], moat_class=MoatTestCar)
+a2 = AgentConfig(2, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=True, mhargs=[True,2], moat_class= MoatTestDrone)
+a3 = AgentConfig(3, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,3],moat_class=MoatTestDrone)
+a4 = AgentConfig(4, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,4], moat_class=MoatTestCar)
 m0 = default_car_moat_config('hotdec_car')
 m1 = default_car_moat_config('f1car')
 m2 = default_qc_moat_config('cyphyhousecopter')
