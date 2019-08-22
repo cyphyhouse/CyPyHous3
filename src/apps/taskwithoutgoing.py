@@ -25,7 +25,7 @@ class TaskApp(AgentThread):
 
     def loop_body(self):
         if not self.locals['doing']:
-            if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
+            if sum([int(a) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
                 self.stop()
                 return
