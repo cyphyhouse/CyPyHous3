@@ -230,6 +230,10 @@ class pos3d(Pos):
         self.yaw = yaw
 
 
+def mid_pt(p1: Pos, p2: Pos):
+    return Pos(np.array([(p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2]))
+
+
 class RoundObs(object):
     """
     obstacle object.

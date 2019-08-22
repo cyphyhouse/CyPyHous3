@@ -20,4 +20,3 @@ class LineForm(AgentThread):
                 self.agent_gvh.moat.goTo(mid_pt(self.read_from_shared('mypos', self.pid() - 1),
                                                 self.read_from_shared('mypos', self.pid() + 1)))
             self.locals['i'] += 1
-

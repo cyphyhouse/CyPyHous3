@@ -5,7 +5,7 @@ from src.motion.rrt_drone import RRT as RRT_DRONE
 from src.motion.rrt_car import RRT as RRT_CAR
 
 
-bots = 4
+bots = 1
 
 a1 = AgentConfig(1, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=False, mhargs=[False,1])
 a2 = AgentConfig(2, bots, "", rport=2001, plist=[], mh=BaseMutexHandler, is_leader=True, mhargs=[True,2])
