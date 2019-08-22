@@ -3,6 +3,8 @@ import time
 from src.config.configs import AgentConfig
 from src.harness.agentThread import AgentThread
 from src.objects.udt import get_tasks
+from src.motion.pos_types import pos3d
+
 
 
 class TaskApp(AgentThread):
@@ -14,6 +16,7 @@ class TaskApp(AgentThread):
     def initialize_vars(self):
         self.initialize_lock('pick_route')
         self.agent_gvh.create_aw_var('tasks', list, [0 for i in get_tasks(taskfile='src/apps/tasks.txt')])
+        self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position])
         self.locals['my_task'] = None
         self.locals['doing'] = False
         self.locals['obstacles'] = []
@@ -36,7 +39,10 @@ class TaskApp(AgentThread):
                         self.locals['doing'] = True
                         self.locals['my_task'] = i
                         self.locals['tasks'][i] = 1
+                        path = [pos3d(2., 1., 0.), pos3d(-2., 1., 0.), pos3d(2., -1., 0.)]
+
                         self.agent_gvh.put('tasks', self.locals['tasks'])
+                        self.agent_gvh.put('route',path,self.pid())
                         self.unlock('pick_route')
                         break
         else:
