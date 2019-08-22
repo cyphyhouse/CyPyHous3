@@ -149,7 +149,7 @@ class CommHandler(Thread):
             while not self.stopped():
                 time.sleep(0.01)
                 try:
-                    data, addr = self.receiver_socket.recvfrom(4096)
+                    data, addr = self.receiver_socket.recvfrom(8192)
                     #print("packet length",len(data))
                     msg = pickle.loads(data)
                     self.agent_gvh.add_recv_msg(msg)
