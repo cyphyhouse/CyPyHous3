@@ -36,7 +36,6 @@ class TaskApp(AgentThread):
                 for i in range(len(self.locals['tasks'])):
                     if not self.locals['tasks'][i] == 1:
                         self.locals['my_task'] = self.locals['tasklist'][i]
-                        print("going to task", i)
 
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
@@ -44,6 +43,7 @@ class TaskApp(AgentThread):
                                                                                           self.locals['obstacles'])
 
                         if self.locals['test_route'] is not None:
+                            print("going to task", i)
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
                             self.locals['tasklist'][i] = self.locals['my_task']
