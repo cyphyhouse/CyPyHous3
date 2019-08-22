@@ -19,4 +19,5 @@ class LineForm(AgentThread):
             if not (self.pid() == 0 or self.pid() == self.num_agents() - 1):
                 self.agent_gvh.moat.goTo(mid_pt(self.read_from_shared('mypos', self.pid() - 1),
                                                 self.read_from_shared('mypos', self.pid() + 1)))
+            self.locals['i'] += 1
 
