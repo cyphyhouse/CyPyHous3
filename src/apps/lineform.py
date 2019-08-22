@@ -15,6 +15,8 @@ class LineForm(AgentThread):
 
     def loop_body(self):
         while (self.locals['i'] < 10):
+            self.write_to_shared('mypos', self.pid(), self.agent_gvh.moat.position)
             if not (self.pid() == 0 or self.pid() == self.num_agents() - 1):
                 self.agent_gvh.moat.goTo(mid_pt(self.read_from_shared('mypos', self.pid() - 1),
                                                 self.read_from_shared('mypos', self.pid() + 1)))
+
