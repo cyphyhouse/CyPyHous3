@@ -53,16 +53,18 @@ def round_update_msg_confirm_create(pid, leaderid, ts: float):
 def stop_msg_handle(msg: message.Message, agent_gvh: Gvh):
     stopping = msg.sender
     if agent_gvh.is_leader:
+
         if stopping in agent_gvh.stop_counter :
             pass
         else:
-            agent_gvh.round_counter.append(stopping)
+            agent_gvh.stop_counter.append(stopping)
         leaderid = -1
         if agent_gvh.is_leader:
             leaderid = agent_gvh.pid
 
         msg1 = stop_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
         if len(agent_gvh.stop_counter) == agent_gvh.participants:
+
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
                     send(msg1, "<broadcast>", port)
@@ -71,11 +73,9 @@ def stop_msg_handle(msg: message.Message, agent_gvh: Gvh):
 
 
 def stop_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
-    leaderid , roundnum = int(msg.content[0]), int(msg.content[1])
-    if msg.sender == leaderid:
-        print(agent_gvh.is_alive)
+    leaderid = int(msg.content)
+    if int(msg.sender) == leaderid:
         agent_gvh.is_alive = False
-        print(agent_gvh.is_alive)
 
 
 def stop_msg_create(pid, round_num, ts: float):

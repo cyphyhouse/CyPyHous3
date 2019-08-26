@@ -32,6 +32,7 @@ class AddNums(AgentThread):
         if self.read_from_shared('numadded', None) == self.num_agents():
             self.locals['finalsum'] = self.read_from_shared('sum', None)
             print("final sum is", self.locals['finalsum'],"\n")
+            self.trystop()
             return
 
 

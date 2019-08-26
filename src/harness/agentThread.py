@@ -221,7 +221,6 @@ class AgentThread(ABC, Thread):
         pass
 
     def trystop(self):
-        print("tryin to stop")
         stop_msg = stop_msg_create(self.pid(), self.agent_gvh.round_num,self.agent_gvh.round_num)
         if len(self.agent_gvh.port_list) is not 0:
             for port in self.agent_gvh.port_list:
@@ -249,12 +248,12 @@ class AgentThread(ABC, Thread):
             time.sleep(0.05)
 
         while not self.stopped():
+            self.msg_handle()
             if not self.agent_gvh.is_alive:
-                print("dead gvh")
+                print("stopping app thread on ",self.pid())
                 self.stop()
                 continue
 
-            self.msg_handle()
 
             try:
                 round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
