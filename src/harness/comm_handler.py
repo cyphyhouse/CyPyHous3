@@ -140,7 +140,7 @@ class CommHandler(Thread):
 
         while not self.stopped():
             try:
-                data, addr = self.receiver_socket.recvfrom(4096)
+                data, addr = self.receiver_socket.recvfrom(8192)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
             except KeyboardInterrupt:
