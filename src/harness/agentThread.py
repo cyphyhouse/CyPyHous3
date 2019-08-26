@@ -279,8 +279,8 @@ class AgentThread(ABC, Thread):
 
             except OSError:
 
-                print("some unhandled error in application thread for agent", self.pid(), sys.exc_info(), sys.exc_traceback)
-                self.stop()
+                print("some unhandled error in application thread for agent", self.pid(), sys.exc_info())
+                self.trystop()
 
             if self.agent_comm_handler.stopped():
-                self.stop()
+                self.trystop()
