@@ -38,8 +38,7 @@ class TaskApp(AgentThread):
                         self.locals['doing'] = True
                         self.locals['my_task'] = i
                         self.locals['tasks'][i] = 1
-                        path = [pos3d(2., 1., 0.), pos3d(-2., 1., 0.), pos3d(2., -1., 0.), pos3d(2., 1., 0.),
-                                pos3d(2., -1., 0.), pos3d(2., 1., 0.), pos3d(-2., 1., 0.), pos3d(2., -7., 0.)]
+                        path = [pos3d(2., 1., 0.)]
 
                         self.agent_gvh.put('tasks', self.locals['tasks'])
                         self.agent_gvh.put('route', path, self.pid())
