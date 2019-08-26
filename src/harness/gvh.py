@@ -73,7 +73,7 @@ class Gvh(object):
             self.mutex_handler.start()
 
 
-    @@property
+    @property
     def rport(self):
         return self.__rport
 
