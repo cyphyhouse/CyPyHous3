@@ -25,6 +25,7 @@ class TaskApp(AgentThread):
             if sum(self.read_from_shared('tasks', None)) == len(
                     self.read_from_shared('tasks', None)):
                 print("print all tasks")
+                self.trystop()
                 return
 
             if self.lock('pick_route'):
