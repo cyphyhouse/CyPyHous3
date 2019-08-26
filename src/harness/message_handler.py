@@ -8,9 +8,10 @@ import time
 def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
     rounding,round_num = msg.sender,msg.content
     if agent_gvh.is_leader:
-        if rounding in agent_gvh.round_counter and round_num == agent_gvh.round_num:
+        if rounding in agent_gvh.round_counter:
             pass
         else:
+            #print(rounding, agent_gvh.round_counter)
             agent_gvh.round_counter.append(rounding)
         leaderid = -1
         if agent_gvh.is_leader:
@@ -19,7 +20,7 @@ def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
         msg_contents = (leaderid, agent_gvh.round_num)
         msg1 = round_update_msg_confirm_create(agent_gvh.pid, msg_contents, time.time())
         if len(agent_gvh.round_counter) == agent_gvh.participants:
-            print("sending message to update round", agent_gvh.round_num)
+            #print("sending message to update round", agent_gvh.round_num)
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
                     send(msg1, "<broadcast>", port)
@@ -29,7 +30,7 @@ def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
 
 def round_update_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
     leaderid , roundnum = int(msg.content[0]), int(msg.content[1])
-    print("got message to update round", roundnum)
+    #print("got message to update round", roundnum)
 
     if msg.sender == leaderid:
         agent_gvh.update_round = True
@@ -44,6 +45,42 @@ def round_update_msg_create(pid, round_num, ts: float):
 
 def round_update_msg_confirm_create(pid, leaderid, ts: float):
     return message.Message(pid, 10, leaderid, ts)
+
+
+def stop_msg_handle(msg: message.Message, agent_gvh: Gvh):
+    stopping = msg.sender
+    if agent_gvh.is_leader:
+        if stopping in agent_gvh.stop_counter :
+            pass
+        else:
+            agent_gvh.round_counter.append(stopping)
+        leaderid = -1
+        if agent_gvh.is_leader:
+            leaderid = agent_gvh.pid
+
+        msg1 = stop_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
+        if len(agent_gvh.stop_counter) == agent_gvh.participants:
+            if len(agent_gvh.port_list) is not 0:
+                for port in agent_gvh.port_list:
+                    send(msg1, "<broadcast>", port)
+            else:
+                send(msg1, "<broadcast>", agent_gvh.rport)
+
+
+def stop_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
+    leaderid , roundnum = int(msg.content[0]), int(msg.content[1])
+    if msg.sender == leaderid:
+        print(agent_gvh.is_alive)
+        agent_gvh.is_alive = False
+        print(agent_gvh.is_alive)
+
+
+def stop_msg_create(pid, round_num, ts: float):
+    return message.Message(pid, 11, round_num, ts)
+
+
+def stop_msg_confirm_create(pid, leaderid, ts: float):
+    return message.Message(pid, 12, leaderid, ts)
 
 
 
@@ -248,3 +285,5 @@ message_handler[7] = init_msg_handle
 message_handler[8] = init_msg_confirm_handle
 message_handler[9] = round_update_msg_handle
 message_handler[10] = round_update_msg_confirm_handle
+message_handler[11] = stop_msg_handle
+message_handler[12] = stop_msg_confirm_handle

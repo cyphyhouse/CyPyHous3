@@ -10,7 +10,7 @@ from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
 from src.harness.message_handler import stop_comm_msg_create
 from src.objects.base_mutex import BaseMutex
-from src.harness.message_handler import round_update_msg_create
+from src.harness.message_handler import round_update_msg_create, stop_msg_create
 
 
 class AgentThread(ABC, Thread):
@@ -219,6 +219,16 @@ class AgentThread(ABC, Thread):
             return self.agent_gvh.get(var_name)
         pass
 
+    def trystop(self):
+        print("tryin to stop")
+        stop_msg = stop_msg_create(self.pid(), self.agent_gvh.round_num,self.agent_gvh.round_num)
+        if len(self.agent_gvh.port_list) is not 0:
+            for port in self.agent_gvh.port_list:
+                send(stop_msg, "<broadcast>", port)
+        else:
+            send(stop_msg, "<broadcast>", self.receiver_port())
+
+
     def run(self) -> None:
         """
         needs to be implemented for any agenThread
@@ -238,13 +248,16 @@ class AgentThread(ABC, Thread):
             time.sleep(0.05)
 
         while not self.stopped():
+            if not self.agent_gvh.is_alive:
+                print("dead gvh")
+                self.stop()
+                continue
 
             self.msg_handle()
 
             try:
                 round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
                 while not self.agent_gvh.update_round:
-                    print("sending message to try update round",self.agent_gvh.round_num)
                     if self.stopped():
                         break
 
@@ -259,10 +272,10 @@ class AgentThread(ABC, Thread):
 
                 if self.stopped():
                     break
+                print("executing round", self.agent_gvh.round_num)
 
                 self.loop_body()
                 self.agent_gvh.update_round = False
-                self.agent_gvh.round_counter.append(self.pid())
 
             except OSError:
                 print("some unhandled error in application thread for agent", self.pid())
