@@ -18,6 +18,7 @@ def send(msg: Message, ip: str, port: int, retry=1) -> None:
     client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     for i in range(retry):
         a = pickle.dumps(msg)
+        print(len(a))
         if len(a) > MAX_UDP_SIZE:
             raise ValueError('Message too large')
         client_sock.sendto(a, (ip, port))
