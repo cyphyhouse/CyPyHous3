@@ -9,7 +9,7 @@ from src.objects.udt import get_tasks
 class TaskApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig):
-        super(TaskApp, self).__init__(agent_config)
+        super(TaskApp, self).__init__(agent_config, None)
         self.start()
 
     def initialize_vars(self):
