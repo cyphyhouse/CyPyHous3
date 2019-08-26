@@ -23,9 +23,10 @@ def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
             #print("sending message to update round", agent_gvh.round_num)
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
-                    send(msg1, "<broadcast>", port)
+
+                    send(msg1, "<broadcast>", port,2)
             else:
-                send(msg1, "<broadcast>", agent_gvh.rport)
+                send(msg1, "<broadcast>", agent_gvh.rport,2)
 
 
 def round_update_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
