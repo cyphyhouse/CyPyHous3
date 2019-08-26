@@ -1,5 +1,5 @@
 from src.harness.agentThread import AgentThread
-
+import time
 
 class AddNums(AgentThread):
     """
@@ -19,7 +19,8 @@ class AddNums(AgentThread):
         self.initialize_lock('adding')
 
     def loop_body(self):
-        print("numadded for agent",self.pid()," is ",self.read_from_shared('numadded',None))
+        time.sleep(0.1)
+        print("numadded for agent",self.pid()," is ",self.read_from_shared('numadded',None),"on round", self.agent_gvh.round_num)
         if not self.locals['added']:
             if not self.lock('adding'):
                 return
@@ -31,7 +32,6 @@ class AddNums(AgentThread):
         if self.read_from_shared('numadded', None) == self.num_agents():
             self.locals['finalsum'] = self.read_from_shared('sum', None)
             print("final sum is", self.locals['finalsum'],"\n")
-            self.stop()
             return
 
 

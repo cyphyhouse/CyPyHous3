@@ -10,6 +10,7 @@ from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
 from src.harness.message_handler import stop_comm_msg_create
 from src.objects.base_mutex import BaseMutex
+from src.harness.message_handler import round_update_msg_create
 
 
 class AgentThread(ABC, Thread):
@@ -239,8 +240,30 @@ class AgentThread(ABC, Thread):
         while not self.stopped():
 
             self.msg_handle()
+
             try:
+                round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
+                while not self.agent_gvh.update_round:
+                    print("sending message to try update round",self.agent_gvh.round_num)
+                    if self.stopped():
+                        break
+
+                    # print("sending init", self.pid())
+                    self.msg_handle()
+                    if len(self.agent_gvh.port_list) is not 0:
+                        for port in self.agent_gvh.port_list:
+                            send(round_update_msg, "<broadcast>", port)
+                    else:
+                        send(round_update_msg, "<broadcast>", self.receiver_port())
+                    time.sleep(0.1)
+
+                if self.stopped():
+                    break
+
                 self.loop_body()
+                self.agent_gvh.update_round = False
+                self.agent_gvh.round_counter.append(self.pid())
+
             except OSError:
                 print("some unhandled error in application thread for agent", self.pid())
                 self.stop()

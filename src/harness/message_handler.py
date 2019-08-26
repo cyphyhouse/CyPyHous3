@@ -5,6 +5,50 @@ from src.harness.gvh import Gvh
 from src.functionality.comm_funcs import send
 import time
 
+def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
+    rounding,round_num = msg.sender,msg.content
+    if agent_gvh.is_leader:
+        if rounding in agent_gvh.round_counter and round_num == agent_gvh.round_num:
+            pass
+        else:
+            agent_gvh.round_counter.append(rounding)
+        leaderid = -1
+        if agent_gvh.is_leader:
+            leaderid = agent_gvh.pid
+
+        msg_contents = (leaderid, agent_gvh.round_num)
+        msg1 = round_update_msg_confirm_create(agent_gvh.pid, msg_contents, time.time())
+        if len(agent_gvh.round_counter) == agent_gvh.participants:
+            print("sending message to update round", agent_gvh.round_num)
+            if len(agent_gvh.port_list) is not 0:
+                for port in agent_gvh.port_list:
+                    send(msg1, "<broadcast>", port)
+            else:
+                send(msg1, "<broadcast>", agent_gvh.rport)
+
+
+def round_update_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
+    leaderid , roundnum = int(msg.content[0]), int(msg.content[1])
+    print("got message to update round", roundnum)
+
+    if msg.sender == leaderid:
+        agent_gvh.update_round = True
+        agent_gvh.round_num = roundnum+1
+        agent_gvh.start_time = time.time()
+        agent_gvh.round_counter = []
+
+
+def round_update_msg_create(pid, round_num, ts: float):
+    return message.Message(pid, 9, round_num, ts)
+
+
+def round_update_msg_confirm_create(pid, leaderid, ts: float):
+    return message.Message(pid, 10, leaderid, ts)
+
+
+
+
+
 def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
     initing = msg.sender
     if agent_gvh.is_leader:
@@ -202,3 +246,5 @@ message_handler[4] = message_update_handle
 message_handler[5] = stop_comm_msg_handle
 message_handler[7] = init_msg_handle
 message_handler[8] = init_msg_confirm_handle
+message_handler[9] = round_update_msg_handle
+message_handler[10] = round_update_msg_confirm_handle

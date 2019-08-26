@@ -56,6 +56,12 @@ class Gvh(object):
         if self.is_leader:
             self.init_counter.append(a.pid)
 
+        self.round_num = 0
+        self.update_round = False
+        self.round_counter = []
+
+
+
     def start_moat(self):
         if self.moat is not None:
             self.moat.start()
@@ -169,7 +175,7 @@ class Gvh(object):
                     var.value[self.pid] = value
                 var.value[pid] = value
 
-            msg = dsm_update_create(self.pid, var, var.owner, time.time())
+            msg = dsm_update_create(self.pid, var, var.owner, self.round_num)
             if not self.__port_list == []:
                 for port in self.__port_list:
                     send(msg, "<broadcast>", port)
@@ -370,7 +376,7 @@ class Gvh(object):
         self.msg_list = []
 
 
-def dsm_update_create(pid: int, dsmvar_updated, owner, ts):
+def dsm_update_create(pid: int, dsmvar_updated, owner, roundnum):
     """
     create dsm update message. cant import from message handler because of circular imports.
     :param pid:
@@ -379,4 +385,4 @@ def dsm_update_create(pid: int, dsmvar_updated, owner, ts):
     :param ts:
     :return:
     """
-    return Message(pid, 4, dsmvar_updated, ts)
+    return Message(pid, 4, dsmvar_updated, roundnum)
