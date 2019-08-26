@@ -19,6 +19,7 @@ class AddNums(AgentThread):
         self.initialize_lock('adding')
 
     def loop_body(self):
+        print("numadded for agent",self.pid()," is ",self.read_from_shared('numadded',None))
         if not self.locals['added']:
             if not self.lock('adding'):
                 return
