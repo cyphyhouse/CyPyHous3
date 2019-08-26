@@ -32,8 +32,9 @@ def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
 def round_update_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
     leaderid , roundnum = int(msg.content[0]), int(msg.content[1])
     #print("got message to update round", roundnum)
-
-    if msg.sender == leaderid:
+    if roundnum < agent_gvh.round_num:
+        pass
+    elif msg.sender == leaderid:
         agent_gvh.update_round = True
         agent_gvh.round_num = roundnum+1
         agent_gvh.start_time = time.time()
