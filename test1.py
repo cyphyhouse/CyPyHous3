@@ -1,5 +1,5 @@
 from src.apps.addnums import AddNums
-from src.apps.taskwithpaths import TaskApp
+from src.apps.taskwithoutgoing import TaskApp
 from src.config.configs import AgentConfig
 from src.functionality.base_mutex_handler import BaseMutexHandler
 
