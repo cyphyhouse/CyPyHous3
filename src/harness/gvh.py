@@ -73,6 +73,10 @@ class Gvh(object):
             self.mutex_handler.start()
 
 
+    @@property
+    def rport(self):
+        return self.__rport
+
 
     @property
     def moat(self):
