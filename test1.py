@@ -3,7 +3,7 @@ from src.apps.taskwithoutgoing import TaskApp
 from src.config.configs import AgentConfig
 from src.functionality.base_mutex_handler import BaseMutexHandler
 
-bots = 2
+bots = 3
 
 a0 = AgentConfig(0, bots, "", rport=2001, plist=[2001,2002,2003,2004,2005], mh=BaseMutexHandler, is_leader=False, mhargs=[False,0])
 a1 = AgentConfig(1, bots, "", rport=2002, plist=[2001,2002,2003,2004,2005], mh=BaseMutexHandler, is_leader=False, mhargs=[False,1])
