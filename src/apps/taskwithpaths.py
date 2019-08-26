@@ -8,8 +8,8 @@ from src.objects.udt import get_tasks
 
 class TaskApp(AgentThread):
 
-    def __init__(self, agent_config: AgentConfig, m):
-        super(TaskApp, self).__init__(agent_config, m)
+    def __init__(self, agent_config: AgentConfig):
+        super(TaskApp, self).__init__(agent_config)
         self.start()
 
     def initialize_vars(self):
