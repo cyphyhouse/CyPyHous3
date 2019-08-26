@@ -28,7 +28,7 @@ class TaskApp(AgentThread):
                 return
 
             if self.lock('pick_route'):
-                #time.sleep(1)
+                time.sleep(0.4)
                 self.locals['tasks'] = self.read_from_shared('tasks', None)
                 # print("Tasks are", self.locals['tasks'])
                 for i in range(len(self.locals['tasks'])):
@@ -38,7 +38,9 @@ class TaskApp(AgentThread):
                         self.locals['doing'] = True
                         self.locals['my_task'] = i
                         self.locals['tasks'][i] = 1
-                        path = [pos3d(2., 1., 0.), pos3d(-2., 1., 0.), pos3d(2., -1., 0.),  pos3d(2., -7., 0.)]
+                        path = [pos3d(2., 1., 0.), pos3d(-2., 1., 0.), pos3d(2., -1., 0.), pos3d(2., 1., 0.),
+                                pos3d(-2., 1., 6.), pos3d(2., -6., 0.), pos3d(2., 1., 0.), pos3d(-6., 1., 0.),
+                                pos3d(2., -1., 0.), pos3d(2., 1., 0.), pos3d(-2., 1., 0.), pos3d(2., -7., 0.)]
 
                         self.agent_gvh.put('tasks', self.locals['tasks'])
                         self.agent_gvh.put('route', path, self.pid())
