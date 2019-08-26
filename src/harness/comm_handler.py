@@ -129,6 +129,8 @@ class CommHandler(Thread):
         create receiver socket, receive messages.
         :return:
         """
+        UDP_MAX = 2 ** 16 - 1
+
         self.receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
@@ -140,7 +142,7 @@ class CommHandler(Thread):
 
         while not self.stopped():
             try:
-                data, addr = self.receiver_socket.recvfrom(8192)
+                data, addr = self.receiver_socket.recvfrom(UDP_MAX)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
             except KeyboardInterrupt:
