@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from threading import Thread, Event
 from typing import Union
 
+import sys
 from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
@@ -278,7 +279,8 @@ class AgentThread(ABC, Thread):
                 self.agent_gvh.update_round = False
 
             except OSError:
-                print("some unhandled error in application thread for agent", self.pid())
+
+                print("some unhandled error in application thread for agent", self.pid(), sys.exc_info(), sys.exc_traceback)
                 self.stop()
 
             if self.agent_comm_handler.stopped():

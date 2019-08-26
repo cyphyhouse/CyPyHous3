@@ -5,6 +5,7 @@ from src.harness.gvh import Gvh
 from src.functionality.comm_funcs import send
 import time
 
+
 def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
     rounding,round_num = msg.sender,msg.content
     if agent_gvh.is_leader:
