@@ -51,15 +51,15 @@ class TaskApp(AgentThread):
                             self.agent_gvh.put('tasks', self.locals['tasks'])
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
                             self.agent_gvh.moat.follow_path(self.locals['test_route'])
+                            break
                         else:
                             self.agent_gvh.put('route', [self.agent_gvh.moat.position],
                                                self.pid())
                             self.locals['my_task'] = None
                             self.locals['doing'] = False
                             continue
-                        self.unlock('pick_route')
-                        time.sleep(0.5)
-                        break
+                self.unlock('pick_route')
+                time.sleep(0.5)
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
