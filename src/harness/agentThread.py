@@ -223,7 +223,18 @@ class AgentThread(ABC, Thread):
         needs to be implemented for any agenThread
         :return:
         """
-        self.initialize_vars()
+        from src.harness.message_handler import init_msg_create
+        init_msg = init_msg_create(self.pid(), time.time())
+        while not self.agent_gvh.init:
+            # print("sending init", self.pid())
+            self.initialize_vars()
+            self.msg_handle()
+            if len(self.agent_gvh.port_list) is not 0:
+                for port in self.agent_gvh.port_list:
+                    send(init_msg, "<broadcast>", port)
+            else:
+                send(init_msg, "<broadcast>", self.receiver_port())
+            time.sleep(0.05)
 
         while not self.stopped():
 

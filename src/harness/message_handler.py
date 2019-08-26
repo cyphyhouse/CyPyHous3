@@ -2,6 +2,41 @@
 
 import src.objects.message as message
 from src.harness.gvh import Gvh
+from src.functionality.comm_funcs import send
+import time
+
+def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
+    initing = msg.sender
+    if agent_gvh.is_leader:
+        if initing in agent_gvh.init_counter:
+            pass
+        else:
+            agent_gvh.init_counter.append(initing)
+        leaderid = -1
+        if agent_gvh.is_leader:
+            leaderid = agent_gvh.pid
+        msg1 = init_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
+        if len(agent_gvh.init_counter) == agent_gvh.participants:
+            if len(agent_gvh.port_list) is not 0:
+                for port in agent_gvh.port_list:
+                    send(msg1, "<broadcast>", port)
+            else:
+                send(msg1, "<broadcast>", agent_gvh.rport)
+
+
+def init_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
+    if msg.sender == msg.content:
+        agent_gvh.init = True
+        agent_gvh.start_time = time.time()
+
+
+def init_msg_create(pid, ts: float):
+    return message.Message(pid, 7, None, ts)
+
+
+def init_msg_confirm_create(pid, leaderid, ts: float):
+    return message.Message(pid, 8, leaderid, ts)
+
 
 
 def stop_comm_msg_create(pid: int, ts: float) -> message.Message:
@@ -165,3 +200,5 @@ message_handler[2] = base_mutex_grant_handle
 message_handler[3] = base_mutex_release_handle
 message_handler[4] = message_update_handle
 message_handler[5] = stop_comm_msg_handle
+message_handler[7] = init_msg_handle
+message_handler[8] = init_msg_confirm_handle

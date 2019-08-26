@@ -51,6 +51,11 @@ class Gvh(object):
         else:
             self.__moat = None
 
+        self.init = False
+        self.init_counter = []
+        if self.is_leader:
+            self.init_counter.append(a.pid)
+
     def start_moat(self):
         if self.moat is not None:
             self.moat.start()
@@ -58,6 +63,8 @@ class Gvh(object):
     def start_mh(self):
         if self.mutex_handler is not None:
             self.mutex_handler.start()
+
+
 
     @property
     def moat(self):
