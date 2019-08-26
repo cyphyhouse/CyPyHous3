@@ -23,7 +23,7 @@ class TaskApp(AgentThread):
         if not self.locals['doing']:
             if sum(self.read_from_shared('tasks', None)) == len(
                     self.read_from_shared('tasks', None)):
-                self.stop()
+                print("done all tasks")
                 return
 
             if self.lock('pick_route'):
