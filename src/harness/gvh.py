@@ -9,6 +9,7 @@ from src.objects.dsm import DSM
 from src.objects.message import Message
 
 
+
 class Gvh(object):
     """
     global variable holder for the agent, this contains the worldview of each agent
@@ -137,7 +138,7 @@ class Gvh(object):
         if self.__dsm is None:
             self.__dsm = []
         self.__dsm.append(a)
-        msg = dsm_update_create(self.pid, a, a.owner, time.time())
+        msg = dsm_update_create(self.pid, a, a.owner, -1)
         if not self.__port_list == []:
             for port in self.__port_list:
                 send(msg, "<broadcast>", port)

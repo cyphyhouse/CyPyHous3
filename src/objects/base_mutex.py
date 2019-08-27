@@ -122,7 +122,7 @@ class BaseMutex(Mutex):
         :param req_num: request number
         :return:
         """
-        msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
+        msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, self.agent_comm_handler.agent_gvh.round_num)
         # print(self.ip_port_list)
         if not self.ip_port_list == []:
             # print("here")
@@ -152,7 +152,7 @@ class BaseMutex(Mutex):
             pass
 
     def release_mutex(self):
-        msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
+        msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, self.agent_comm_handler.agent_gvh.round_num)
         if not self.ip_port_list == []:
             for port in self.ip_port_list:
                 send(msg, '<broadcast>', port)

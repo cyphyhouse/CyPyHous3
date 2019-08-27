@@ -24,6 +24,7 @@ class TestAR(AgentThread):
             self.locals['neighbor'] = 0
         else:
             self.locals['neighbor'] = self.pid() + 1
+        self.create_ar_var('sum1', int, 0)
         self.create_ar_var('mypid', int, self.pid())
         self.create_aw_var('numadded', int, 0)
         self.initialize_lock('adding')
@@ -34,6 +35,7 @@ class TestAR(AgentThread):
                 return
 
             self.write_to_shared('sum', None, self.read_from_shared('sum', None) + self.read_from_shared('mypid', self.locals['neighbor']))
+            self.write_to_shared('sum1', self.pid(), self.read_from_shared('sum',None))
             self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
             self.locals['added'] = True
             self.unlock('adding')
@@ -65,6 +67,7 @@ class AllReadTest(unittest.TestCase):
         time.sleep(8)
         self.finalsum = self.b.locals['finalsum']
         # self.numvoted = self.b.read_from_shared('numvoted', None)
+        print(self.b.agent_gvh.dsm)
         self.assertEqual(self.finalsum, 10)
 
     def tearDown(self):

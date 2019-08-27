@@ -19,7 +19,7 @@ def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
             leaderid = agent_gvh.pid
 
         msg_contents = (leaderid, agent_gvh.round_num)
-        msg1 = round_update_msg_confirm_create(agent_gvh.pid, msg_contents, time.time())
+        msg1 = round_update_msg_confirm_create(agent_gvh.pid, msg_contents, agent_gvh.round_num)
         if len(agent_gvh.round_counter) == agent_gvh.participants:
             #print("sending message to update round", agent_gvh.round_num)
             if len(agent_gvh.port_list) is not 0:
@@ -62,7 +62,7 @@ def stop_msg_handle(msg: message.Message, agent_gvh: Gvh):
         if agent_gvh.is_leader:
             leaderid = agent_gvh.pid
 
-        msg1 = stop_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
+        msg1 = stop_msg_confirm_create(agent_gvh.pid, leaderid, agent_gvh.round_num)
         if len(agent_gvh.stop_counter) == agent_gvh.participants:
 
             if len(agent_gvh.port_list) is not 0:
@@ -87,8 +87,6 @@ def stop_msg_confirm_create(pid, leaderid, ts: float):
 
 
 
-
-
 def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
     initing = msg.sender
     if agent_gvh.is_leader:
@@ -99,7 +97,7 @@ def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
         leaderid = -1
         if agent_gvh.is_leader:
             leaderid = agent_gvh.pid
-        msg1 = init_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
+        msg1 = init_msg_confirm_create(agent_gvh.pid, leaderid, agent_gvh.round_num)
         if len(agent_gvh.init_counter) == agent_gvh.participants:
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
@@ -250,7 +248,6 @@ def stop_comm_msg_handle(msg: message.Message, agent_gvh: Gvh) -> None:
 
 
 def message_update_handle(msg: message.Message, agent_gvh: Gvh):
-    # print("got an update message",msg)
     var = msg.content
     updater = msg.sender
     for i in range(len(agent_gvh.dsm)):
@@ -265,15 +262,19 @@ def message_update_handle(msg: message.Message, agent_gvh: Gvh):
                     agent_gvh.dsm[i].updated = msg.timestamp
 
             else:
+
                 if agent_gvh.dsm[i].get_val(updater) is None or agent_gvh.dsm[i].last_update(updater) is None:
+
                     agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
                     agent_gvh.dsm[i].set_update(msg.timestamp, updater)
 
-                elif agent_gvh.dsm[i].last_update(updater) > msg.timestamp:
+                elif (agent_gvh.dsm[i].last_update(updater)) > (msg.timestamp):
                     pass
+                    #print("last update from", updater, "at ", agent_gvh.dsm[i].last_update(updater)," overriding", msg.timestamp)
                 else:
+
                     agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
-                    agent_gvh.dsm[i].set_update(msg.timestamp, updater)
+                    agent_gvh.dsm[i].set_update(int(msg.timestamp), updater)
 
 
 message_handler = dict()

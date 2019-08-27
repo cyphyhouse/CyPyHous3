@@ -235,7 +235,7 @@ class AgentThread(ABC, Thread):
         :return:
         """
         from src.harness.message_handler import init_msg_create
-        init_msg = init_msg_create(self.pid(), time.time())
+        init_msg = init_msg_create(self.pid(), self.agent_gvh.round_num)
         while not self.agent_gvh.init:
             # print("sending init", self.pid())
             self.initialize_vars()
