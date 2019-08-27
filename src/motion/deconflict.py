@@ -38,6 +38,12 @@ def line_to_pt_dist(l: pos.Seg, p: pos.Pos) -> float:
         return cd
 
     else:
+        d1 = pos.distance(l.start, p)
+        d2  = pos.distance(l.end, p)
+        d3 = l.length()
+        import math
+        if math.isclose(d1 + d2, d3):
+            return 0.0
         return min(pos.distance(l.start, p), pos.distance(l.end, p))
 
 
@@ -77,6 +83,7 @@ def seg_distance_3d(l1: pos.Seg, l2: pos.Seg, tol=0.000001) -> float:
             sN = sD
             tN = e + b
             tD = c
+
     if tN < 0:
         tN = 0.0
         if -d < 0:
@@ -84,7 +91,7 @@ def seg_distance_3d(l1: pos.Seg, l2: pos.Seg, tol=0.000001) -> float:
         elif -d > a:
             sN = sD
             sD = a
-    elif tN < tD:
+    elif tN > tD:
         tN = tD
         if - d + b < 0:
             sN = 0
@@ -93,6 +100,7 @@ def seg_distance_3d(l1: pos.Seg, l2: pos.Seg, tol=0.000001) -> float:
         else:
             sN = - d + b
             sD = a
+
     if abs(sN) < tol:
         sc = 0.0
         tc = 0.0
@@ -177,3 +185,4 @@ def clear_path(paths: list, proposed_path: list, ignore=None, tolerance=0.5) -> 
                 # print(paths[i], proposed_path, "are the conflicting paths")
                 return False
     return True
+
