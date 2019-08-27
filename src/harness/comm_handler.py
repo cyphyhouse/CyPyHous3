@@ -124,12 +124,12 @@ class CommHandler(Thread):
         """
         return self.__stop_event.is_set()
 
-    def __check_receiving_buffer(self) -> bool:
+    def __check_receiving_buffer(self, wait_time=0.001) -> bool:
         """
         Check if there are messages in the buffer
         :return: True if there are messages
         """
-        r, _, _ = select.select([self.receiver_socket], [], [], 0.001)
+        r, _, _ = select.select([self.receiver_socket], [], [], wait_time)
         return bool(r)
 
     def run(self):
@@ -143,21 +143,19 @@ class CommHandler(Thread):
             try:
                 self.receiver_socket.bind((self.ip, self.r_port))
                 self.receiver_socket.settimeout(self.timeout)
-            except OSError:
-                print("perhaps already created socket")
-
-            while not self.stopped():
-                time.sleep(0.01)
-                try:
+                while not self.stopped():
+                    if not self.__check_receiving_buffer(0.01):
+                        continue
                     data, addr = self.receiver_socket.recvfrom(8192)
                     #print("packet length",len(data))
                     msg = pickle.loads(data)
                     self.agent_gvh.add_recv_msg(msg)
-                except socket.timeout:
-                    print("agent", self.agent_gvh.pid, "timed out")
-                    self.stop()
-                except OSError:
-                    print("unexpected os error on agent", self.agent_gvh.pid)
+            except socket.timeout:
+                print("agent", self.agent_gvh.pid, "timed out")
+                self.stop()
+            except OSError as e:
+                print(e)
+                print("unexpected os error on agent", self.agent_gvh.pid)
 
     def handle_msgs(self) -> None:
         """
