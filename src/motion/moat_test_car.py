@@ -21,6 +21,7 @@ class MoatTestCar(MotionAutomaton):
             self.reached = True
 
     def moat_init_action(self):
+        super().moat_init_action()
         pass
 
     def moat_exit_action(self):

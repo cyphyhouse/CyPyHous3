@@ -30,6 +30,7 @@ class MoatTestDrone(MotionAutomaton):
         self.goTo(landing)
 
     def moat_init_action(self):
+        super().moat_init_action()
         self.takeoff()
         while not self.reached:
             time.sleep(0.1)

@@ -45,7 +45,26 @@ class MotionAutomaton(threading.Thread, ABC):
         action to perform when the motion automaton starts up.
         :return:
         """
-        pass
+        import rospy
+        if self.__position:
+            return
+        # else wait for messages to initialize position
+        rospy.loginfo("Waiting for the initial position")
+        timeout=10
+        try:
+            rospy.wait_for_message(
+                self.__sub_positioning.name,
+                self.__sub_positioning.data_class,
+                timeout=timeout
+            )
+            # self.__sub_positioning should also receive the message now.
+            # Just yield so the subscriber thread can update the position
+            rospy.sleep(0)
+        except rospy.exceptions.ROSException:
+            rospy.logerr("Unable to initialize position after %d sec. Shutdown ROS node for motion automaton.", timeout)
+            rospy.signal_shutdown("Unable to intialize position.")
+            raise NotImplementedError("TODO handle initialization failure")
+
 
     @abstractmethod
     def moat_exit_action(self):
