@@ -66,5 +66,5 @@ class TaskApp(AgentThread):
                 if self.locals['my_task'] is not None:
                     self.locals['my_task'] = None
                 self.locals['doing'] = False
-                time.sleep(0.5)
+                time.sleep(0.05)
                 return
