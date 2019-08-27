@@ -63,7 +63,7 @@ class MoatTestDrone(MotionAutomaton):
         self.pub.publish(pose)
 
     def follow_path(self, path: list) -> None:
-        for wp in path[:-1]:
+        for wp in path[1:-1]:
             self.goTo(wp, 0)
         self.goTo(path[-1], 1)
 
