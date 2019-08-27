@@ -272,7 +272,7 @@ class AgentThread(ABC, Thread):
 
                 if self.stopped():
                     break
-                print("executing round", self.agent_gvh.round_num)
+                #print("executing round", self.agent_gvh.round_num)
 
                 self.loop_body()
                 self.agent_gvh.update_round = False

@@ -57,7 +57,7 @@ class RRT(Planner):
         # print("Start ", start)
         # print("End", end)
         if end.z != 0:
-            print("z != 0, point not valid for car")
+            #print("z != 0, point not valid for car")
             return None
 
         self.node_list = [start]
