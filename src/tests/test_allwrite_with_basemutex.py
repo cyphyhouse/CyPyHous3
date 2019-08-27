@@ -5,7 +5,6 @@ from src.config.configs import AgentConfig
 from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.harness.agentThread import AgentThread
 
-
 class AddNums(AgentThread):
     """
     test class to test that agent thread objects are created
@@ -56,7 +55,7 @@ class AllwriteTest(unittest.TestCase):
         self.b, self.c, self.d, self.e, self.f = AddNums(c1), AddNums(c2), AddNums(c3), AddNums(c4), AddNums(c5)
 
     def test_write_to_shared(self):
-        time.sleep(3)
+        time.sleep(8)
         self.finalsum = self.b.locals['finalsum']
         #self.numvoted = self.b.read_from_shared('numvoted', None)
         self.assertEqual(self.finalsum, 12)

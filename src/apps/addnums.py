@@ -1,5 +1,5 @@
 from src.harness.agentThread import AgentThread
-
+import time
 
 class AddNums(AgentThread):
     """
@@ -12,32 +12,31 @@ class AddNums(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.locals['added'] = 0
+        self.locals['added'] = False
         self.locals['finalsum'] = None
-        self.create_aw_var('sum', int, 0)
-        self.create_aw_var('numadded', int, 0)
+        self.create_ar_var('sum', int, 0)
+        self.create_ar_var('numadded', int, 0)
+        self.locals['numadded'] = 0
         self.initialize_lock('adding')
 
     def loop_body(self):
-        import time
-        #time.sleep(1)
-        print("numadded, should be",self.num_agents()*2 ,"at the end",self.read_from_shared('numadded', None))
-
-        if not self.locals['added'] >= 2:
+        time.sleep(0.1)
+        self.locals['numadded'] = 0
+        for pid in range(self.num_agents()):
+            self.locals['numadded'] += self.read_from_shared('numadded', pid)
+        print("numadded for agent",self.pid()," is ",self.read_from_shared('numadded',None),"on round", self.agent_gvh.round_num)
+        if not self.locals['added']:
             if not self.lock('adding'):
-                #print("checking lock, don't have it")
                 return
-            print(self.locals['added'], "time add", self.pid())
-            self.write_to_shared('sum', None, self.read_from_shared('sum', None) + self.pid() * 2)
-            self.write_to_shared('numadded', None, self.read_from_shared('numadded', None) + 1)
-            self.locals['added'] += 1
+            self.write_to_shared('sum', self.pid(), self.read_from_shared('sum', self.pid()) + self.pid() * 2)
+            self.write_to_shared('numadded', self.pid(), 1)
+            self.locals['added'] = True
             self.unlock('adding')
-            print("releasing lock")
             return
-        if self.read_from_shared('numadded', None) == 2 * self.num_agents():
-            self.locals['finalsum'] = self.read_from_shared('sum', None)
+        if self.locals['numadded'] == self.num_agents():
+            self.locals['finalsum'] = self.read_from_shared('sum', self.pid())
             print("final sum is", self.locals['finalsum'],"\n")
-            self.stop()
+            self.trystop()
             return
 
 

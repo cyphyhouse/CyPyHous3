@@ -1,4 +1,5 @@
 import signal
+import sys
 import time
 from abc import ABC, abstractmethod
 from threading import Thread, Event
@@ -8,7 +9,7 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
-from src.harness.message_handler import stop_comm_msg_create
+from src.harness.message_handler import stop_comm_msg_create, round_update_msg_create,stop_msg_create
 from src.objects.base_mutex import BaseMutex
 
 
@@ -235,15 +236,24 @@ class AgentThread(ABC, Thread):
                 if not self.requestedlocks[i]:
                     self.baselocks[i].release_mutex()
 
+    def trystop(self):
+        stop_msg = stop_msg_create(self.pid(), self.agent_gvh.round_num,self.agent_gvh.round_num)
+        if len(self.agent_gvh.port_list) is not 0:
+            for port in self.agent_gvh.port_list:
+                send(stop_msg, "<broadcast>", port)
+        else:
+            send(stop_msg, "<broadcast>", self.receiver_port())
+
+
     def run(self) -> None:
         """
         needs to be implemented for any agenThread
         :return:
         """
         from src.harness.message_handler import init_msg_create
-        init_msg = init_msg_create(self.pid(), time.time())
+        init_msg = init_msg_create(self.pid(), self.agent_gvh.round_num)
         while not self.agent_gvh.init:
-            #print("sending init", self.pid())
+            # print("sending init", self.pid())
             self.initialize_vars()
             self.msg_handle()
             if len(self.agent_gvh.port_list) is not 0:
@@ -256,11 +266,39 @@ class AgentThread(ABC, Thread):
         while not self.stopped():
             self.msg_handle()
             self.release_unnecessary_mutexes()
-            try:
-                self.loop_body()
-            except OSError:
-                print("some unhandled error in application thread for agent", self.pid())
+            if not self.agent_gvh.is_alive:
+                print("stopping app thread on ",self.pid())
                 self.stop()
+                continue
+
+
+            try:
+                round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
+                while not self.agent_gvh.update_round:
+                    if self.stopped():
+                        break
+
+                    # print("sending init", self.pid())
+                    self.msg_handle()
+                    if len(self.agent_gvh.port_list) is not 0:
+                        for port in self.agent_gvh.port_list:
+                            send(round_update_msg, "<broadcast>", port)
+                    else:
+                        send(round_update_msg, "<broadcast>", self.receiver_port())
+                    time.sleep(0.1)
+
+                if self.stopped():
+                    break
+                #print("executing round", self.agent_gvh.round_num)
+
+                self.loop_body()
+                self.agent_gvh.update_round = False
+
+            except OSError:
+
+                print("some unhandled error in application thread for agent", sys.exc_info())
+                self.trystop()
 
             if self.agent_comm_handler.stopped():
-                self.stop()
+                self.trystop()
+

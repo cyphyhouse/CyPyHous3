@@ -6,7 +6,6 @@ from src.objects.udt import get_tasks
 from src.motion.pos_types import pos3d
 
 
-
 class TaskApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, m):
