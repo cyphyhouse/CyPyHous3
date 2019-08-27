@@ -260,22 +260,22 @@ class RRT(Planner):
                 path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
         return path
 
-'''
-a = RRT()
-p1 = Pos(np.array([-2, 0, 0]))
-p2 = Pos(np.array([-2, 0.5, 0]))
+#
+# a = RRT()
+# p1 = Pos(np.array([-2, 0, 0]))
+# p2 = Pos(np.array([-2, 0.5, 0]))
+#
+# from src.motion.cylobs import CylObs
+# o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
+#
+# import time
+# loops = 1
+# start_time = time.time()
+# for i in range(loops):
+#     p = a.find_path(p1, p2, [o1])
+# elapsed_time = time.time() - start_time
+# # print(elapsed_time/loops)
+# # print(p)
+# # for i in range(len(p)):
+# #     print(p[i])
 
-from src.motion.cylobs import CylObs
-o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
-
-import time
-loops = 1
-start_time = time.time()
-for i in range(loops):
-    p = a.find_path(p1, p2, [o1])
-elapsed_time = time.time() - start_time
-print(elapsed_time/loops)
-print(p)
-for i in range(len(p)):
-    print(p[i])
-'''

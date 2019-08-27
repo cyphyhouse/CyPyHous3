@@ -113,6 +113,12 @@ class Pos(object):
     def to_obs(self, size, z):
         return RoundObs(self.x, self.y, size, z)
 
+    def to_list(self):
+        """
+        :return:
+        """
+        return [self.x, self.y, self.z]
+
 
 class Seg(object):
     """
