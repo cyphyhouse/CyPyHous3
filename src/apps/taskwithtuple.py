@@ -16,7 +16,7 @@ class TaskApp(AgentThread):
     def initialize_vars(self):
         self.initialize_lock('pick_route')
         self.agent_gvh.create_aw_var('tasks', list, [0 for i in get_tasks(taskfile='src/apps/tasks.txt')])
-        self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position.to_tuple()])
+        self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position.to_list()])
 
         self.locals['my_task'] = None
         self.locals['doing'] = False
@@ -50,11 +50,11 @@ class TaskApp(AgentThread):
                             self.locals['doing'] = True
                             self.locals['tasks'][i] = 1
                             self.agent_gvh.put('tasks', self.locals['tasks'])
-                            self.agent_gvh.put('route', [i.to_tuple() for i in self.locals['test_route']], self.pid())
+                            self.agent_gvh.put('route', [i.to_list() for i in self.locals['test_route']], self.pid())
                             self.agent_gvh.moat.follow_path(self.locals['test_route'])
                             break
                         else:
-                            self.agent_gvh.put('route', [self.agent_gvh.moat.position.to_tuple()],
+                            self.agent_gvh.put('route', [self.agent_gvh.moat.position.to_list()],
                                                self.pid())
                             self.locals['my_task'] = None
                             self.locals['doing'] = False
