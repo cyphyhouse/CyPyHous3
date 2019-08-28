@@ -35,7 +35,7 @@ class TaskApp(AgentThread):
 
             if self.lock('pick_route'):
                 self.locals['tasks'] = self.read_from_shared('tasks', None)
-                #print("the computed paths on round",self.agent_gvh.round_num,"are:\n")
+                print("round",self.agent_gvh.round_num)
                 #for i in range(self.num_agents()):
                 #    print("route for agent",i," is :",self.read_from_shared('route',i))
                 # print("Tasks are", self.locals['tasks'])
