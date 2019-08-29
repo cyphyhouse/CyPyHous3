@@ -14,7 +14,7 @@ class AddNums(AgentThread):
     def initialize_vars(self):
         self.locals['added'] = False
         self.locals['finalsum'] = None
-        self.create_ar_var('sum', int, 0)
+        self.create_aw_var('sum', int, 0)
         self.create_ar_var('numadded', int, 0)
         self.locals['numadded'] = 0
         self.initialize_lock('adding')
@@ -24,11 +24,11 @@ class AddNums(AgentThread):
         self.locals['numadded'] = 0
         for pid in range(self.num_agents()):
             self.locals['numadded'] += self.read_from_shared('numadded', pid)
-        print("numadded for agent",self.pid()," is ",self.read_from_shared('numadded',None),"on round", self.agent_gvh.round_num)
         if not self.locals['added']:
             if not self.lock('adding'):
                 return
-            self.write_to_shared('sum', self.pid(), self.read_from_shared('sum', self.pid()) + self.pid() * 2)
+
+            self.write_to_shared('sum', None , self.pid() * 2 + self.read_from_shared('sum',None))
             self.write_to_shared('numadded', self.pid(), 1)
             self.locals['added'] = True
             self.unlock('adding')
