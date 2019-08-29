@@ -48,7 +48,7 @@ class TaskApp(AgentThread):
                                                                                           [])
                         if clear_path([[pos3d(*i) for i in path] for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
-                                      self.locals['test_route'], self.pid(), tolerance=0.75):
+                                      self.locals['test_route'], self.pid(), tolerance=1.00):
                             print("going to task", i)
                             self.locals['doing'] = True
                             self.locals['tasks'][i] = 1
