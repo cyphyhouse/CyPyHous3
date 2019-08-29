@@ -25,7 +25,7 @@ class TaskApp(AgentThread):
 
     def loop_body(self):
         time.sleep(0.1)
-
+        print("executing round", self.agent_gvh.round_num)
         if not self.locals['doing']:
             if sum(self.read_from_shared('tasks', None)) == len(
                     self.read_from_shared('tasks', None)):

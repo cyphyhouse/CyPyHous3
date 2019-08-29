@@ -249,6 +249,7 @@ class AgentThread(ABC, Thread):
 
         while not self.stopped():
             self.msg_handle()
+
             if not self.agent_gvh.is_alive:
                 print("stopping app thread on ",self.pid())
                 self.stop()
@@ -273,7 +274,7 @@ class AgentThread(ABC, Thread):
                 if self.stopped():
                     break
                 #print("executing round", self.agent_gvh.round_num)
-
+                self.msg_handle()
                 self.loop_body()
                 self.agent_gvh.update_round = False
 
