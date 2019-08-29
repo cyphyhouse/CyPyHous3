@@ -23,7 +23,7 @@ class MotionAutomaton(threading.Thread, ABC):
 
         try:
             import rospy
-            rospy.init_node("motionautomaton", anonymous=True)
+            rospy.init_node("motionautomaton", anonymous=True, disable_signals=True)
             self.__pub = rospy.Publisher(*gen_waypoint_params(config), queue_size=config.queue_size)
             self.__sub_reached = rospy.Subscriber(*gen_reached_params(config), self._getReached,
                                                   queue_size=config.queue_size)
@@ -72,7 +72,8 @@ class MotionAutomaton(threading.Thread, ABC):
         action to perform when the motion automaton exits
         :return:
         """
-        pass
+        import rospy
+        rospy.signal_shutdown("Motion automaton exit action. Shutting down...")
 
     @property
     def path(self) -> Union[Pos, list]:

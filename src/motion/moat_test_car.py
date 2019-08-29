@@ -25,6 +25,7 @@ class MoatTestCar(MotionAutomaton):
         pass
 
     def moat_exit_action(self):
+        super().moat_exit_action()
         pass
 
     def goTo(self, dest: Pos, wp_type: int = None) -> None:
