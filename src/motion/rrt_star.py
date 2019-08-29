@@ -43,11 +43,11 @@ class RRT(Planner):
         """
         if obstacle_list is None:
             obstacle_list = []
-        print("here, start:",start, "end:",end)
+        #print("here, start:",start, "end:",end)
         start = to_node(start)
         end = to_node(end)
         if end.z != 0:
-            print("z != 0, point not valid for car")
+            #print("z != 0, point not valid for car")
             return None
 
         node_list = [start]
