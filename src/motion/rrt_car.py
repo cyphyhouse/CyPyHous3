@@ -130,8 +130,10 @@ class RRT(Planner):
                         yaw_next = yaw_next - 2*math.pi
                     elif yaw_next < -math.pi:
                         yaw_next = yaw_next + 2*math.pi
-                tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
-                tmp_node.append(Node(x_next, y_next, 0, yaw_next))
+
+                if ((abs(x) <= self.max_xrand) or (abs(y) <= self.max_yrand)):
+                    tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
+                    tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
         minind = tmp_cost.index(min(tmp_cost))
         new_node = tmp_node[minind]
