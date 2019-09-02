@@ -23,7 +23,7 @@ class TaskApp(AgentThread):
         self.locals['obstacles'] = []
 
     def loop_body(self):
-        time.sleep(1)
+        time.sleep(0.5)
         if not self.locals['doing']:
             if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
@@ -31,6 +31,7 @@ class TaskApp(AgentThread):
                 return
 
             if self.lock('pick_route'):
+                print("i have mutex")
                 self.locals['tasks'] = self.read_from_shared('tasks', None)
                 for i in range(len(self.locals['tasks'])):
                     if not self.read_from_shared('tasks', None)[i].assigned:
@@ -57,12 +58,12 @@ class TaskApp(AgentThread):
                             self.locals['doing'] = False
                             continue
                         self.unlock('pick_route')
-                        time.sleep(0.5)
+                        time.sleep(0.1)
                         break
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
                     self.locals['my_task'] = None
                 self.locals['doing'] = False
-                time.sleep(0.5)
+                time.sleep(0.1)
                 return
