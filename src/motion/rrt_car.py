@@ -131,7 +131,7 @@ class RRT(Planner):
                     elif yaw_next < -math.pi:
                         yaw_next = yaw_next + 2*math.pi
 
-                if ((abs(x) <= self.max_xrand) or (abs(y) <= self.max_yrand)):
+                if (abs(x_next) <= self.max_xrand) or (abs(y_next) <= self.max_yrand):
                     tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
                     tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
