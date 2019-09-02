@@ -38,10 +38,10 @@ class RRT(Planner):
         self.node_list = []
         self.d = 0.33
         self.dt = 0.1
-        self.max_vel = 4
-        self.vel_steps = 4
-        self.steer_configs = [0, 0.1, 0.2, 0.3]
-        self.vel_configs = [1, 2, 3, 4]
+        self.max_vel = 3
+        self.vel_steps = 3
+        self.steer_configs = [0, 0.1, 0.2]
+        self.vel_configs = [1, 2, 3]
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
@@ -130,8 +130,10 @@ class RRT(Planner):
                         yaw_next = yaw_next - 2*math.pi
                     elif yaw_next < -math.pi:
                         yaw_next = yaw_next + 2*math.pi
-                tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
-                tmp_node.append(Node(x_next, y_next, 0, yaw_next))
+
+                if (abs(x_next) <= self.max_xrand) or (abs(y_next) <= self.max_yrand):
+                    tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
+                    tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
         minind = tmp_cost.index(min(tmp_cost))
         new_node = tmp_node[minind]
