@@ -24,7 +24,7 @@ class RRT(Planner):
     """
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.25, goal_sample_rate: int = 15,
-                 max_iter: int = 500):
+                 max_iter: int = 100):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-2.5, 2.5]
