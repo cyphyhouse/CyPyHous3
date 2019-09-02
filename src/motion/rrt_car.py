@@ -39,9 +39,9 @@ class RRT(Planner):
         self.d = 0.33
         self.dt = 0.1
         self.max_vel = 4
-        self.vel_steps = 4
-        self.steer_configs = [0, 0.1, 0.2, 0.3]
-        self.vel_configs = [1, 2, 3, 4]
+        self.vel_steps = 3
+        self.steer_configs = [0, 0.1, 0.2, 0.25]
+        self.vel_configs = [2, 3, 4]
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
