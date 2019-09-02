@@ -34,6 +34,7 @@ class TaskApp(AgentThread):
                 return
 
             if self.lock('pick_route'):
+                print("i have mutex")
                 self.locals['tasks'] = self.read_from_shared('tasks', None)
                 #for i in range(self.num_agents()):
                 #    print("route for agent",i," is :",self.read_from_shared('route',i))
