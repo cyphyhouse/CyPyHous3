@@ -65,5 +65,5 @@ def get_nbrs(pid, num_agents):
     else:
         all_nbrs = [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
 
-    prop_nbrs = [(nx, ny) for nx, ny in all_nbrs if 0 <= x < w and 0 <= y < w]
+    prop_nbrs = [(nx, ny) for nx, ny in all_nbrs if 0 <= nx < w and 0 <= ny < w]
     return set([nx*w + ny for nx, ny in prop_nbrs])
