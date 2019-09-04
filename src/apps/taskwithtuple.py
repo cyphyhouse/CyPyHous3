@@ -63,6 +63,8 @@ class TaskApp(AgentThread):
                             self.locals['my_task'] = None
                             self.locals['doing'] = False
                             continue
+                if not self.locals['doing']:
+                    print("didnt find a clear path")
                 self.unlock('pick_route')
                 time.sleep(0.05)
         else:
