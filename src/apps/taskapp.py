@@ -3,18 +3,33 @@ import time
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
-from src.objects.udt import get_tasks
+from src.objects.udt import Task
+from src.motion.pos_types import Pos
 
 
 class TaskApp(AgentThread):
 
+    tasks = [
+        Task(Pos(pos), i, False, None)
+        for i, pos in enumerate([
+            (2,2,1.25),
+            (0,2,1),
+            (0,0,1.25),
+            (-2,2,1),
+            (-2,-2,1.25),
+            (0,-2,1),
+            (-2,0,1.5),
+            (2,0,1),
+            (2,-2,1.5),
+        ])
+    ]
+
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(TaskApp, self).__init__(agent_config, moat_config)
-        self.start()
 
     def initialize_vars(self):
         self.initialize_lock('pick_route')
-        self.agent_gvh.create_aw_var('tasks', list, get_tasks(taskfile='src/apps/tasks.txt'))
+        self.agent_gvh.create_aw_var('tasks', list, TaskApp.tasks)
         self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position])
         self.locals['my_task'] = None
         self.locals['test_route'] = None
@@ -26,13 +41,14 @@ class TaskApp(AgentThread):
         if not self.locals['doing']:
             if sum([int(a.assigned) for a in self.read_from_shared('tasks', None)]) == len(
                     self.read_from_shared('tasks', None)):
-                self.stop()
+                self.trystop()
                 return
 
             if self.lock('pick_route'):
-                time.sleep(1)
                 self.locals['tasks'] = self.read_from_shared('tasks', None)
-                print("Tasks are", self.locals['tasks'])
+                print("Agent", self.pid(), "at", self.agent_gvh.moat.position,
+                      "has lock. Remaining tasks:",
+                      [t.id for t in self.locals['tasks'] if not t.assigned])
                 for i in range(len(self.locals['tasks'])):
                     if not self.locals['tasks'][i].assigned:
                         self.locals['my_task'] = self.locals['tasks'][i]
@@ -57,10 +73,14 @@ class TaskApp(AgentThread):
                             self.locals['doing'] = False
                             continue
                         break
+                if not self.locals['doing']:
+                    print("Agent", self.pid(), "didnt find a clear path")
                 self.unlock('pick_route')
+                time.sleep(0.05)
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
                     self.locals['my_task'] = None
                 self.locals['doing'] = False
+                time.sleep(2.0)  # Wait at the task for a while
                 return
