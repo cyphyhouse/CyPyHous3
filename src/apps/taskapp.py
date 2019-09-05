@@ -36,8 +36,6 @@ class TaskApp(AgentThread):
                 for i in range(len(self.locals['tasks'])):
                     if not self.locals['tasks'][i].assigned:
                         self.locals['my_task'] = self.locals['tasks'][i]
-                        print("going to task", i, "at", self.locals['my_task'].location)
-
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location,
@@ -50,6 +48,7 @@ class TaskApp(AgentThread):
                             self.locals['tasks'][i] = self.locals['my_task']
                             self.agent_gvh.put('tasks', self.locals['tasks'])
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
+                            print("Agent", self.pid(), "is going to task", i, "at", self.locals['my_task'].location)
                             self.agent_gvh.moat.follow_path(self.locals['test_route'])
                         else:
                             self.agent_gvh.put('route', [self.agent_gvh.moat.position],
@@ -57,8 +56,8 @@ class TaskApp(AgentThread):
                             self.locals['my_task'] = None
                             self.locals['doing'] = False
                             continue
-                        self.unlock('pick_route')
                         break
+                self.unlock('pick_route')
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:

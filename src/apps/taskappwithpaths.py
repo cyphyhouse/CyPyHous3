@@ -51,8 +51,8 @@ class TaskApp(AgentThread):
                             self.agent_gvh.put('tasks', self.locals['tasks'])
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
                             # self.agent_gvh.moat.follow_path(self.locals['test_route'])
-                            self.unlock('pick_route')
                             break
+                self.unlock('pick_route')
 
         else:
             if self.locals['my_task'] is not None:
