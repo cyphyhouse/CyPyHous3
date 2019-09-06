@@ -49,7 +49,7 @@ def get_corner_pos(pid, num_agents):
     space = 3.5
     return pos3d((x - (w-1) / 2)*space,
                  (y - (w-1) / 2)*space,
-                 1)
+                 1 if x != y else space)
 
 
 def get_nbrs(pid, num_agents):
