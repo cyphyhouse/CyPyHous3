@@ -28,8 +28,10 @@ class BasicFollowApp(AgentThread):
             if self.agent_gvh.moat.reached:
                 if self.locals['back']:
                     self.agent_gvh.moat.goTo(self.locals['dest2'])
+                    self.locals['back'] = False
                 else:
                     self.agent_gvh.moat.goTo(self.locals['dest1'])
+                    self.locals['back'] = True
                 self.locals['tries'] = self.locals['tries'] + 1
                 return
         else:
