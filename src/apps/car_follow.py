@@ -20,17 +20,17 @@ class BasicFollowApp(AgentThread):
         self.locals['back'] = True
 
     def loop_body(self):
-        while self.locals['tries'] < 10 :
-        if self.locals['init']:
-            self.agent_gvh.moat.goTo(self.locals['dest1'])
-            self.locals['init'] = False
-            return
-        if self.agent_gvh.moat.reached:
-            if self.locals['back']:
-                self.agent_gvh.moat.goTo(self.locals['dest2'])
-            else:
+        if self.locals['tries'] < 10 :
+            if self.locals['init']:
                 self.agent_gvh.moat.goTo(self.locals['dest1'])
-            self.locals['tries'] = self.locals['tries'] + 1
-            return
-
-        self.stop()
+                self.locals['init'] = False
+                return
+            if self.agent_gvh.moat.reached:
+                if self.locals['back']:
+                    self.agent_gvh.moat.goTo(self.locals['dest2'])
+                else:
+                    self.agent_gvh.moat.goTo(self.locals['dest1'])
+                self.locals['tries'] = self.locals['tries'] + 1
+                return
+        else:
+            self.stop()
