@@ -15,23 +15,22 @@ class BasicFollowApp(AgentThread):
     def initialize_vars(self):
         self.locals['dest1'] = pos3d(2., 1., 0.)
         self.locals['dest2'] = pos3d(-2., 1., 0.)
-        self.locals['dest3'] = pos3d(2., -1., 0.)
         self.locals['tries'] = 1
+        self.locals['init'] = True
+        self.locals['back'] = True
 
     def loop_body(self):
-        if self.locals['tries'] == 1:
+        while self.locals['tries'] < 10 :
+        if self.locals['init']:
             self.agent_gvh.moat.goTo(self.locals['dest1'])
-            time.sleep(5)
-            self.locals['tries'] = 2
+            self.locals['init'] = False
             return
-        if self.locals['tries'] == 2:
-            self.agent_gvh.moat.goTo(self.locals['dest2'])
-            time.sleep(5)
-            self.locals['tries'] = 3
+        if self.agent_gvh.moat.reached:
+            if self.locals['back']:
+                self.agent_gvh.moat.goTo(self.locals['dest2'])
+            else:
+                self.agent_gvh.moat.goTo(self.locals['dest1'])
+            self.locals['tries'] = self.locals['tries'] + 1
             return
-        if self.locals['tries'] == 3:
-            self.agent_gvh.moat.goTo(self.locals['dest3'])
-            time.sleep(5)
-            self.locals['tries'] = 4
-            self.stop()
-            return
+
+        self.stop()
