@@ -13,8 +13,8 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.locals['dest1'] = pos3d(2., 1., 0.)
-        self.locals['dest2'] = pos3d(-2., 1., 0.)
+        self.locals['dest1'] = pos3d(1.9, 1.7, 0.)
+        self.locals['dest2'] = pos3d(-2.1, 1.2., 0.)
         self.locals['tries'] = 1
         self.locals['init'] = True
         self.locals['back'] = True
