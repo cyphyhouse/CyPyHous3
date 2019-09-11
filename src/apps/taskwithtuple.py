@@ -65,7 +65,9 @@ class TaskApp(AgentThread):
                             continue
                 if not self.locals['doing']:
                     print("didnt find a clear path")
+
                 self.unlock('pick_route')
+                print("released mutex")
                 time.sleep(0.05)
         else:
             if self.agent_gvh.moat.reached:
