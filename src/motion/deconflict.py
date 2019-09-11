@@ -158,6 +158,8 @@ def path_is_close(l1: list, l2: list, tolerance=0.5) -> bool:
     :param tolerance:
     :return:
     """
+    if (l1[-1].z > 0 and l2[-1].z == 0) or (l1[-1].z == 0 and l2[-1] > 0):
+        return False
     l1 = get_path_segs(l1)
     l2 = get_path_segs(l2)
     for path_seg_1 in l1:
