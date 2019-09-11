@@ -70,6 +70,7 @@ class TaskApp(AgentThread):
                 print("released mutex")
                 time.sleep(0.05)
         else:
+            print("doing old task")
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
                     self.locals['my_task'] = None
