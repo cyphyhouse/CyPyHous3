@@ -38,10 +38,10 @@ class RRT(Planner):
         self.node_list = []
         self.d = 0.33
         self.dt = 0.1
-        self.max_vel = 4
-        self.vel_steps = 4
-        self.steer_configs = [0, 0.1, 0.2, 0.3]
-        self.vel_configs = [1, 2, 3, 4]
+        self.max_vel = 3
+        self.vel_steps = 3
+        self.steer_configs = [0, 0.1, 0.2]
+        self.vel_configs = [1, 2, 3]
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
@@ -57,7 +57,7 @@ class RRT(Planner):
         # print("Start ", start)
         # print("End", end)
         if end.z != 0:
-            print("z != 0, point not valid for car")
+            #print("z != 0, point not valid for car")
             return None
 
         self.node_list = [start]
@@ -90,11 +90,11 @@ class RRT(Planner):
         """
         # expand tree
         nearest_node = self.node_list[nind]
-        
+
         nnx = nearest_node.x
         nny = nearest_node.y
         nnyaw = nearest_node.yaw
-        
+
         theta_rnd = math.atan2(rnd[1] - nny, rnd[0] - nnx)
         theta_diff = nnyaw - theta_rnd
         if abs(theta_diff) <= math.pi/2:
@@ -130,8 +130,10 @@ class RRT(Planner):
                         yaw_next = yaw_next - 2*math.pi
                     elif yaw_next < -math.pi:
                         yaw_next = yaw_next + 2*math.pi
-                tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
-                tmp_node.append(Node(x_next, y_next, 0, yaw_next))
+
+                if (abs(x_next) <= self.max_xrand) or (abs(y_next) <= self.max_yrand):
+                    tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
+                    tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
         minind = tmp_cost.index(min(tmp_cost))
         new_node = tmp_node[minind]
@@ -225,7 +227,7 @@ class RRT(Planner):
                 return False
         else:
             return False
-    
+
     def path_smoothing(self, obstacle_list: list, path: list, max_iter: int) -> list:
         """
         smooth path
@@ -241,7 +243,7 @@ class RRT(Planner):
             if not ((pickPoints[0] == pickPoints[1]) or (abs(pickPoints[0] - pickPoints[1]) == 1)):
                 # don't waste cpu time if points are the same or sequential
                 pickPoints.sort()
-                
+
                 point0 = path[pickPoints[0]]
                 point1 = path[pickPoints[1]]
                 if pickPoints[1] == (path_len-1):
@@ -249,7 +251,7 @@ class RRT(Planner):
                     theta_diff = point0.yaw - end_theta
                 else:
                     theta_diff = point0.yaw - point1.yaw
-                
+
                 if abs(theta_diff) <= 0.3:
                     pass
                 else:
@@ -260,22 +262,21 @@ class RRT(Planner):
                 path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
         return path
 
-'''
-a = RRT()
-p1 = Pos(np.array([-2, 0, 0]))
-p2 = Pos(np.array([-2, 0.5, 0]))
-
-from src.motion.cylobs import CylObs
-o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
-
-import time
-loops = 1
-start_time = time.time()
-for i in range(loops):
-    p = a.find_path(p1, p2, [o1])
-elapsed_time = time.time() - start_time
-print(elapsed_time/loops)
-print(p)
-for i in range(len(p)):
-    print(p[i])
-'''
+#
+# a = RRT()
+# p1 = Pos(np.array([-2, 0, 0]))
+# p2 = Pos(np.array([-2, 0.5, 0]))
+#
+# from src.motion.cylobs import CylObs
+# o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
+#
+# import time
+# loops = 1
+# start_time = time.time()
+# for i in range(loops):
+#     p = a.find_path(p1, p2, [o1])
+# elapsed_time = time.time() - start_time
+# # print(elapsed_time/loops)
+# # print(p)
+# # for i in range(len(p)):
+# #     print(p[i])
