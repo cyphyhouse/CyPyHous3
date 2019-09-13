@@ -48,8 +48,10 @@ class MoatTestCar(MotionAutomaton):
         self.pub.publish(pose)
 
     def follow_path(self, path: list) -> None:
+        import rospy
         for wp in path[:-1]:
             self.goTo(wp, 0)
+            rospy.sleep(0.1)
         self.goTo(path[-1], 1)
 
     def run(self):
