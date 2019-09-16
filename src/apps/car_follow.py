@@ -1,15 +1,12 @@
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d
-import sys
 
-from src.config.config_funcs import get_configs
 
 class BasicFollowApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
-        self.start()
 
     def initialize_vars(self):
         self.locals['dest1'] = pos3d(2., 1., 0.)
@@ -33,7 +30,3 @@ class BasicFollowApp(AgentThread):
                 self.locals['tries'] = 2
                 self.locals['i'] += 1
                 return
-
-
-a_c, m_c = get_configs(sys.argv[1])
-app = BasicFollowApp(a_c, m_c)
