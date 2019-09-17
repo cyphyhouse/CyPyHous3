@@ -23,11 +23,13 @@ class RRT(Planner):
     Class for RRT* Planning
     """
 
+    ARENA_WIDTH = 10
+
     def __init__(self, rand_area: list = None, expand_dis: float = 0.25, goal_sample_rate: int = 15,
                  max_iter: int = 500):
         super(RRT, self).__init__()
         if rand_area is None:
-            rand_area = [-2.5, 2.5]
+            rand_area = [-RRT.ARENA_WIDTH, RRT.ARENA_WIDTH]
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
         self.expand_dis = expand_dis
