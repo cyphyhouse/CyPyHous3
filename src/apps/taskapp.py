@@ -1,4 +1,5 @@
-import time
+import rospy
+from std_msgs.msg import String
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
@@ -10,7 +11,7 @@ from src.motion.pos_types import Pos
 class TaskApp(AgentThread):
 
     tasks = [
-        Task(Pos(pos), i, False, None)
+        Task(Pos((4*pos[0], 4*pos[1], pos[2])), i, False, None)
         for i, pos in enumerate([
             (1.75, 1.75, 0),
             (0, 2, 0),
@@ -33,6 +34,9 @@ class TaskApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(TaskApp, self).__init__(agent_config, moat_config)
+        self._pub_marker = rospy.Publisher("gazebo_marker", String, queue_size=10)
+        if self.agent_gvh.is_leader:
+            self.init_all_task_markers()
 
     def initialize_vars(self):
         self.initialize_lock('pick_route')
@@ -68,6 +72,7 @@ class TaskApp(AgentThread):
                                       self.locals['test_route'], self.pid(), tolerance=1.0):
                             self.locals['doing'] = True
                             self.locals['my_task'].assign(self.pid())
+                            self.assign_task_marker()  # Add a visual marker in simulator
                             self.locals['tasks'][i] = self.locals['my_task']
                             self.agent_gvh.put('tasks', self.locals['tasks'])
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
@@ -83,11 +88,56 @@ class TaskApp(AgentThread):
                 if not self.locals['doing']:
                     print("Agent", self.pid(), "didnt find a clear path")
                 self.unlock('pick_route')
-                time.sleep(0.05)
+                rospy.sleep(0.05)
         else:
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
+                    self.finish_task_marker()
                     self.locals['my_task'] = None
                 self.locals['doing'] = False
-                time.sleep(2.0)  # Wait at the task for a while
+                rospy.sleep(1.0)  # Wait at the task for a while
                 return
+
+    def assign_task_marker(self):
+        marker_str = ", ".join([
+            "action: ADD_MODIFY",
+            "ns: 'tasks'",
+            "id: " + str(self.locals['my_task'].id),
+            "material: {script: {name: 'Gazebo/RedTransparent'}}",
+        ])
+        self._pub_marker.publish(marker_str)
+
+    def finish_task_marker(self):
+        marker_str = ", ".join([
+            "action: ADD_MODIFY",
+            "ns: 'tasks'",
+            "id: " + str(self.locals['my_task'].id),
+            "lifetime: {sec: 2}",
+            "material: {script: {name: 'Gazebo/GreenTransparent'}}",
+        ])
+        self._pub_marker.publish(marker_str)
+
+    def init_all_task_markers(self):
+        diameter = 1
+        scale_str = "{x: " + str(diameter) + "," \
+                    " y: " + str(diameter) + "," \
+                    " z: " + str(0.01) + "}"
+
+        for task in TaskApp.tasks:
+            task_loc = task.location
+            pose_str = "{position: " \
+                       " {x: " + str(task_loc.x) + "," \
+                       "  y: " + str(task_loc.y) + "," \
+                       "  z: " + str(0.0) + "}" \
+                       "}"
+            marker_str = ", ".join([
+                "action: ADD_MODIFY",
+                "ns: 'tasks'",
+                "id: " + str(task.id),
+                "type: CYLINDER",
+                "pose: " + pose_str,
+                "scale: " + scale_str,
+                "material: {script: {name: 'Gazebo/BlackTransparent'}}",
+            ])
+            rospy.sleep(0.4)
+            self._pub_marker.publish(marker_str)
