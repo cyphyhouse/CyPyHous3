@@ -4,6 +4,8 @@ from typing import Union
 
 
 class AgentConfig(object):
+    BROADCAST_ADDR = "127.255.255.255"  # TODO Move this into a global config file
+
     def __init__(self, pid: int, bots: int, rip: str, rport: int, plist: Union[list, None] = None,
                  mh: Union[None, classmethod] = None, is_leader=False, moat_class=None,
                  mhargs: Union[list, None] = None):

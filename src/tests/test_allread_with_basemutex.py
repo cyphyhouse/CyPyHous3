@@ -55,11 +55,12 @@ class AllReadTest(unittest.TestCase):
     def setUp(self):
         plist = [2000, 2001, 2002, 2003, 2004]
         bots = 5
-        c1 = AgentConfig(2, bots, "", 2001, plist, BaseMutexHandler, mhargs=[False, 2])
-        c2 = AgentConfig(1, bots, "", 2002, plist, BaseMutexHandler, mhargs=[False, 1])
-        c4 = AgentConfig(4, bots, "", 2004, plist, BaseMutexHandler, mhargs=[False, 4])
-        c5 = AgentConfig(3, bots, "", 2000, plist, BaseMutexHandler, mhargs=[False, 3])
-        c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler, mhargs=[True, 0], is_leader=True)
+        ip = AgentConfig.BROADCAST_ADDR
+        c1 = AgentConfig(2, bots, ip, 2001, plist, BaseMutexHandler, mhargs=[False, 2])
+        c2 = AgentConfig(1, bots, ip, 2002, plist, BaseMutexHandler, mhargs=[False, 1])
+        c4 = AgentConfig(4, bots, ip, 2004, plist, BaseMutexHandler, mhargs=[False, 4])
+        c5 = AgentConfig(3, bots, ip, 2000, plist, BaseMutexHandler, mhargs=[False, 3])
+        c3 = AgentConfig(0, bots, ip, 2003, plist, BaseMutexHandler, mhargs=[True, 0], is_leader=True)
 
         self.b, self.c, self.d, self.e, self.f = TestAR(c1), TestAR(c2), TestAR(c3), TestAR(c4), TestAR(c5)
 
@@ -70,25 +71,6 @@ class AllReadTest(unittest.TestCase):
         print(self.b.agent_gvh.dsm)
         self.assertEqual(self.finalsum, 10)
 
-    def tearDown(self):
-        self.b.agent_comm_handler.receiver_socket.close()
-        self.c.agent_comm_handler.receiver_socket.close()
-        self.d.agent_comm_handler.receiver_socket.close()
-        self.e.agent_comm_handler.receiver_socket.close()
-        self.f.agent_comm_handler.receiver_socket.close()
-
 
 if __name__ == '__main__':
     unittest.main()
-
-'''
-plist = [2000, 2001, 2002, 2003, 2004]
-bots = 5
-c1 = AgentConfig(2, bots, "", 2001, plist, BaseMutexHandler(False, 2))
-c2 = AgentConfig(1, bots, "", 2002, plist, BaseMutexHandler(False, 1))
-c4 = AgentConfig(4, bots, "", 2004, plist, BaseMutexHandler(False, 4))
-c5 = AgentConfig(5, bots, "", 2000, plist, BaseMutexHandler(False, 5))
-c3 = AgentConfig(0, bots, "", 2003, plist, BaseMutexHandler(True, 0), is_leader=True)
-
-b, c, d, e, f = AddNums(c1), AddNums(c2), AddNums(c3), AddNums(c4), AddNums(c5)
-'''

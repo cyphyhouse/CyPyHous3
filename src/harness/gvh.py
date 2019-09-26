@@ -153,9 +153,9 @@ class Gvh(object):
         msg = dsm_update_create(self.pid, a, a.owner, -1)
         if not self.__port_list == []:
             for port in self.__port_list:
-                send(msg, "<broadcast>", port, self.__window)
+                send(msg, AgentConfig.BROADCAST_ADDR, port, self.__window)
         else:
-            send(msg, "<broadcast>", self.__rport,self.__window)
+            send(msg, AgentConfig.BROADCAST_ADDR, self.__rport,self.__window)
 
     def get(self, varname: str, pid: int = -1) -> Union[int, bool, float, list, object, tuple]:
         """
@@ -197,9 +197,9 @@ class Gvh(object):
             msg = dsm_update_create(self.pid, var, var.owner, self.round_num)
             if not self.__port_list == []:
                 for port in self.__port_list:
-                    send(msg, "<broadcast>", port,self.__window)
+                    send(msg, AgentConfig.BROADCAST_ADDR, port,self.__window)
             else:
-                send(msg, "<broadcast>", self.__rport,self.__window)
+                send(msg, AgentConfig.BROADCAST_ADDR, self.__rport,self.__window)
 
     @property
     def port_list(self):
@@ -389,9 +389,9 @@ class Gvh(object):
         for msg in self.msg_list:
             if not self.__port_list == []:
                 for port in self.__port_list:
-                    send(msg, "<broadcast>", port)
+                    send(msg, AgentConfig.BROADCAST_ADDR, port)
             else:
-                send(msg, "<broadcast>", self.__rport)
+                send(msg, AgentConfig.BROADCAST_ADDR, self.__rport)
         self.msg_list = []
 
 

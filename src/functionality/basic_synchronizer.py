@@ -89,7 +89,7 @@ class BasicSynchronizer(Synchronizer):
 
     def send_sync_message(self):
         for port in self.ip_port_list:
-            send(round_update_create(self.pid, self.round_num, time.time()), "<broadcast>", port)
+            send(round_update_create(self.pid, self.round_num, time.time()), AgentConfig.BROADCAST_ADDR, port)
 
     def synchronize_wait(self):
         # print("synchronizing", self.pid)

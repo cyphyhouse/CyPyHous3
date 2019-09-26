@@ -1,6 +1,7 @@
 import time
 from typing import Union
 
+from src.config.configs import AgentConfig
 from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.message_handler import base_mutex_grant_create, mutex_release_create, base_mutex_request_create, base_mutex_ack_create
@@ -126,18 +127,18 @@ class BaseMutex(Mutex):
         msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
         if not self.ip_port_list == []:
             for port in self.ip_port_list:
-                send(msg, '<broadcast>', port)
+                send(msg, AgentConfig.BROADCAST_ADDR, port)
         else:
-            send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+            send(msg, AgentConfig.BROADCAST_ADDR, self.agent_comm_handler.r_port)
 
     def ack_request(self, grantee, reqnum):
         if self.agent_comm_handler.agent_gvh.is_leader:
             msg = base_mutex_ack_create(self.agent_comm_handler.agent_gvh.pid, grantee, self.mutex_id, reqnum, time.time())
             if not self.ip_port_list == []:
                 for port in self.ip_port_list:
-                    send(msg, '<broadcast>', port)
+                    send(msg, AgentConfig.BROADCAST_ADDR, port)
             else:
-                send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+                send(msg, AgentConfig.BROADCAST_ADDR, self.agent_comm_handler.r_port)
 
     def grant_mutex(self, mutexnum: int) -> None:
         """
@@ -154,9 +155,9 @@ class BaseMutex(Mutex):
 
             if not self.ip_port_list == []:
                 for port in self.ip_port_list:
-                    send(msg, '<broadcast>', port)
+                    send(msg, AgentConfig.BROADCAST_ADDR, port)
             else:
-                send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+                send(msg, AgentConfig.BROADCAST_ADDR, self.agent_comm_handler.r_port)
         else:
             pass
 
@@ -165,6 +166,6 @@ class BaseMutex(Mutex):
         msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
         if not self.ip_port_list == []:
             for port in self.ip_port_list:
-                send(msg, '<broadcast>', port)
+                send(msg, AgentConfig.BROADCAST_ADDR, port)
         else:
-            send(msg, '<broadcast>', self.agent_comm_handler.r_port)
+            send(msg, AgentConfig.BROADCAST_ADDR, self.agent_comm_handler.r_port)

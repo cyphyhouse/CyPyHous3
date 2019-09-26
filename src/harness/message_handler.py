@@ -3,6 +3,7 @@
 import time
 
 import src.objects.message as message
+from src.config.configs import AgentConfig
 from src.functionality.comm_funcs import send
 from src.harness.gvh import Gvh
 
@@ -25,9 +26,9 @@ def round_update_msg_handle(msg: message.Message, agent_gvh: Gvh):
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
 
-                    send(msg1, "<broadcast>", port,2)
+                    send(msg1, AgentConfig.BROADCAST_ADDR, port,2)
             else:
-                send(msg1, "<broadcast>", agent_gvh.rport,2)
+                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport,2)
 
 
 def round_update_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
@@ -67,9 +68,9 @@ def stop_msg_handle(msg: message.Message, agent_gvh: Gvh):
 
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
-                    send(msg1, "<broadcast>", port)
+                    send(msg1, AgentConfig.BROADCAST_ADDR, port)
             else:
-                send(msg1, "<broadcast>", agent_gvh.rport)
+                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport)
 
 
 def stop_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
@@ -102,9 +103,9 @@ def init_msg_handle(msg: message.Message, agent_gvh: Gvh):
         if len(agent_gvh.init_counter) == agent_gvh.participants:
             if len(agent_gvh.port_list) is not 0:
                 for port in agent_gvh.port_list:
-                    send(msg1, "<broadcast>", port)
+                    send(msg1, AgentConfig.BROADCAST_ADDR, port)
             else:
-                send(msg1, "<broadcast>", agent_gvh.rport)
+                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport)
 
 
 def init_msg_confirm_handle(msg: message.Message, agent_gvh: Gvh):
