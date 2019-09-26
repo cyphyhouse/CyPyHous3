@@ -11,8 +11,6 @@ def send(msg: Message, ip: str, port: int, resend = 1) -> None:
     :param port: port to be sent to
     :return: Nothing
     """
-    client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    #for i in range(0,resend):
-    client_sock.sendto(pickle.dumps(msg), (ip, port))
-    client_sock.close()
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client_sock:
+        client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        client_sock.sendto(pickle.dumps(msg), (ip, port))
