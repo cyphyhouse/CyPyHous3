@@ -20,6 +20,7 @@ class MotionAutomaton(threading.Thread, ABC):
         self.__path = []
         self.__planner = config.planner
         self.__bot_type = config.bot_type
+        self.__tpos = {}
 
         try:
             import rospy
