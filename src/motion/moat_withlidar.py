@@ -10,9 +10,7 @@ class MoatWithLidar(MotionAutomaton):
 
     def __init__(self, config):
         super(MoatWithLidar, self).__init__(config)
-        self.lidarData = None
-        # print("init")
-        self.tscan = []
+        self.tscan = {}
         self.tpos = {}
 
         self.__sub_lidar = rospy.Subscriber(config.rospy_node.strip("/waypoint_node")+'/racecar/laser/scan', LaserScan, self._getLidarData)
@@ -23,38 +21,25 @@ class MoatWithLidar(MotionAutomaton):
         import math
         yaw = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), pow(quat.w, 2) + pow(quat.x,2) - pow(quat.y,2) - pow(quat.z,2))
         self.position = Pos(np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z, yaw]))
-        # print("tpos")
         try:
-            self.tpos[data.header.stamp.secs] = self.position
+            cur_time = data.header.stamp.secs + data.header.stamp.nsecs*1e-9
+            self.tpos[cur_time] = self.position
         except:
             pass
 
     def _getLidarData(self, data) -> None:
-        myList = []
+        tmpList = []
         lidar_msg = data
         cur_angle = lidar_msg.angle_max
-        cur_time = lidar_msg.header.stamp.secs
+        cur_time = lidar_msg.header.stamp.secs + lidar_msg.header.stamp.nsecs*1e-9
         for distance in lidar_msg.ranges:
             cur_angle -= lidar_msg.angle_increment
             # If encounter infinite distance, continue
             if distance == float('inf'):
                 continue
             
-            try:
-                if not cur_time in self.tpos:
-                    continue
-                position = self.tpos[cur_time]
-                
-                x = position.x + np.sin(np.pi/2 - position.yaw + cur_angle)*distance*np.cos(0.05)
-                y = position.y + np.cos(np.pi/2 - position.yaw + cur_angle)*distance*np.cos(0.05)
-            except:
-                x = self.position.x + np.sin(np.pi/2 - self.position.yaw + cur_angle)*distance*np.cos(0.05)
-                y = self.position.y + np.cos(np.pi/2 - self.position.yaw + cur_angle)*distance*np.cos(0.05)
-
-            myList.append(((x,y), cur_angle))
-        # print("tscan")
-        self.lidarData = myList
-        self.tscan.append((lidar_msg.header.stamp.secs, myList))
+            tmpList.append((distance, cur_angle))
+        self.tscan[cur_time] = tmpList
 
     def _getReached(self, data) -> None:
         a = str(data).upper()
