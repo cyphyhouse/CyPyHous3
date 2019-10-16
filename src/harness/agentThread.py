@@ -1,5 +1,3 @@
-import signal
-import sys
 import time
 from abc import ABC, abstractmethod
 from threading import Thread, Event
@@ -9,7 +7,8 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
-from src.harness.message_handler import stop_comm_msg_create, round_update_msg_create,stop_msg_create
+from src.harness.message_handler import stop_comm_msg_create, round_update_msg_create, stop_msg_create
+from src.motion.moat_withlidar import MoatWithLidar
 from src.objects.base_mutex import BaseMutex
 
 
@@ -226,13 +225,12 @@ class AgentThread(ABC, Thread):
                     self.baselocks[i].release_mutex()
 
     def trystop(self):
-        stop_msg = stop_msg_create(self.pid(), self.agent_gvh.round_num,self.agent_gvh.round_num)
+        stop_msg = stop_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
         if len(self.agent_gvh.port_list) is not 0:
             for port in self.agent_gvh.port_list:
                 send(stop_msg, AgentConfig.BROADCAST_ADDR, port)
         else:
             send(stop_msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
-
 
     def run(self) -> None:
         """
@@ -256,13 +254,13 @@ class AgentThread(ABC, Thread):
             self.msg_handle()
             self.release_unnecessary_mutexes()
             if not self.agent_gvh.is_alive:
-                print("stopping app thread on ",self.pid())
+                print("stopping app thread on ", self.pid())
                 self.stop()
                 continue
 
-
             try:
-                round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
+                round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num,
+                                                           self.agent_gvh.round_num)
                 while not self.agent_gvh.update_round:
                     if self.stopped():
                         break
@@ -278,9 +276,15 @@ class AgentThread(ABC, Thread):
 
                 if self.stopped():
                     break
-                #print("executing round", self.agent_gvh.round_num)
+                # print("executing round", self.agent_gvh.round_num)
 
                 self.loop_body()
+                # resetting t_pos and t_sync
+                if self.agent_gvh.moat is not None:
+                    if isinstance(self.agent_gvh.moat, MoatWithLidar):
+                        self.agent_gvh.moat.tscan = []
+                        self.agent_gvh.moat.tpos = {}
+
                 self.agent_gvh.update_round = False
 
             except OSError as e:
@@ -289,4 +293,3 @@ class AgentThread(ABC, Thread):
 
             if self.agent_comm_handler.stopped():
                 self.trystop()
-
