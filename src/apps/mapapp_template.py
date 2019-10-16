@@ -15,7 +15,7 @@ class MapApp(AgentThread):
 
     def loop_body(self):
         while not self.stopped():
-            time.sleep(100)
+            time.sleep(0.1)
             if self.locals['new_point'] :
                 self.locals['new_point'] = False
                 return

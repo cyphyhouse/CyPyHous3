@@ -282,7 +282,7 @@ class AgentThread(ABC, Thread):
                 # resetting t_pos and t_sync
                 if self.agent_gvh.moat is not None:
                     if isinstance(self.agent_gvh.moat, MoatWithLidar):
-                        self.agent_gvh.moat.tscan = []
+                        self.agent_gvh.moat.tscan = {}
                         self.agent_gvh.moat.tpos = {}
 
                 self.agent_gvh.update_round = False
