@@ -1,6 +1,7 @@
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d
+import time
 
 
 class MapApp(AgentThread):
@@ -14,6 +15,7 @@ class MapApp(AgentThread):
 
     def loop_body(self):
         while not self.stopped():
+            time.sleep(100)
             if self.locals['new_point'] :
                 self.locals['new_point'] = False
                 return
