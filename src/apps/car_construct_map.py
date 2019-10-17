@@ -3,6 +3,7 @@ from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos  # TODO Choose only one of them
 
 from typing import Tuple, Optional
+import rospy
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -86,40 +87,44 @@ class BasicFollowApp(AgentThread):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
 
     def initialize_vars(self):
-        self.locals['dest1'] = pos3d(2., 1., 0.)
-        self.locals['dest2'] = pos3d(-2., 1., 0.)
-        self.locals['dest3'] = pos3d(2., -1., 0.)
-        self.locals['tries'] = 1
         self.locals['i'] = 1
         self.locals['map'] = GridMap()
+        self.locals['newpoint'] = True
 
     def loop_body(self):
-        while (self.locals['i'] < 5):
-            self.LUpdate()
-            if self.locals['tries'] == 1:
-                self.agent_gvh.moat.goTo(self.locals['dest1'])
-                self.locals['tries'] = 2
-                return
-            if self.locals['tries'] == 2 and self.agent_gvh.moat.reached:
-                self.agent_gvh.moat.goTo(self.locals['dest2'])
-                self.locals['tries'] = 3
-                return
-            if self.locals['tries'] == 3 and self.agent_gvh.moat.reached:
-                self.agent_gvh.moat.goTo(self.locals['dest3'])
-                self.locals['tries'] = 2
-                self.locals['i'] += 1
-                return
+        if self.locals['i'] > 20:
+            self.trystop()
+            return
 
-    def LUpdate(self) -> None:
-        pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
-        self.agent_gvh.moat.tpos = {}
-        for time in pscan:
-            ipos, iscan = pscan[time]
-            empty_map = get_empty_map(ipos, iscan)
-            obs_map = get_obstacle_map(ipos, iscan)
-            self.locals['map'] = self.locals['map'] + empty_map + obs_map
+        rospy.sleep(0.05)
+        self.locals['i'] += 1
 
-        self.locals['map'].show()
+        # NewPoint event
+        if self.locals['newpoint']:
+            self.locals['map'] = self.locals['map'] # TODO merge global and local map
+            pos = self.agent_gvh.moat.position
+            next_pos = pick_free_grid(self.locals['map'], pos)
+            if not next_pos:
+                rospy.logwarn("Cannot find an empty adjacent grid from " + str(pos))
+            self.locals['path'] = self.agent_gvh.moat.planner.find_path(pos, next_pos)
+            self.agent_gvh.moat.follow_path(self.locals['path'])
+            self.locals['newpoint'] = False
+            return
+
+        # LUpdate event
+        if True:
+            if self.agent_gvh.moat.reached:
+                self.locals['newpoint'] = True
+            pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
+            self.agent_gvh.moat.tpos = {}
+            for time in pscan:
+                ipos, iscan = pscan[time]
+                empty_map = get_empty_map(ipos, iscan)
+                obs_map = get_obstacle_map(ipos, iscan)
+                self.locals['map'] = self.locals['map'] + empty_map + obs_map
+
+            self.locals['map'].show()
+            return
 
 
 def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Tuple[int, int]:
@@ -234,3 +239,13 @@ def dist(x1, y1, x2, y2, yaw, scan) -> bool:
                 return d < 50
             else:
                 return d < distance  # * 10
+
+
+def pick_free_grid(m: GridMap, pos: pos3d) -> Optional[pos3d]:
+    curr_grid = GridMap.to_2d_grid(pos.x, pos.y)
+    next_grid = m.pick_next_grid(curr_grid, pos.yaw)
+    rospy.loginfo("Picked grid: " + str(next_grid))
+    if next_grid:
+        return pos3d(next_grid[0] + .5, next_grid[1] + .5, 0, pos.yaw)
+    else:
+        return None
