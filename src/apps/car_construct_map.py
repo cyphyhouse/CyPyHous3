@@ -70,8 +70,6 @@ class BasicFollowApp(AgentThread):
             ipos, iscan = pscan[time]
             x = ipos.x
             y = ipos.y
-            # self.locals['map'][int(y*100 + 900)][int(x*100 + 900)] = 0
-            #TODO setAll(pos, scan, dim)
             self.setAll(ipos, iscan)
 
             obstacles = self.getObs(ipos, iscan)
@@ -192,19 +190,6 @@ class BasicFollowApp(AgentThread):
             else:
                 delta = -np.pi/2
         omega = yaw - delta
-
-        # cur_angle = min_angle
-        # n = 0
-        # while(cur_angle < max_angle):
-        #     if abs(cur_angle-omega) < 0.1:
-        #         break
-        #     n+=1
-        #     cur_angle += angle_inc
-
-        # if scan[n][0] == float('inf'):
-        #     return d <= 50
-        # else:
-        #     return d <= scan[n][0]
 
         for distance, angle in scan:
             if abs(angle - omega) < 0.01:
