@@ -2,12 +2,22 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos  # TODO Choose only one of them
 
+from typing import Tuple, Optional
+
 import numpy as np
 import matplotlib.pyplot as plt
 from math import floor
 
 
+def _normalize_radians(rad: float) -> float:
+    return (rad + np.pi) % (2 * np.pi) - np.pi
+
+
 class GridMap:
+    UNKNOWN = -1
+    EMPTY = 0
+    OCCUPIED = 1
+
     def __init__(self, shape=(200, 200)):
         """ Map should initialized with -1"""
         self.__grid_map = np.full(shape=shape, fill_value=-1, dtype=np.int8)
@@ -32,6 +42,43 @@ class GridMap:
     def show(self):
         plt.imshow(self.__grid_map)
         plt.pause(0.5)
+
+    @staticmethod
+    def to_2d_grid(x: float, y: float) -> Tuple[int, int]:
+        return tuple(np.floor([x, y]).astype(int))
+
+    def pick_next_grid(self, curr_grid: Tuple[int, int], curr_yaw: float,
+                       yaw_diff_threshold: float = np.pi / 4) -> Optional[Tuple[int, int]]:
+        """ Randomly pick an adjacent grid without obstacle and within yaw threshold.
+        :param curr_grid: Current grid of the device
+        :param curr_yaw: Current orientation of the device
+        :param yaw_diff_threshold: Threshold for orientation difference
+        :return: An empty adjacent grid or None if cannot find one
+        """
+        assert self.__grid_map[curr_grid] == GridMap.EMPTY
+        assert -np.pi < curr_yaw <= np.pi
+        assert yaw_diff_threshold >= 0.0
+
+        next_grid = None
+        moves = [(_x, _y) for _x in [-1, 0, 1] for _y in [-1, 0, 1] if not (_x == 0 and _y == 0)]
+        for x, y in np.random.permutation(moves):
+            try_grid = (curr_grid[0] + x, curr_grid[1] + y)
+            if self.__grid_map[try_grid] != GridMap.EMPTY:
+                continue  # The grid is already occupied
+
+            headings = [curr_yaw, curr_yaw + np.pi]  # Can go forward or backward
+            yaw = np.arctan2(y, x)  # Target yaw
+            norm_diffs = [_normalize_radians(h - yaw) for h in headings]
+            yaw_diff = min(abs(d) for d in norm_diffs)
+            if yaw_diff > yaw_diff_threshold:
+                continue
+            # else:
+            next_grid = try_grid
+            break
+
+        assert next_grid != curr_grid, str(next_grid)
+        return next_grid
+
 
 class BasicFollowApp(AgentThread):
 
@@ -64,74 +111,32 @@ class BasicFollowApp(AgentThread):
                 return
 
     def LUpdate(self) -> None:
-        pscan = self.tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
+        pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
         self.agent_gvh.moat.tpos = {}
         for time in pscan:
             ipos, iscan = pscan[time]
-            x = ipos.x
-            y = ipos.y
             self.setAll(ipos, iscan)
 
-            obstacles = self.getObs(ipos, iscan)
+            obstacles = get_obstacles(ipos, iscan)
 
             for obs in obstacles:
-                obsX = floor(obs[0]*1 + 9)
-                obsY = floor(obs[1]*1 + 9)
-                self.locals['map'][obsY][obsX] = 1
+                obs_x, obs_y = GridMap.to_2d_grid(obs[0]*1 + 9, obs[1]*1 + 9)
+                self.locals['map'][obs_x][obs_y] = 1
 
-        # plt.imshow(self.locals['map'])
-        # plt.pause(0.5)
         self.locals['map'].show()
 
-    def getObs(self, ipos: Pos, iscan: list) -> list:
-        x = ipos.x
-        y = ipos.y
-        yaw = ipos.yaw
-        obstacles = []
-        for distance, cur_angle in iscan:
-            if distance == float('inf'):
-                continue
-            obsX = x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
-            obsY = y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
-            obstacles.append((obsX, obsY))
-
-        return obstacles
-
-    def tsync(self, tpos: dict, tscan: dict) -> dict:
-        pscan = {}
-        for pt in tpos:
-            for st in tscan:
-                if abs(pt-st)<0.01:
-                    pscan[pt] = (tpos[pt], tscan[st])
-                    break
-
-        return pscan
-        
     def setAll(self, pos, scan):
         px = floor(pos.x*1 + 9)
         py = floor(pos.y*1 + 9) 
         yaw = pos.yaw
 
-        leftPoint = scan[-1]
-        rightPoint = scan[0]
-        midPoint = scan[int(len(scan)/2)]
+        left_point = scan[-1]
+        right_point = scan[0]
+        mid_point = scan[int(len(scan)/2)]
 
-        _, cur_angle = leftPoint
-        distance = 5
-        lx = floor((pos.x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05))*1 + 9)
-        ly = floor((pos.y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05))*1 + 9)
-
-        _, cur_angle = rightPoint
-        distance = 5
-        rx = floor((pos.x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05))*1 + 9)
-        ry = floor((pos.y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05))*1 + 9)
-
-        _, cur_angle = midPoint
-        distance = 5
-        mx = floor((pos.x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05))*1 + 9)
-        my = floor((pos.y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05))*1 + 9)
-
-
+        lx, ly = global_grid(pos, left_point[1])
+        rx, ry = global_grid(pos, right_point[1])
+        mx, my = global_grid(pos, mid_point[1])
 
         # Left half
         if lx < mx:
@@ -149,11 +154,10 @@ class BasicFollowApp(AgentThread):
         
         for x in itrx:
             for y in itry:
-                if self.dist(x,y,px,py,yaw,scan):
-                    if self.locals['map'][y][x] == 1:
+                if dist(x, y, px, py, yaw, scan):
+                    if self.locals['map'][x][y] == 1:
                         continue
-                    self.locals['map'][y][x] = 0
-
+                    self.locals['map'][x][y] = 0
 
         # Right half
         if rx < mx:
@@ -163,37 +167,66 @@ class BasicFollowApp(AgentThread):
             else:
                 itry = range(ry, my+1)
         else:
-            itr = range(mx, rx)
+            itrx = range(mx, rx)
             if ry > my:
                 itry = range(my, ry+1)
             else:
                 itry = range(my+1, ry-1, -1)
-        
-        for x in itrx   :
+
+        for x in itrx:
             for y in itry:
-                if self.dist(x,y,px,py, yaw, scan):
-                    if self.locals['map'][y][x] == 1:
+                if dist(x, y, px, py, yaw, scan):
+                    if self.locals['map'][x][y] == 1:
                         continue
-                    self.locals['map'][y][x] = 0
+                    self.locals['map'][x][y] = 0
 
 
-    def dist(self, x1, y1, x2, y2, yaw, scan) -> bool:
-        min_angle = -1.57079994678
-        max_angle = 1.57079994678
-        angle_inc = 0.00290888897143
-        d = np.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
-        try:
-            delta = np.arctan((y1-y2)/(x1-x2))
-        except ZeroDivisionError:
-            if y1 > y2:
-                delta = np.pi/2
+def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Tuple[int, int]:
+    x = np.floor((pos.x + np.sin(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05)) * 1 + 9).astype(int)
+    y = np.floor((pos.y + np.cos(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05)) * 1 + 9).astype(int)
+    return x, y
+
+
+def get_obstacles(ipos: Pos, iscan: list) -> list:
+    x = ipos.x
+    y = ipos.y
+    yaw = ipos.yaw
+    obstacles = []
+    for distance, cur_angle in iscan:
+        if distance == float('inf'):
+            continue
+        obs_x = x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
+        obs_y = y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
+        obstacles.append((obs_x, obs_y))
+
+    return obstacles
+
+
+def tsync(tpos: dict, tscan: dict) -> dict:
+    pscan = {}
+    for pt in tpos:
+        for st in tscan:
+            if abs(pt-st)<0.01:
+                pscan[pt] = (tpos[pt], tscan[st])
+                break
+
+    return pscan
+
+
+def dist(x1, y1, x2, y2, yaw, scan) -> bool:
+    d = np.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
+    try:
+        delta = np.arctan((y1-y2)/(x1-x2))
+    except ZeroDivisionError:
+        if y1 > y2:
+            delta = np.pi/2
+        else:
+            delta = -np.pi/2
+    omega = yaw - delta
+
+    for distance, angle in scan:
+        if abs(angle - omega) < 0.01:
+            if distance == float('inf'):
+                return d < 50
             else:
-                delta = -np.pi/2
-        omega = yaw - delta
-
-        for distance, angle in scan:
-            if abs(angle - omega) < 0.01:
-                if distance == float('inf'):
-                    return d < 50
-                else:
-                    return d < distance #* 10
+                return d < distance  # * 10
