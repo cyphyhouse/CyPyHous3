@@ -115,70 +115,11 @@ class BasicFollowApp(AgentThread):
         self.agent_gvh.moat.tpos = {}
         for time in pscan:
             ipos, iscan = pscan[time]
-            self.setAll(ipos, iscan)
-
-            obstacles = get_obstacles(ipos, iscan)
-
-            for obs in obstacles:
-                obs_x, obs_y = GridMap.to_2d_grid(obs[0]*1 + 9, obs[1]*1 + 9)
-                self.locals['map'][obs_x][obs_y] = 1
+            empty_map = get_empty_map(ipos, iscan)
+            obs_map = get_obstacle_map(ipos, iscan)
+            self.locals['map'] = self.locals['map'] + empty_map + obs_map
 
         self.locals['map'].show()
-
-    def setAll(self, pos, scan):
-        px = floor(pos.x*1 + 9)
-        py = floor(pos.y*1 + 9) 
-        yaw = pos.yaw
-
-        left_point = scan[-1]
-        right_point = scan[0]
-        mid_point = scan[int(len(scan)/2)]
-
-        lx, ly = global_grid(pos, left_point[1])
-        rx, ry = global_grid(pos, right_point[1])
-        mx, my = global_grid(pos, mid_point[1])
-
-        # Left half
-        if lx < mx:
-            itrx = range(lx, mx+1)
-            if ly > my:
-                itry = range(ly+1, my-1, -1)
-            else:
-                itry = range(ly, my+1)
-        else:
-            itrx = range(mx, lx)
-            if ly > my:
-                itry = range(my, ly+1)
-            else:
-                itry = range(my+1, ly-1, -1)
-        
-        for x in itrx:
-            for y in itry:
-                if dist(x, y, px, py, yaw, scan):
-                    if self.locals['map'][x][y] == 1:
-                        continue
-                    self.locals['map'][x][y] = 0
-
-        # Right half
-        if rx < mx:
-            itrx = range(rx, mx)
-            if ry > my:
-                itry = range(ry+1, my-1, -1)
-            else:
-                itry = range(ry, my+1)
-        else:
-            itrx = range(mx, rx)
-            if ry > my:
-                itry = range(my, ry+1)
-            else:
-                itry = range(my+1, ry-1, -1)
-
-        for x in itrx:
-            for y in itry:
-                if dist(x, y, px, py, yaw, scan):
-                    if self.locals['map'][x][y] == 1:
-                        continue
-                    self.locals['map'][x][y] = 0
 
 
 def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Tuple[int, int]:
@@ -200,6 +141,69 @@ def get_obstacles(ipos: Pos, iscan: list) -> list:
         obstacles.append((obs_x, obs_y))
 
     return obstacles
+
+
+def get_obstacle_map(pos, scan) -> GridMap:
+    ret_map = GridMap()
+    for obs in get_obstacles(pos, scan):
+        obs_x, obs_y = GridMap.to_2d_grid(obs[0] * 1 + 9, obs[1] * 1 + 9)
+        ret_map[obs_x][obs_y] = GridMap.OCCUPIED
+    return ret_map
+
+
+def get_empty_map(pos, scan) -> GridMap:
+    ret_map = GridMap()
+    px = floor(pos.x*1 + 9)
+    py = floor(pos.y*1 + 9)
+    yaw = pos.yaw
+
+    left_point = scan[-1]
+    right_point = scan[0]
+    mid_point = scan[int(len(scan)/2)]
+
+    lx, ly = global_grid(pos, left_point[1])
+    rx, ry = global_grid(pos, right_point[1])
+    mx, my = global_grid(pos, mid_point[1])
+
+    # Left half
+    if lx < mx:
+        itrx = range(lx, mx+1)
+        if ly > my:
+            itry = range(ly+1, my-1, -1)
+        else:
+            itry = range(ly, my+1)
+    else:
+        itrx = range(mx, lx)
+        if ly > my:
+            itry = range(my, ly+1)
+        else:
+            itry = range(my+1, ly-1, -1)
+
+    for x in itrx:
+        for y in itry:
+            if dist(x, y, px, py, yaw, scan):
+                ret_map[x][y] = GridMap.EMPTY
+
+    # Right half
+    if rx < mx:
+        itrx = range(rx, mx)
+        if ry > my:
+            itry = range(ry+1, my-1, -1)
+        else:
+            itry = range(ry, my+1)
+    else:
+        itrx = range(mx, rx)
+        if ry > my:
+            itry = range(my, ry+1)
+        else:
+            itry = range(my+1, ry-1, -1)
+
+    for x in itrx:
+        for y in itry:
+            if dist(x, y, px, py, yaw, scan):
+                ret_map[x][y] = GridMap.EMPTY
+
+    return ret_map
 
 
 def tsync(tpos: dict, tscan: dict) -> dict:
