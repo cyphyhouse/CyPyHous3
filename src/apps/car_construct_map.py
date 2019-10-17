@@ -18,7 +18,7 @@ class GridMap:
     EMPTY = 0
     OCCUPIED = 1
 
-    def __init__(self, shape=(200, 200)):
+    def __init__(self, shape=(20, 20)):
         """ Map should initialized with -1"""
         self.__grid_map = np.full(shape=shape, fill_value=-1, dtype=np.int8)
 
@@ -91,7 +91,7 @@ class BasicFollowApp(AgentThread):
         self.locals['dest3'] = pos3d(2., -1., 0.)
         self.locals['tries'] = 1
         self.locals['i'] = 1
-        self.locals['map'] = GridMap(shape=(20,20))
+        self.locals['map'] = GridMap()
 
     def loop_body(self):
         while (self.locals['i'] < 5):
