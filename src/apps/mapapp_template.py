@@ -1,8 +1,9 @@
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
-from src.motion.pos_types import pos3d
-import time
+from src.motion.pos_types import Pos
+import rospy
 
+import numpy as np
 
 class MapApp(AgentThread):
 
@@ -14,13 +15,44 @@ class MapApp(AgentThread):
         pass
 
     def loop_body(self):
-        while not self.stopped():
-            time.sleep(0.1)
-            if self.locals['new_point'] :
-                self.locals['new_point'] = False
-                return
+        rospy.sleep(0.1)
+        pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
+        print("|pscan|", len(pscan))        
+        for pt in pscan:
+            ipos, iscan = pscan[pt]
+            obstacles = getObs(ipos, iscan)
+            print("obstacles: ", obstacles)
 
-            if not self.locals['new_point']:
-                self.stop()
-                return
+
+        if self.locals['new_point']:
+            self.locals['new_point'] = False
+            return
+
+        if not self.locals['new_point']:
+            self.stop()
+            return
+
+
+def getObs(ipos: Pos, iscan: list) -> list:
+    x = ipos.x
+    y = ipos.y
+    yaw = ipos.yaw
+    obstacles = []
+    for distance, cur_angle in iscan:
+        obsX = x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
+        obsY = y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
+        obstacles.append((obsX, obsY))
+
+    return obstacles
+
+
+def tsync(tpos: dict, tscan: dict) -> dict:
+    pscan = {}
+    for pt in tpos:
+        for st in tscan:
+            if abs(pt-st) < 0.02:
+                pscan[pt] = (tpos[pt], tscan[st])
+                break
+
+    return pscan
 

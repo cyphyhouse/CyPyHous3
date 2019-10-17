@@ -35,8 +35,8 @@ class MoatWithLidar(MotionAutomaton):
         for distance in lidar_msg.ranges:
             cur_angle -= lidar_msg.angle_increment
             # If encounter infinite distance, continue
-            if distance == float('inf'):
-                continue
+            # if distance == float('inf'):
+            #     continue
             
             tmpList.append((distance, cur_angle))
         self.tscan[cur_time] = tmpList
