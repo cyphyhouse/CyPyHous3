@@ -7,7 +7,6 @@ import rospy
 
 import numpy as np
 import matplotlib.pyplot as plt
-from math import floor
 
 
 def _normalize_radians(rad: float) -> float:
@@ -19,9 +18,16 @@ class GridMap:
     EMPTY = 0
     OCCUPIED = 1
 
-    def __init__(self, shape=(20, 20)):
+    HALF_GRID_WIDTH = 12
+    GRID_WIDTH = 2 * HALF_GRID_WIDTH
+    HALF_ARENA_WIDTH = 10
+
+    def __init__(self, shape=(GRID_WIDTH, GRID_WIDTH)):
         """ Map should initialized with -1"""
-        self.__grid_map = np.full(shape=shape, fill_value=-1, dtype=np.int8)
+        self.__grid_map = np.full(shape=shape, fill_value=GridMap.OCCUPIED, dtype=np.int8)
+        for x in range(-GridMap.HALF_ARENA_WIDTH, GridMap.HALF_ARENA_WIDTH):
+            for y in range(-GridMap.HALF_ARENA_WIDTH, GridMap.HALF_ARENA_WIDTH):
+                self.__grid_map[x][y] = GridMap.UNKNOWN
 
     def __add__(self, other):
         """ Merge maps by choosing the larger value """
@@ -41,7 +47,13 @@ class GridMap:
         return self.__grid_map.__delitem__(key)
 
     def show(self):
-        plt.imshow(self.__grid_map)
+        viz_map = np.full(shape=self.__grid_map.shape, fill_value=-1, dtype=np.int8)
+        for x in range(GridMap.GRID_WIDTH):
+            for y in range(GridMap.GRID_WIDTH):
+                _x, _y = x - GridMap.HALF_GRID_WIDTH, y - GridMap.HALF_GRID_WIDTH
+                viz_map[y][x] = self.__grid_map[_x][_y]  # XXX the image has to be transposed
+
+        plt.imshow(viz_map, origin='lower')
         plt.pause(0.5)
 
     @staticmethod
@@ -50,13 +62,13 @@ class GridMap:
 
     def pick_next_grid(self, curr_grid: Tuple[int, int], curr_yaw: float,
                        yaw_diff_threshold: float = np.pi / 4) -> Optional[Tuple[int, int]]:
-        """ Randomly pick an adjacent grid without obstacle and within yaw threshold.
+        """ Randomly pick an unoccupied adjacent grid within yaw threshold.
         :param curr_grid: Current grid of the device
         :param curr_yaw: Current orientation of the device
         :param yaw_diff_threshold: Threshold for orientation difference
         :return: An empty adjacent grid or None if cannot find one
         """
-        assert self.__grid_map[curr_grid] == GridMap.EMPTY
+        assert self.__grid_map[curr_grid] != GridMap.OCCUPIED
         assert -np.pi < curr_yaw <= np.pi
         assert yaw_diff_threshold >= 0.0
 
@@ -64,7 +76,7 @@ class GridMap:
         moves = [(_x, _y) for _x in [-1, 0, 1] for _y in [-1, 0, 1] if not (_x == 0 and _y == 0)]
         for x, y in np.random.permutation(moves):
             try_grid = (curr_grid[0] + x, curr_grid[1] + y)
-            if self.__grid_map[try_grid] != GridMap.EMPTY:
+            if self.__grid_map[try_grid] == GridMap.OCCUPIED:
                 continue  # The grid is already occupied
 
             headings = [curr_yaw, curr_yaw + np.pi]  # Can go forward or backward
@@ -89,6 +101,7 @@ class BasicFollowApp(AgentThread):
     def initialize_vars(self):
         self.locals['i'] = 1
         self.locals['map'] = GridMap()
+        self.update_local_map()
         self.locals['newpoint'] = True
 
     def loop_body(self):
@@ -96,8 +109,8 @@ class BasicFollowApp(AgentThread):
             self.trystop()
             return
 
-        rospy.sleep(0.05)
         self.locals['i'] += 1
+        self.locals['map'].show()
 
         # NewPoint event
         if self.locals['newpoint']:
@@ -105,7 +118,7 @@ class BasicFollowApp(AgentThread):
             pos = self.agent_gvh.moat.position
             next_pos = pick_free_grid(self.locals['map'], pos)
             if not next_pos:
-                rospy.logwarn("Cannot find an empty adjacent grid from " + str(pos))
+                return
             self.locals['path'] = self.agent_gvh.moat.planner.find_path(pos, next_pos)
             self.agent_gvh.moat.follow_path(self.locals['path'])
             self.locals['newpoint'] = False
@@ -115,21 +128,22 @@ class BasicFollowApp(AgentThread):
         if True:
             if self.agent_gvh.moat.reached:
                 self.locals['newpoint'] = True
-            pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
-            self.agent_gvh.moat.tpos = {}
-            for time in pscan:
-                ipos, iscan = pscan[time]
-                empty_map = get_empty_map(ipos, iscan)
-                obs_map = get_obstacle_map(ipos, iscan)
-                self.locals['map'] = self.locals['map'] + empty_map + obs_map
-
-            self.locals['map'].show()
+            self.update_local_map()
             return
+
+    def update_local_map(self):
+        pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
+        self.agent_gvh.moat.tpos = {}
+        for time in pscan:
+            ipos, iscan = pscan[time]
+            empty_map = get_empty_map(ipos, iscan)
+            obs_map = get_obstacle_map(ipos, iscan)
+            self.locals['map'] = self.locals['map'] + empty_map + obs_map
 
 
 def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Tuple[int, int]:
-    x = np.floor((pos.x + np.sin(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05)) * 1 + 9).astype(int)
-    y = np.floor((pos.y + np.cos(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05)) * 1 + 9).astype(int)
+    x = np.floor((pos.x + np.sin(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05))).astype(int)
+    y = np.floor((pos.y + np.cos(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05))).astype(int)
     return x, y
 
 
@@ -150,16 +164,15 @@ def get_obstacles(ipos: Pos, iscan: list) -> list:
 
 def get_obstacle_map(pos, scan) -> GridMap:
     ret_map = GridMap()
-    for obs in get_obstacles(pos, scan):
-        obs_x, obs_y = GridMap.to_2d_grid(obs[0] * 1 + 9, obs[1] * 1 + 9)
+    for pos_x, pos_y in get_obstacles(pos, scan):
+        obs_x, obs_y = GridMap.to_2d_grid(pos_x, pos_y)
         ret_map[obs_x][obs_y] = GridMap.OCCUPIED
     return ret_map
 
 
 def get_empty_map(pos, scan) -> GridMap:
     ret_map = GridMap()
-    px = floor(pos.x*1 + 9)
-    py = floor(pos.y*1 + 9)
+    px, py = GridMap.to_2d_grid(pos.x, pos.y)
     yaw = pos.yaw
 
     left_point = scan[-1]
@@ -224,13 +237,8 @@ def tsync(tpos: dict, tscan: dict) -> dict:
 
 def dist(x1, y1, x2, y2, yaw, scan) -> bool:
     d = np.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
-    try:
-        delta = np.arctan((y1-y2)/(x1-x2))
-    except ZeroDivisionError:
-        if y1 > y2:
-            delta = np.pi/2
-        else:
-            delta = -np.pi/2
+
+    delta = np.arctan2((y1-y2), (x1-x2))
     omega = yaw - delta
 
     for distance, angle in scan:
@@ -244,8 +252,9 @@ def dist(x1, y1, x2, y2, yaw, scan) -> bool:
 def pick_free_grid(m: GridMap, pos: pos3d) -> Optional[pos3d]:
     curr_grid = GridMap.to_2d_grid(pos.x, pos.y)
     next_grid = m.pick_next_grid(curr_grid, pos.yaw)
-    rospy.loginfo("Picked grid: " + str(next_grid))
     if next_grid:
+        rospy.loginfo("Picked grid: " + str(next_grid))
         return pos3d(next_grid[0] + .5, next_grid[1] + .5, 0, pos.yaw)
     else:
+        rospy.logwarn("Cannot find an unoccupied adjacent grid from " + str(pos))
         return None
