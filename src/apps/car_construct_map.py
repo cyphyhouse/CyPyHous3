@@ -103,18 +103,23 @@ class BasicFollowApp(AgentThread):
         self.locals['map'] = GridMap()
         self.update_local_map()
         self.locals['newpoint'] = True
+        self.agent_gvh.create_aw_var('global_map', type(GridMap), GridMap())
+        self.initialize_lock('GUpdate')
 
     def loop_body(self):
-        if self.locals['i'] > 20:
+        rospy.sleep(0.01)
+        if self.locals['i'] > 40:
             self.trystop()
             return
-
+        
         self.locals['i'] += 1
-        self.locals['map'].show()
+        # self.locals['map'].show()
 
         # NewPoint event
         if self.locals['newpoint']:
-            self.locals['map'] = self.locals['map'] # TODO merge global and local map
+            print("Newpoint")
+            # self.locals['map'] = self.locals['map'] # TODO merge global and local map
+            self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
             pos = self.agent_gvh.moat.position
             next_pos = pick_free_grid(self.locals['map'], pos)
             if not next_pos:
@@ -125,11 +130,24 @@ class BasicFollowApp(AgentThread):
             return
 
         # LUpdate event
-        if True:
-            if self.agent_gvh.moat.reached:
-                self.locals['newpoint'] = True
+        if not self.locals['newpoint'] and not self.agent_gvh.moat.reached:
+            print("LUdate")
+            self.locals['newpoint'] = False
             self.update_local_map()
             return
+
+        # GUpdate event
+        if self.agent_gvh.moat.reached:
+            print("GUpdate")
+            self.update_local_map()
+            if self.lock('GUpdate'):
+                self.agent_gvh.put('global_map', self.read_from_shared('global_map', None)+self.locals['map'])
+                self.read_from_shared('global_map', None).show()
+                self.unlock('GUpdate')
+                self.locals['newpoint'] = True
+            else:
+                return
+
 
     def update_local_map(self):
         pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
@@ -228,7 +246,7 @@ def tsync(tpos: dict, tscan: dict) -> dict:
     pscan = {}
     for pt in tpos:
         for st in tscan:
-            if abs(pt-st)<0.01:
+            if abs(pt-st)<0.02:
                 pscan[pt] = (tpos[pt], tscan[st])
                 break
 
@@ -244,9 +262,9 @@ def dist(x1, y1, x2, y2, yaw, scan) -> bool:
     for distance, angle in scan:
         if abs(angle - omega) < 0.01:
             if distance == float('inf'):
-                return d < 50
+                return d < 5
             else:
-                return d < distance  # * 10
+                return d < distance  
 
 
 def pick_free_grid(m: GridMap, pos: pos3d) -> Optional[pos3d]:
