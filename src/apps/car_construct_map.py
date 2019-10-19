@@ -157,10 +157,16 @@ class BasicFollowApp(AgentThread):
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
             pos = self.agent_gvh.moat.position
             next_pos_list = pick_free_pos(self.locals['map'], pos)
-
+            '''
+            if len(next_pos_list) == 0:
+               self.trystop()
+               return
+            '''
             for next_pos in next_pos_list:
                 # TODO check if path planner can find path when obstacles are added
                 self.locals['path'] = self.agent_gvh.moat.planner.find_path(pos, next_pos)
+                if self.locals['path'] is None:
+                   continue
                 rospy.loginfo("Target position: " + str(next_pos))
                 self.agent_gvh.moat.follow_path(self.locals['path'])
                 self.locals['newpoint'] = False
