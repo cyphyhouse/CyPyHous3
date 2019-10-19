@@ -2,7 +2,8 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos  # TODO Choose only one of them
 
-from typing import Tuple, Optional
+from collections import deque
+from typing import List, Tuple, Optional
 import rospy
 
 import numpy as np
@@ -11,6 +12,9 @@ import matplotlib.pyplot as plt
 
 def _normalize_radians(rad: float) -> float:
     return (rad + np.pi) % (2 * np.pi) - np.pi
+
+
+Grid = Tuple[int, int]
 
 
 class GridMap:
@@ -40,8 +44,8 @@ class GridMap:
     def __getitem__(self, key):
         return self.__grid_map.__getitem__(key)
 
-    def __setitem__(self, key):
-        return self.__grid_map.__setitem__(key)
+    def __setitem__(self, key, value):
+        return self.__grid_map.__setitem__(key, value)
 
     def __delitem__(self, key):
         return self.__grid_map.__delitem__(key)
@@ -57,11 +61,43 @@ class GridMap:
         plt.pause(0.5)
 
     @staticmethod
-    def to_2d_grid(x: float, y: float) -> Tuple[int, int]:
+    def quantize(x: float, y: float) -> Grid:
         return tuple(np.floor([x, y]).astype(int))
 
-    def pick_next_grid(self, curr_grid: Tuple[int, int], curr_yaw: float,
-                       yaw_diff_threshold: float = np.pi / 4) -> Optional[Tuple[int, int]]:
+    @staticmethod
+    def _nbr_grids(grid: Grid) -> List[Grid]:
+        x, y = grid
+        return [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
+
+    def get_frontier_grids(self, curr_grid: Grid) -> List[Grid]:
+        """ Get the frontier empty grids that are next to unknown grids.
+        These frontier nodes must be reachable from current grid thru a connected empty grids.
+        :param curr_grid: Current grid
+        :return: Frontier grids
+        """
+        assert self[curr_grid] == GridMap.EMPTY
+
+        frontier = []
+        visited = {curr_grid}
+        q = deque()
+        q.append(curr_grid)
+        # Simple BFS to find the list of frontier grids. TODO optimization?
+        while q:
+            s = q.pop()
+
+            nbr_grids = self._nbr_grids(s)
+            # If any of the neighbors is unknown, this grid is a frontier grid
+            if any([self[n] == GridMap.UNKNOWN for n in nbr_grids]):
+                frontier.append(s)
+            # Add unvisited empty neighbors to queue
+            q.extend([n for n in nbr_grids if n not in visited and self[n] == GridMap.EMPTY])
+
+            visited |= set(nbr_grids)  # Add neighbors to visited
+
+        return frontier
+
+    def pick_next_grid(self, curr_grid: Grid, curr_yaw: float,
+                       yaw_diff_threshold: float = np.pi / 4) -> Optional[Grid]:
         """ Randomly pick an unoccupied adjacent grid within yaw threshold.
         :param curr_grid: Current grid of the device
         :param curr_yaw: Current orientation of the device
@@ -113,25 +149,29 @@ class BasicFollowApp(AgentThread):
             return
         
         self.locals['i'] += 1
-        # self.locals['map'].show()
 
         # NewPoint event
         if self.locals['newpoint']:
             print("Newpoint")
-            # self.locals['map'] = self.locals['map'] # TODO merge global and local map
+            # Local map is updated with global map only when we need to pick a new point
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
             pos = self.agent_gvh.moat.position
-            next_pos = pick_free_grid(self.locals['map'], pos)
-            if not next_pos:
+            next_pos_list = pick_free_pos(self.locals['map'], pos)
+
+            for next_pos in next_pos_list:
+                # TODO check if path planner can find path when obstacles are added
+                self.locals['path'] = self.agent_gvh.moat.planner.find_path(pos, next_pos)
+                rospy.loginfo("Target position: " + str(next_pos))
+                self.agent_gvh.moat.follow_path(self.locals['path'])
+                self.locals['newpoint'] = False
                 return
-            self.locals['path'] = self.agent_gvh.moat.planner.find_path(pos, next_pos)
-            self.agent_gvh.moat.follow_path(self.locals['path'])
-            self.locals['newpoint'] = False
+            # else:
+            rospy.logwarn("Cannot find any frontier grid from " + str(pos))
             return
 
         # LUpdate event
         if not self.locals['newpoint'] and not self.agent_gvh.moat.reached:
-            print("LUdate")
+            print("LUpdate")
             self.locals['newpoint'] = False
             self.update_local_map()
             return
@@ -148,7 +188,6 @@ class BasicFollowApp(AgentThread):
             else:
                 return
 
-
     def update_local_map(self):
         pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
         self.agent_gvh.moat.tpos = {}
@@ -159,7 +198,7 @@ class BasicFollowApp(AgentThread):
             self.locals['map'] = self.locals['map'] + empty_map + obs_map
 
 
-def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Tuple[int, int]:
+def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Grid:
     x = np.floor((pos.x + np.sin(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05))).astype(int)
     y = np.floor((pos.y + np.cos(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05))).astype(int)
     return x, y
@@ -183,14 +222,14 @@ def get_obstacles(ipos: Pos, iscan: list) -> list:
 def get_obstacle_map(pos, scan) -> GridMap:
     ret_map = GridMap()
     for pos_x, pos_y in get_obstacles(pos, scan):
-        obs_x, obs_y = GridMap.to_2d_grid(pos_x, pos_y)
+        obs_x, obs_y = GridMap.quantize(pos_x, pos_y)
         ret_map[obs_x][obs_y] = GridMap.OCCUPIED
     return ret_map
 
 
 def get_empty_map(pos, scan) -> GridMap:
     ret_map = GridMap()
-    px, py = GridMap.to_2d_grid(pos.x, pos.y)
+    px, py = GridMap.quantize(pos.x, pos.y)
     yaw = pos.yaw
 
     left_point = scan[-1]
@@ -267,12 +306,9 @@ def dist(x1, y1, x2, y2, yaw, scan) -> bool:
                 return d < distance  
 
 
-def pick_free_grid(m: GridMap, pos: pos3d) -> Optional[pos3d]:
-    curr_grid = GridMap.to_2d_grid(pos.x, pos.y)
-    next_grid = m.pick_next_grid(curr_grid, pos.yaw)
-    if next_grid:
-        rospy.loginfo("Picked grid: " + str(next_grid))
-        return pos3d(next_grid[0] + .5, next_grid[1] + .5, 0, pos.yaw)
-    else:
-        rospy.logwarn("Cannot find an unoccupied adjacent grid from " + str(pos))
-        return None
+def pick_free_pos(m: GridMap, pos: pos3d) -> List[pos3d]:
+    curr_grid = GridMap.quantize(pos.x, pos.y)
+    next_grids = m.get_frontier_grids(curr_grid)
+    # XXX Can take current yaw into account and filter positions that is not reachable
+    # Or just let path planner to handle it
+    return [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
