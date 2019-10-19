@@ -22,16 +22,18 @@ class GridMap:
     EMPTY = 0
     OCCUPIED = 1
 
-    HALF_GRID_WIDTH = 12
+    HALF_GRID_WIDTH = 11
     GRID_WIDTH = 2 * HALF_GRID_WIDTH
-    HALF_ARENA_WIDTH = 10
 
     def __init__(self, shape=(GRID_WIDTH, GRID_WIDTH)):
         """ Map should initialized with -1"""
-        self.__grid_map = np.full(shape=shape, fill_value=GridMap.OCCUPIED, dtype=np.int8)
-        for x in range(-GridMap.HALF_ARENA_WIDTH, GridMap.HALF_ARENA_WIDTH):
-            for y in range(-GridMap.HALF_ARENA_WIDTH, GridMap.HALF_ARENA_WIDTH):
-                self.__grid_map[x][y] = GridMap.UNKNOWN
+        self.__grid_map = np.full(shape=shape, fill_value=GridMap.UNKNOWN, dtype=np.int8)
+        for i in range(-GridMap.HALF_GRID_WIDTH, GridMap.HALF_GRID_WIDTH):
+            self.__grid_map[i][-GridMap.HALF_GRID_WIDTH] = GridMap.OCCUPIED
+            self.__grid_map[i][GridMap.HALF_GRID_WIDTH-1] = GridMap.OCCUPIED
+
+            self.__grid_map[-GridMap.HALF_GRID_WIDTH][i] = GridMap.OCCUPIED
+            self.__grid_map[GridMap.HALF_GRID_WIDTH-1][i] = GridMap.OCCUPIED
 
     def __add__(self, other):
         """ Merge maps by choosing the larger value """
@@ -75,7 +77,7 @@ class GridMap:
         :param curr_grid: Current grid
         :return: Frontier grids
         """
-        assert self[curr_grid] == GridMap.EMPTY
+        assert self[curr_grid] != GridMap.OCCUPIED
 
         frontier = []
         visited = {curr_grid}
@@ -83,7 +85,7 @@ class GridMap:
         q.append(curr_grid)
         # Simple BFS to find the list of frontier grids. TODO optimization?
         while q:
-            s = q.pop()
+            s = q.popleft()
 
             nbr_grids = self._nbr_grids(s)
             # If any of the neighbors is unknown, this grid is a frontier grid
@@ -95,38 +97,6 @@ class GridMap:
             visited |= set(nbr_grids)  # Add neighbors to visited
 
         return frontier
-
-    def pick_next_grid(self, curr_grid: Grid, curr_yaw: float,
-                       yaw_diff_threshold: float = np.pi / 4) -> Optional[Grid]:
-        """ Randomly pick an unoccupied adjacent grid within yaw threshold.
-        :param curr_grid: Current grid of the device
-        :param curr_yaw: Current orientation of the device
-        :param yaw_diff_threshold: Threshold for orientation difference
-        :return: An empty adjacent grid or None if cannot find one
-        """
-        assert self.__grid_map[curr_grid] != GridMap.OCCUPIED
-        assert -np.pi < curr_yaw <= np.pi
-        assert yaw_diff_threshold >= 0.0
-
-        next_grid = None
-        moves = [(_x, _y) for _x in [-1, 0, 1] for _y in [-1, 0, 1] if not (_x == 0 and _y == 0)]
-        for x, y in np.random.permutation(moves):
-            try_grid = (curr_grid[0] + x, curr_grid[1] + y)
-            if self.__grid_map[try_grid] == GridMap.OCCUPIED:
-                continue  # The grid is already occupied
-
-            headings = [curr_yaw, curr_yaw + np.pi]  # Can go forward or backward
-            yaw = np.arctan2(y, x)  # Target yaw
-            norm_diffs = [_normalize_radians(h - yaw) for h in headings]
-            yaw_diff = min(abs(d) for d in norm_diffs)
-            if yaw_diff > yaw_diff_threshold:
-                continue
-            # else:
-            next_grid = try_grid
-            break
-
-        assert next_grid != curr_grid, str(next_grid)
-        return next_grid
 
 
 class BasicFollowApp(AgentThread):
@@ -144,7 +114,7 @@ class BasicFollowApp(AgentThread):
 
     def loop_body(self):
         rospy.sleep(0.01)
-        if self.locals['i'] > 40:
+        if self.locals['i'] > 80:
             self.trystop()
             return
         
@@ -155,24 +125,17 @@ class BasicFollowApp(AgentThread):
             print("Newpoint")
             # Local map is updated with global map only when we need to pick a new point
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
-            pos = self.agent_gvh.moat.position
-            next_pos_list = pick_free_pos(self.locals['map'], pos)
-            '''
-            if len(next_pos_list) == 0:
-               self.trystop()
-               return
-            '''
-            for next_pos in next_pos_list:
-                # TODO check if path planner can find path when obstacles are added
-                self.locals['path'] = self.agent_gvh.moat.planner.find_path(pos, next_pos)
-                if self.locals['path'] is None:
-                   continue
-                rospy.loginfo("Target position: " + str(next_pos))
+
+            self.locals['path'] = pick_path_to_frontier(self.locals['map'],
+                                                        self.agent_gvh.moat.position,
+                                                        self.agent_gvh.moat.planner)
+            if len(self.locals['path']) > 0:
+                rospy.loginfo("Target position: " + str(self.locals['path'][-1]))
                 self.agent_gvh.moat.follow_path(self.locals['path'])
                 self.locals['newpoint'] = False
-                return
-            # else:
-            rospy.logwarn("Cannot find any frontier grid from " + str(pos))
+            else:
+                rospy.logwarn("Cannot find any path to frontier from " + str(self.agent_gvh.moat.position))
+                self.trystop()
             return
 
         # LUpdate event
@@ -309,12 +272,19 @@ def dist(x1, y1, x2, y2, yaw, scan) -> bool:
             if distance == float('inf'):
                 return d < 5
             else:
-                return d < distance  
+                return d < distance
 
 
-def pick_free_pos(m: GridMap, pos: pos3d) -> List[pos3d]:
+def pick_path_to_frontier(m: GridMap, pos: pos3d, planner) -> List[pos3d]:
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
-    # XXX Can take current yaw into account and filter positions that is not reachable
-    # Or just let path planner to handle it
-    return [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
+    next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
+    # XXX reverse because BFS returns from closest to furthest. We can add random permutation here
+    next_pos_list.reverse()
+    for next_pos in next_pos_list:
+        # TODO add obstacles from map
+        path = planner.find_path(pos, next_pos)
+        if path:
+            return path
+
+    return []
