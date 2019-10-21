@@ -1,6 +1,7 @@
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos  # TODO Choose only one of them
+from src.motion.rectobs import RectObs
 
 from collections import deque
 from typing import List, Tuple, Optional
@@ -111,10 +112,11 @@ class BasicFollowApp(AgentThread):
         self.locals['newpoint'] = True
         self.agent_gvh.create_aw_var('global_map', type(GridMap), GridMap())
         self.initialize_lock('GUpdate')
+        self.locals['obstacle'] = [] # obstacle list for path planner
 
     def loop_body(self):
         rospy.sleep(0.01)
-        if self.locals['i'] > 80:
+        if self.locals['i'] > 8000:
             self.trystop()
             return
         
@@ -125,10 +127,10 @@ class BasicFollowApp(AgentThread):
             print("Newpoint")
             # Local map is updated with global map only when we need to pick a new point
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
-
             self.locals['path'] = pick_path_to_frontier(self.locals['map'],
                                                         self.agent_gvh.moat.position,
-                                                        self.agent_gvh.moat.planner)
+                                                        self.agent_gvh.moat.planner,
+                                                        self.locals['obstacle'])
             if len(self.locals['path']) > 0:
                 rospy.loginfo("Target position: " + str(self.locals['path'][-1]))
                 self.agent_gvh.moat.follow_path(self.locals['path'])
@@ -163,7 +165,9 @@ class BasicFollowApp(AgentThread):
         for time in pscan:
             ipos, iscan = pscan[time]
             empty_map = get_empty_map(ipos, iscan)
-            obs_map = get_obstacle_map(ipos, iscan)
+            obs_map = get_obstacle_map(ipos, iscan, self.locals['obstacle'])
+            # self.locals['obstacle'] += obstacle_list
+            print("At line 171, marked obstacle: ", len(self.locals['obstacle']))
             self.locals['map'] = self.locals['map'] + empty_map + obs_map
 
 
@@ -188,11 +192,26 @@ def get_obstacles(ipos: Pos, iscan: list) -> list:
     return obstacles
 
 
-def get_obstacle_map(pos, scan) -> GridMap:
+def get_obstacle_map(pos, scan, cur_obstalces) -> GridMap:
+    print("Call get obs map")
     ret_map = GridMap()
+    obstacle_list = []
+    count = 0
     for pos_x, pos_y in get_obstacles(pos, scan):
         obs_x, obs_y = GridMap.quantize(pos_x, pos_y)
+        if len(cur_obstalces) == 0:
+            obs_pos = RectObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([1, 1, 1]))
+            cur_obstalces.append(obs_pos)
+        else:
+            flag = 0
+            for cur_obs in cur_obstalces:
+                if cur_obs.position.x == obs_x and cur_obs.position.y == obs_y:
+                    flag = 1 
+            if not flag:
+                obs_pos = RectObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([1, 1, 1]))
+                cur_obstalces.append(obs_pos)
         ret_map[obs_x][obs_y] = GridMap.OCCUPIED
+        count += 1
     return ret_map
 
 
@@ -211,18 +230,17 @@ def get_empty_map(pos, scan) -> GridMap:
 
     # Left half
     if lx < mx:
-        itrx = range(lx, mx+1)
+        itrx = range(lx-2, mx+2)
         if ly > my:
-            itry = range(ly+1, my-1, -1)
+            itry = range(ly+2, my-2, -1)
         else:
-            itry = range(ly, my+1)
+            itry = range(ly-2, my+2)
     else:
-        itrx = range(mx, lx)
+        itrx = range(mx-2, lx+2)
         if ly > my:
-            itry = range(my, ly+1)
+            itry = range(my-2, ly+2)
         else:
-            itry = range(my+1, ly-1, -1)
-
+            itry = range(my+2, ly-2, -1)
     for x in itrx:
         for y in itry:
             if dist(x, y, px, py, yaw, scan):
@@ -230,17 +248,17 @@ def get_empty_map(pos, scan) -> GridMap:
 
     # Right half
     if rx < mx:
-        itrx = range(rx, mx)
+        itrx = range(rx-2, mx+2)
         if ry > my:
-            itry = range(ry+1, my-1, -1)
+            itry = range(ry+2, my-2, -1)
         else:
-            itry = range(ry, my+1)
+            itry = range(ry-2, my+2)
     else:
-        itrx = range(mx, rx)
+        itrx = range(mx-2, rx+2)
         if ry > my:
-            itry = range(my, ry+1)
+            itry = range(my-2, ry+2)
         else:
-            itry = range(my+1, ry-1, -1)
+            itry = range(my+2, ry-2, -1)
 
     for x in itrx:
         for y in itry:
@@ -254,7 +272,8 @@ def tsync(tpos: dict, tscan: dict) -> dict:
     pscan = {}
     for pt in tpos:
         for st in tscan:
-            if abs(pt-st)<0.02:
+            # print(pt, st)
+            if abs(pt-st)<0.01:
                 pscan[pt] = (tpos[pt], tscan[st])
                 break
 
@@ -275,7 +294,7 @@ def dist(x1, y1, x2, y2, yaw, scan) -> bool:
                 return d < distance
 
 
-def pick_path_to_frontier(m: GridMap, pos: pos3d, planner) -> List[pos3d]:
+def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> List[pos3d]:
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
     next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
@@ -283,7 +302,7 @@ def pick_path_to_frontier(m: GridMap, pos: pos3d, planner) -> List[pos3d]:
     next_pos_list.reverse()
     for next_pos in next_pos_list:
         # TODO add obstacles from map
-        path = planner.find_path(pos, next_pos)
+        path = planner.find_path(pos, next_pos, obstacle_list=obstacle_list)
         if path:
             return path
 
