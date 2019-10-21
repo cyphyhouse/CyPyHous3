@@ -58,9 +58,8 @@ class RRT(Planner):
             nind = get_nearest_list_index(node_list, rnd)
 
             new_node = self.steer(node_list, rnd, nind)
-            node_path = Seg(node_list[nind], new_node)
 
-            if self.__collision_check(node_path, obstacle_list):
+            if self.__collision_check(new_node, obstacle_list):
                 nearinds = find_near_nodes(node_list, new_node)
                 new_node = self.choose_parent(node_list, obstacle_list, new_node, nearinds)
                 node_list.append(new_node)
@@ -225,7 +224,7 @@ class RRT(Planner):
                 return False
         return True
 
-    def __collision_check(self, dir_seg: Seg, obstacle_list: list) -> bool:
+    def __collision_check(self, node: Node, obstacle_list: list) -> bool:
         """
         check collision callback
         :param node:
@@ -233,29 +232,17 @@ class RRT(Planner):
         :return:
         """
 
-        # for obs in obstacle_list:
-        #     try:
-        #         dx = obs.x - node.x
-        #         dy = obs.y - node.y
-        #         d = dx * dx + dy * dy
-        #         if d <= obs.radius ** 2:
-        #             return False  # collision
-        #     except AttributeError:
-        #         print("obstacle might not be correctly formatted")
-
-        # return True  # safe
-
-        """
-        extended check collision
-        :param obstacle_list:
-        :param dir_seg:
-        :return:
-        """
         for obs in obstacle_list:
-            if not obs.collision_check(dir_seg):
-                return False
+            try:
+                dx = obs.position.x - node.x
+                dy = obs.position.y - node.y
+                d = dx * dx + dy * dy
+                if d <= obs.size[0][0] ** 2:
+                    return False  # collision
+            except AttributeError:
+                print("obstacle might not be correctly formatted")
 
-        return True
+        return True  # safe
 
 
 def get_nearest_list_index(node_list: list, rnd: list) -> int:
