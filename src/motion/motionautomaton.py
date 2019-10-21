@@ -28,13 +28,13 @@ class MotionAutomaton(threading.Thread, ABC):
             self.__pub = rospy.Publisher(*gen_waypoint_params(config), queue_size=config.queue_size)
             self.__sub_reached = rospy.Subscriber(*gen_reached_params(config), self._getReached,
                                                   queue_size=config.queue_size)
-            self.__sub_positioning = rospy.Subscriber(*gen_positioning_params(config), self._getPositioning,
-                                                      queue_size=config.queue_size)
+            self._sub_positioning = rospy.Subscriber(*gen_positioning_params(config), self._getPositioning,
+                                                     queue_size=config.queue_size)
 
         except ImportError:
             self.__pub = None
             self.__sub_reached = None
-            self.__sub_positioning = None
+            self._sub_positioning = None
             print("maybe issue with ros installation")
 
         time.sleep(1)
@@ -54,8 +54,8 @@ class MotionAutomaton(threading.Thread, ABC):
         timeout=10
         try:
             rospy.wait_for_message(
-                self.__sub_positioning.name,
-                self.__sub_positioning.data_class,
+                self._sub_positioning.name,
+                self._sub_positioning.data_class,
                 timeout=timeout
             )
             # self.__sub_positioning should also receive the message now.

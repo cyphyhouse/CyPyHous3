@@ -1,111 +1,94 @@
 import numpy as np
 import rospy
-from src.motion.motionautomaton import MotionAutomaton
+from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos_types import Pos
 from src.config.configs import MoatConfig, gen_positioning_params
 
 from sensor_msgs.msg import LaserScan
 import message_filters
 
+import itertools
 
-class MoatWithLidar(MotionAutomaton):
+
+class MoatWithLidar(MoatTestCar):
 
     def __init__(self, config):
         super(MoatWithLidar, self).__init__(config)
-        self.tscan = {}
-        self.tpos = {}
         self.tsync = {}
 
-        self.__sub_lidar = message_filters.Subscriber(config.rospy_node.strip("/waypoint_node")+'/racecar/laser/scan', LaserScan)
-        self.__sub_positioning = message_filters.Subscriber(*gen_positioning_params(config))
+        sub_scan = message_filters.Subscriber(config.rospy_node.strip("/waypoint_node") + '/racecar/laser/scan',
+                                              LaserScan)
+        sub_pose = message_filters.Subscriber(self._sub_positioning.name,
+                                              self._sub_positioning.data_class)
 
-        ts = message_filters.TimeSynchronizer([self.__sub_lidar, self.__sub_positioning], 10)
-        ts.registerCallback(self._getPosLidar)
+        ts = MyApproximateTimeSynchronizer([sub_scan, sub_pose], 10, 0.005)
+        ts.registerCallback(self._get_scan_at_pos)
 
+    @staticmethod
+    def _quaternion_to_euler(q):
+        from scipy.spatial.transform import Rotation
+        return Rotation.from_quat([q.x, q.y, q.z, q.w]).as_euler('zyx')
 
-    def _getPositioning(self, data) -> None:
-        quat = data.pose.orientation
-        import math
-        yaw = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), pow(quat.w, 2) + pow(quat.x,2) - pow(quat.y,2) - pow(quat.z,2))
-        self.position = Pos(np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z, yaw]))
-        try:
-            cur_time = data.header.stamp.secs + data.header.stamp.nsecs*1e-9
-            self.tpos[cur_time] = self.position
-        except:
-            pass
+    def _get_scan_at_pos(self, scan, pos) -> None:
+        yaw = self._quaternion_to_euler(pos.pose.orientation)[0]
+        position = Pos(np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.position.z, yaw]))
 
-    def _getLidarData(self, data) -> None:
-        tmpList = []
-        lidar_msg = data
-        cur_angle = lidar_msg.angle_max
-        cur_time = lidar_msg.header.stamp.secs + lidar_msg.header.stamp.nsecs*1e-9
-        for distance in lidar_msg.ranges:
-            cur_angle -= lidar_msg.angle_increment
-            # If encounter infinite distance, continue
-            # if distance == float('inf'):
-            #     continue
-            
-            tmpList.append((distance, cur_angle))
-        self.tscan[cur_time] = tmpList
-
-    def _getPosLidar(self, lidar, pos) -> None:
-        # print("Get")
-        assert lidar.header.stamp.secs == pos.header.stamp.secs
-        quat = pos.pose.orientation
-        import math
-        yaw = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), pow(quat.w, 2) + pow(quat.x,2) - pow(quat.y,2) - pow(quat.z,2))
-        self.position = Pos(np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.position.z, yaw]))
-
-        tmpList = []
-        lidar_msg = lidar
-        cur_angle = lidar_msg.angle_max
-        cur_time = lidar_msg.header.stamp.secs + lidar_msg.header.stamp.nsecs*1e-9
-        for distance in lidar_msg.ranges:
-            cur_angle -= lidar_msg.angle_increment
-            tmpList.append((distance, cur_angle))
-        self.tsync[cur_time] = (self.position, tmpList)
+        tmp_list = []
+        cur_angle = scan.angle_max
+        cur_time = scan.header.stamp.secs + scan.header.stamp.nsecs*1e-9
+        for distance in scan.ranges:
+            cur_angle -= scan.angle_increment
+            tmp_list.append((distance, cur_angle))
+        self.tsync[cur_time] = (position, tmp_list)
 
 
-
-    def _getReached(self, data) -> None:
-        a = str(data).upper()
-        if 'TRUE' in a:
-            self.reached = True
-
-    def moat_init_action(self):
-        super().moat_init_action()
-        pass
-
-    def moat_exit_action(self):
-        super().moat_exit_action()
-        pass
-
-    def goTo(self, dest: Pos, wp_type: int = None) -> None:
-        print("going to point", dest)
-        if wp_type is not None:
-            frame_id = str(wp_type)
+class MyApproximateTimeSynchronizer(message_filters.ApproximateTimeSynchronizer):
+    def add(self, msg, my_queue, my_queue_index=None):
+        if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
+            if not self.allow_headerless:
+                rospy.logwarn("Cannot use message filters with non-stamped messages. "
+                              "Use the 'allow_headerless' constructor option to "
+                              "auto-assign ROS time to headerless messages.")
+                return
+            stamp = rospy.Time.now()
         else:
-            frame_id = '1'
+            stamp = msg.header.stamp
 
-        import rospy
-        from geometry_msgs.msg import PoseStamped
-
-        pose = PoseStamped()
-        pose.header.stamp = rospy.Time.now()
-        pose.header.frame_id = frame_id
-        pose.pose = dest.to_pose()
-
-        self.reached = False
-        self.waypoint_count += 1
-        self.pub.publish(pose)
-
-    def follow_path(self, path: list) -> None:
-        import rospy
-        for wp in path[:-1]:
-            self.goTo(wp, 0)
-            rospy.sleep(0.1)
-        self.goTo(path[-1], 1)
-
-    def run(self):
-        import rospy
-        rospy.spin()
+        self.lock.acquire()
+        my_queue[stamp] = msg
+        while len(my_queue) > self.queue_size:
+            del my_queue[min(my_queue)]
+        # self.queues = [topic_0 {stamp: msg}, topic_1 {stamp: msg}, ...]
+        if my_queue_index is None:
+            search_queues = self.queues
+        else:
+            search_queues = self.queues[:my_queue_index] + \
+                self.queues[my_queue_index+1:]
+        # sort and leave only reasonable stamps for synchronization
+        stamps = []
+        for queue in search_queues:
+            topic_stamps = []
+            for s in queue:
+                stamp_delta = abs(s - stamp)
+                if stamp_delta > self.slop:
+                    continue  # far over the slop
+                topic_stamps.append((s, stamp_delta))
+            if not topic_stamps:
+                self.lock.release()
+                return
+            topic_stamps = sorted(topic_stamps, key=lambda x: x[1])
+            stamps.append(topic_stamps)
+        for vv in itertools.product(*[list(zip(*s))[0] for s in stamps]):
+            vv = list(vv)
+            # insert the new message
+            if my_queue_index is not None:
+                vv.insert(my_queue_index, stamp)
+            qt = list(zip(self.queues, vv))
+            if ( ((max(vv) - min(vv)) < self.slop) and
+                (len([1 for q,t in qt if t not in q]) == 0) ):
+                msgs = [q[t] for q,t in qt]
+                self.signalMessage(*msgs)
+                for q,t in qt:
+                    del q[t]
+                break  # fast finish after the synchronization
+        self.lock.release()
