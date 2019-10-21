@@ -2,6 +2,7 @@ from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos  # TODO Choose only one of them
 from src.motion.rectobs import RectObs
+from src.motion.cylobs import CylObs
 
 from collections import deque
 from typing import List, Tuple, Optional
@@ -9,6 +10,7 @@ import rospy
 
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
 
 
 def _normalize_radians(rad: float) -> float:
@@ -48,6 +50,8 @@ class GridMap:
         return self.__grid_map.__getitem__(key)
 
     def __setitem__(self, key, value):
+        if key[0] >= GridMap.HALF_GRID_WIDTH or key[1] >= GridMap.HALF_GRID_WIDTH or key[0] < -GridMap.HALF_GRID_WIDTH or key[1] < -GridMap.HALF_GRID_WIDTH:
+            return 
         return self.__grid_map.__setitem__(key, value)
 
     def __delitem__(self, key):
@@ -116,7 +120,7 @@ class BasicFollowApp(AgentThread):
 
     def loop_body(self):
         rospy.sleep(0.01)
-        if self.locals['i'] > 8000:
+        if self.locals['i'] > 80:
             self.trystop()
             return
         
@@ -160,14 +164,12 @@ class BasicFollowApp(AgentThread):
                 return
 
     def update_local_map(self):
-        pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
+        pscan = self.agent_gvh.moat.tsync # tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
         self.agent_gvh.moat.tpos = {}
-        for time in pscan:
+        for time in list(pscan):
             ipos, iscan = pscan[time]
             empty_map = get_empty_map(ipos, iscan)
             obs_map = get_obstacle_map(ipos, iscan, self.locals['obstacle'])
-            # self.locals['obstacle'] += obstacle_list
-            print("At line 171, marked obstacle: ", len(self.locals['obstacle']))
             self.locals['map'] = self.locals['map'] + empty_map + obs_map
 
 
@@ -193,14 +195,13 @@ def get_obstacles(ipos: Pos, iscan: list) -> list:
 
 
 def get_obstacle_map(pos, scan, cur_obstalces) -> GridMap:
-    print("Call get obs map")
     ret_map = GridMap()
     obstacle_list = []
     count = 0
     for pos_x, pos_y in get_obstacles(pos, scan):
         obs_x, obs_y = GridMap.quantize(pos_x, pos_y)
         if len(cur_obstalces) == 0:
-            obs_pos = RectObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([1, 1, 1]))
+            obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
             cur_obstalces.append(obs_pos)
         else:
             flag = 0
@@ -208,7 +209,7 @@ def get_obstacle_map(pos, scan, cur_obstalces) -> GridMap:
                 if cur_obs.position.x == obs_x and cur_obs.position.y == obs_y:
                     flag = 1 
             if not flag:
-                obs_pos = RectObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([1, 1, 1]))
+                obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
                 cur_obstalces.append(obs_pos)
         ret_map[obs_x][obs_y] = GridMap.OCCUPIED
         count += 1
@@ -272,8 +273,8 @@ def tsync(tpos: dict, tscan: dict) -> dict:
     pscan = {}
     for pt in tpos:
         for st in tscan:
-            # print(pt, st)
-            if abs(pt-st)<0.01:
+            print(pt, st)
+            if abs(pt-st)<0.1:
                 pscan[pt] = (tpos[pt], tscan[st])
                 break
 

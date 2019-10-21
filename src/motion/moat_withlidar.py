@@ -2,8 +2,10 @@ import numpy as np
 import rospy
 from src.motion.motionautomaton import MotionAutomaton
 from src.motion.pos_types import Pos
+from src.config.configs import MoatConfig, gen_positioning_params
 
 from sensor_msgs.msg import LaserScan
+import message_filters
 
 
 class MoatWithLidar(MotionAutomaton):
@@ -12,8 +14,13 @@ class MoatWithLidar(MotionAutomaton):
         super(MoatWithLidar, self).__init__(config)
         self.tscan = {}
         self.tpos = {}
+        self.tsync = {}
 
-        self.__sub_lidar = rospy.Subscriber(config.rospy_node.strip("/waypoint_node")+'/racecar/laser/scan', LaserScan, self._getLidarData)
+        self.__sub_lidar = message_filters.Subscriber(config.rospy_node.strip("/waypoint_node")+'/racecar/laser/scan', LaserScan)
+        self.__sub_positioning = message_filters.Subscriber(*gen_positioning_params(config))
+
+        ts = message_filters.TimeSynchronizer([self.__sub_lidar, self.__sub_positioning], 10)
+        ts.registerCallback(self._getPosLidar)
 
 
     def _getPositioning(self, data) -> None:
@@ -40,6 +47,25 @@ class MoatWithLidar(MotionAutomaton):
             
             tmpList.append((distance, cur_angle))
         self.tscan[cur_time] = tmpList
+
+    def _getPosLidar(self, lidar, pos) -> None:
+        # print("Get")
+        assert lidar.header.stamp.secs == pos.header.stamp.secs
+        quat = pos.pose.orientation
+        import math
+        yaw = math.atan2(2 * (quat.x * quat.y + quat.w * quat.z), pow(quat.w, 2) + pow(quat.x,2) - pow(quat.y,2) - pow(quat.z,2))
+        self.position = Pos(np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.position.z, yaw]))
+
+        tmpList = []
+        lidar_msg = lidar
+        cur_angle = lidar_msg.angle_max
+        cur_time = lidar_msg.header.stamp.secs + lidar_msg.header.stamp.nsecs*1e-9
+        for distance in lidar_msg.ranges:
+            cur_angle -= lidar_msg.angle_increment
+            tmpList.append((distance, cur_angle))
+        self.tsync[cur_time] = (self.position, tmpList)
+
+
 
     def _getReached(self, data) -> None:
         a = str(data).upper()

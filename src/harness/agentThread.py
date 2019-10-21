@@ -284,6 +284,7 @@ class AgentThread(ABC, Thread):
                     if isinstance(self.agent_gvh.moat, MoatWithLidar):
                         self.agent_gvh.moat.tscan = {}
                         self.agent_gvh.moat.tpos = {}
+                        self.agent_gvh.moat.tsync = {}
 
                 self.agent_gvh.update_round = False
 
