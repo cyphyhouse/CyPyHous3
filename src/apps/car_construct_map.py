@@ -5,6 +5,7 @@ from src.motion.cylobs import CylObs
 
 from bisect import bisect
 from collections import deque
+import csv
 import queue
 from typing import List, Tuple
 import rospy
@@ -60,6 +61,9 @@ class GridMap:
     def __delitem__(self, key):
         return self.__grid_map.__delitem__(key)
 
+    def __repr__(self):
+        return repr(self.__grid_map.tolist())
+
     def show(self):
         viz_map = np.full(shape=self.__grid_map.shape, fill_value=-1, dtype=np.int8)
         for x in range(GridMap.GRID_WIDTH):
@@ -112,7 +116,21 @@ class BasicFollowApp(AgentThread):
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
 
-        self.t = rospy.get_rostime()
+    def dump(self, ev: str) -> None:
+        if not self.agent_gvh.is_leader:
+            return
+
+        d = {'iter': self.locals['i'],
+             'time': rospy.get_rostime().to_nsec()}
+        if ev == "GUpdate":
+            d['map'] = self.read_from_shared('global_map', None)
+            d['map'].show()
+        else:
+            d['map'] = self.locals['map']
+
+        with open(self.name, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['iter', 'time', 'map'])
+            writer.writerow(d)
 
     def initialize_vars(self):
         rospy.loginfo("Initializing variables")
@@ -135,6 +153,7 @@ class BasicFollowApp(AgentThread):
             rospy.loginfo("NewPoint")
             # Local map is updated with global map only when we need to pick a new point
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
+            self.dump("NewPoint")
             self.locals['path'] = pick_path_to_frontier(self.locals['map'],
                                                         self.agent_gvh.moat.position,
                                                         self.agent_gvh.moat.planner,
@@ -153,6 +172,7 @@ class BasicFollowApp(AgentThread):
             rospy.loginfo("LUpdate")
             self.locals['newpoint'] = False
             self.update_local_map()
+            self.dump("LUpdate")
             return
 
         # GUpdate event
@@ -161,7 +181,7 @@ class BasicFollowApp(AgentThread):
             self.update_local_map()
             if self.lock('GUpdate'):
                 self.agent_gvh.put('global_map', self.read_from_shared('global_map', None)+self.locals['map'])
-                self.read_from_shared('global_map', None).show()
+                self.dump("GUpdate")
                 self.unlock('GUpdate')
                 self.locals['newpoint'] = True
             else:
@@ -262,7 +282,17 @@ def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> Lis
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
     next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
+
     # XXX BFS returns from closest to furthest. We can add random permutation here
+    def pos_key(new_pos: pos3d) -> float:
+        dist = (new_pos.x - pos.x) ** 2 + (new_pos.y - pos.y) ** 2
+        new_yaw = np.arctan2((new_pos.y-pos.y), (new_pos.x-pos.x))
+        forward_diff = _normalize_radians(new_yaw - pos.yaw)
+        backward_diff = _normalize_radians(forward_diff + np.pi)
+        min_diff = min(abs(forward_diff), abs(backward_diff))
+        return min_diff if dist < 25 else min_diff * 25 / dist
+
+    next_pos_list.sort(key=pos_key)
     for next_pos in next_pos_list:
         # TODO add obstacles from map
         path = planner.find_path(pos, next_pos, obstacle_list=obstacle_list)
