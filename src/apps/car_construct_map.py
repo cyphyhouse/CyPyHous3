@@ -1,23 +1,26 @@
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.pos_types import pos3d, Pos  # TODO Choose only one of them
-from src.motion.rectobs import RectObs
 from src.motion.cylobs import CylObs
 
+from bisect import bisect
 from collections import deque
-from typing import List, Tuple, Optional
+import queue
+from typing import List, Tuple
 import rospy
 
 import numpy as np
 import matplotlib.pyplot as plt
-import copy
+
+
+LIDAR_RANGE = 5.0
+LIDAR_ANGLE_MIN, LIDAR_ANGLE_MAX = -np.pi, np.pi
+
+Grid = Tuple[int, int]
 
 
 def _normalize_radians(rad: float) -> float:
     return (rad + np.pi) % (2 * np.pi) - np.pi
-
-
-Grid = Tuple[int, int]
 
 
 class GridMap:
@@ -109,26 +112,27 @@ class BasicFollowApp(AgentThread):
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(BasicFollowApp, self).__init__(agent_config, moat_config)
 
+        self.t = rospy.get_rostime()
+
     def initialize_vars(self):
+        rospy.loginfo("Initializing variables")
         self.locals['i'] = 1
         self.locals['map'] = GridMap()
         self.update_local_map()
         self.locals['newpoint'] = True
         self.agent_gvh.create_aw_var('global_map', type(GridMap), GridMap())
         self.initialize_lock('GUpdate')
-        self.locals['obstacle'] = [] # obstacle list for path planner
+        self.locals['obstacle'] = []  # obstacle list for path planner
 
     def loop_body(self):
-        rospy.sleep(0.01)
-        if self.locals['i'] > 80:
+        if self.locals['i'] > 800:
             self.trystop()
             return
-        
         self.locals['i'] += 1
 
         # NewPoint event
         if self.locals['newpoint']:
-            print("Newpoint")
+            rospy.loginfo("NewPoint")
             # Local map is updated with global map only when we need to pick a new point
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
             self.locals['path'] = pick_path_to_frontier(self.locals['map'],
@@ -146,14 +150,14 @@ class BasicFollowApp(AgentThread):
 
         # LUpdate event
         if not self.locals['newpoint'] and not self.agent_gvh.moat.reached:
-            print("LUpdate")
+            rospy.loginfo("LUpdate")
             self.locals['newpoint'] = False
             self.update_local_map()
             return
 
         # GUpdate event
         if self.agent_gvh.moat.reached:
-            print("GUpdate")
+            rospy.loginfo("GUpdate")
             self.update_local_map()
             if self.lock('GUpdate'):
                 self.agent_gvh.put('global_map', self.read_from_shared('global_map', None)+self.locals['map'])
@@ -164,53 +168,47 @@ class BasicFollowApp(AgentThread):
                 return
 
     def update_local_map(self):
-        pscan = self.agent_gvh.moat.tsync # tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
-        self.agent_gvh.moat.tpos = {}
-        for time in list(pscan):
-            ipos, iscan = pscan[time]
-            empty_map = get_empty_map(ipos, iscan)
-            obs_map = get_obstacle_map(ipos, iscan, self.locals['obstacle'])
-            self.locals['map'] = self.locals['map'] + empty_map + obs_map
+        for _ in range(self.agent_gvh.moat.tsync.qsize()):
+            try:
+                ipos, iscan = self.agent_gvh.moat.tsync.get_nowait()
+                empty_map = get_empty_map(ipos, iscan)
+                obs_map = get_obstacle_map(ipos, iscan, self.locals['obstacle'])
+                self.locals['map'] = self.locals['map'] + empty_map + obs_map
+            except queue.Empty:
+                pass
 
 
-def global_grid(pos: pos3d, cur_angle: float, distance: float = 5.0) -> Grid:
-    x = np.floor((pos.x + np.sin(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05))).astype(int)
-    y = np.floor((pos.y + np.cos(np.pi / 2 - pos.yaw + cur_angle) * distance * np.cos(0.05))).astype(int)
-    return x, y
-
-
-def get_obstacles(ipos: Pos, iscan: list) -> list:
-    x = ipos.x
-    y = ipos.y
-    yaw = ipos.yaw
+def get_obstacles(pos: Pos, scan: list) -> list:
+    x = pos.x
+    y = pos.y
+    yaw = pos.yaw
     obstacles = []
-    for distance, cur_angle in iscan:
+    for distance, cur_angle in scan:
         if distance == float('inf'):
             continue
-        obs_x = x + np.sin(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
-        obs_y = y + np.cos(np.pi/2 - yaw + cur_angle)*distance*np.cos(0.05)
+        obs_x = x + np.cos(yaw + cur_angle)*distance
+        obs_y = y + np.sin(yaw + cur_angle)*distance
         obstacles.append((obs_x, obs_y))
 
     return obstacles
 
 
-def get_obstacle_map(pos, scan, cur_obstalces) -> GridMap:
+def get_obstacle_map(pos, scan, cur_obstacles) -> GridMap:
     ret_map = GridMap()
-    obstacle_list = []
     count = 0
     for pos_x, pos_y in get_obstacles(pos, scan):
         obs_x, obs_y = GridMap.quantize(pos_x, pos_y)
-        if len(cur_obstalces) == 0:
+        if len(cur_obstacles) == 0:
             obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
-            cur_obstalces.append(obs_pos)
+            cur_obstacles.append(obs_pos)
         else:
             flag = 0
-            for cur_obs in cur_obstalces:
+            for cur_obs in cur_obstacles:
                 if cur_obs.position.x == obs_x and cur_obs.position.y == obs_y:
                     flag = 1 
             if not flag:
                 obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
-                cur_obstalces.append(obs_pos)
+                cur_obstacles.append(obs_pos)
         ret_map[obs_x][obs_y] = GridMap.OCCUPIED
         count += 1
     return ret_map
@@ -218,81 +216,46 @@ def get_obstacle_map(pos, scan, cur_obstalces) -> GridMap:
 
 def get_empty_map(pos, scan) -> GridMap:
     ret_map = GridMap()
-    px, py = GridMap.quantize(pos.x, pos.y)
-    yaw = pos.yaw
 
-    left_point = scan[-1]
-    right_point = scan[0]
-    mid_point = scan[int(len(scan)/2)]
+    # Get the begin and end of x and y inside LIDAR_RANGE radius
+    # [x_beg, x_end)*[y_beg, y_end) should cover all possibly empty grids
+    # TODO get LIDAR_RANGE from LaserScan message
+    # FIXME we can consider less grids if Lidar angle min/max are taken into account
+    x_beg, y_beg, x_end, y_end = \
+        np.ceil([pos.x - LIDAR_RANGE,
+                 pos.y - LIDAR_RANGE,
+                 pos.x + LIDAR_RANGE,
+                 pos.y + LIDAR_RANGE]).astype(int).tolist()
 
-    lx, ly = global_grid(pos, left_point[1])
-    rx, ry = global_grid(pos, right_point[1])
-    mx, my = global_grid(pos, mid_point[1])
+    # NOTE x_end and y_end are excluded
+    angle_inc = 0.01  # TODO get LIDAR_RANGE and angle increment from LaserScan message
+    scan_angles = [ang for _, ang in scan]
 
-    # Left half
-    if lx < mx:
-        itrx = range(lx-2, mx+2)
-        if ly > my:
-            itry = range(ly+2, my-2, -1)
-        else:
-            itry = range(ly-2, my+2)
-    else:
-        itrx = range(mx-2, lx+2)
-        if ly > my:
-            itry = range(my-2, ly+2)
-        else:
-            itry = range(my+2, ly-2, -1)
-    for x in itrx:
-        for y in itry:
-            if dist(x, y, px, py, yaw, scan):
-                ret_map[x][y] = GridMap.EMPTY
+    def is_covered_by_scan(polar: Tuple[float, float]) -> bool:
+        nonlocal scan, scan_angles
+        rad, ang = polar
+        if rad > LIDAR_RANGE:
+            return False
+        #  Binary search the angles because it is in ascending order
+        i = bisect(scan_angles, _normalize_radians(ang))
+        if i:
+            distance, angle = scan[i-1]
+            return abs(_normalize_radians(angle - ang)) < angle_inc and rad < distance
+        return False
 
-    # Right half
-    if rx < mx:
-        itrx = range(rx-2, mx+2)
-        if ry > my:
-            itry = range(ry+2, my-2, -1)
-        else:
-            itry = range(ry-2, my+2)
-    else:
-        itrx = range(mx-2, rx+2)
-        if ry > my:
-            itry = range(my-2, ry+2)
-        else:
-            itry = range(my+2, ry-2, -1)
-
-    for x in itrx:
-        for y in itry:
-            if dist(x, y, px, py, yaw, scan):
-                ret_map[x][y] = GridMap.EMPTY
+    for x in range(x_beg, x_end):
+        for y in range(y_beg, y_end):
+            # Check if all four corners are covered by Lidar scan
+            corners = [(x, y), (x+1, y), (x, y+1), (x+1, y+1)]
+            polars = [(np.sqrt((_x-pos.x)**2 + (_y-pos.y)**2),  # radius
+                       np.arctan2((_y-pos.y), (_x-pos.x)) - pos.yaw)  # angle
+                      for _x, _y in corners]
+            if any(not is_covered_by_scan(p) for p in polars):
+                continue
+            # else: # All four corners are covered
+            ret_map[x][y] = GridMap.EMPTY
 
     return ret_map
-
-
-def tsync(tpos: dict, tscan: dict) -> dict:
-    pscan = {}
-    for pt in tpos:
-        for st in tscan:
-            print(pt, st)
-            if abs(pt-st)<0.1:
-                pscan[pt] = (tpos[pt], tscan[st])
-                break
-
-    return pscan
-
-
-def dist(x1, y1, x2, y2, yaw, scan) -> bool:
-    d = np.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
-
-    delta = np.arctan2((y1-y2), (x1-x2))
-    omega = yaw - delta
-
-    for distance, angle in scan:
-        if abs(angle - omega) < 0.01:
-            if distance == float('inf'):
-                return d < 5
-            else:
-                return d < distance
 
 
 def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> List[pos3d]:

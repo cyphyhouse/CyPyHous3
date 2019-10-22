@@ -1,8 +1,8 @@
+import queue
 import numpy as np
 import rospy
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.pos_types import Pos
-from src.config.configs import MoatConfig, gen_positioning_params
 
 from sensor_msgs.msg import LaserScan
 import message_filters
@@ -14,7 +14,7 @@ class MoatWithLidar(MoatTestCar):
 
     def __init__(self, config):
         super(MoatWithLidar, self).__init__(config)
-        self.tsync = {}
+        self.tsync = queue.Queue()
 
         sub_scan = message_filters.Subscriber(config.rospy_node.strip("/waypoint_node") + '/racecar/laser/scan',
                                               LaserScan)
@@ -23,6 +23,13 @@ class MoatWithLidar(MoatTestCar):
 
         ts = MyApproximateTimeSynchronizer([sub_scan, sub_pose], 10, 0.005)
         ts.registerCallback(self._get_scan_at_pos)
+
+    def reset(self) -> None:
+        super().reset()
+        if self.tsync:
+            tmp = self.tsync
+            self.tsync = queue.Queue()
+            del tmp
 
     @staticmethod
     def _quaternion_to_euler(q):
@@ -34,12 +41,14 @@ class MoatWithLidar(MoatTestCar):
         position = Pos(np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.position.z, yaw]))
 
         tmp_list = []
-        cur_angle = scan.angle_max
-        cur_time = scan.header.stamp.secs + scan.header.stamp.nsecs*1e-9
+        cur_angle = scan.angle_min
         for distance in scan.ranges:
-            cur_angle -= scan.angle_increment
+            cur_angle += scan.angle_increment
             tmp_list.append((distance, cur_angle))
-        self.tsync[cur_time] = (position, tmp_list)
+        try:
+            self.tsync.put_nowait((position, tmp_list))
+        except queue.Full:
+            pass
 
 
 class MyApproximateTimeSynchronizer(message_filters.ApproximateTimeSynchronizer):
