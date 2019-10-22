@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-LIDAR_RANGE = 5.0
+LIDAR_RANGE = 2.5
 LIDAR_ANGLE_MIN, LIDAR_ANGLE_MAX = -np.pi, np.pi
 
 Grid = Tuple[int, int]
@@ -262,8 +262,7 @@ def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> Lis
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
     next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
-    # XXX reverse because BFS returns from closest to furthest. We can add random permutation here
-    next_pos_list.reverse()
+    # XXX BFS returns from closest to furthest. We can add random permutation here
     for next_pos in next_pos_list:
         # TODO add obstacles from map
         path = planner.find_path(pos, next_pos, obstacle_list=obstacle_list)
