@@ -234,7 +234,7 @@ class AgentThread(ABC, Thread):
 
     def run(self) -> None:
         """
-        needs to be implemented for any agenThread
+        needs to be implemented for any agentThread
         :return:
         """
         from src.harness.message_handler import init_msg_create
@@ -279,12 +279,9 @@ class AgentThread(ABC, Thread):
                 # print("executing round", self.agent_gvh.round_num)
 
                 self.loop_body()
-                # resetting t_pos and t_sync
+                # resetting motion automaton
                 if self.agent_gvh.moat is not None:
-                    if isinstance(self.agent_gvh.moat, MoatWithLidar):
-                        self.agent_gvh.moat.tscan = {}
-                        self.agent_gvh.moat.tpos = {}
-                        self.agent_gvh.moat.tsync = {}
+                    self.agent_gvh.moat.reset()
 
                 self.agent_gvh.update_round = False
 

@@ -20,7 +20,6 @@ class MotionAutomaton(threading.Thread, ABC):
         self.__path = []
         self.__planner = config.planner
         self.__bot_type = config.bot_type
-        self.__tpos = {}
 
         try:
             import rospy
@@ -39,6 +38,9 @@ class MotionAutomaton(threading.Thread, ABC):
 
         time.sleep(1)
         self.moat_init_action()
+
+    def reset(self) -> None:
+        pass
 
     @abstractmethod
     def moat_init_action(self):
