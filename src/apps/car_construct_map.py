@@ -143,7 +143,7 @@ class BasicFollowApp(AgentThread):
         self.locals['obstacle'] = []  # obstacle list for path planner
 
     def loop_body(self):
-        if self.locals['i'] > 800:
+        if self.locals['i'] > 5000:
             self.trystop()
             return
         self.locals['i'] += 1
@@ -285,12 +285,25 @@ def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> Lis
 
     # XXX BFS returns from closest to furthest. We can add random permutation here
     def pos_key(new_pos: pos3d) -> float:
-        dist = (new_pos.x - pos.x) ** 2 + (new_pos.y - pos.y) ** 2
-        new_yaw = np.arctan2((new_pos.y-pos.y), (new_pos.x-pos.x))
+        new_yaw = np.arctan2((new_pos.y - pos.y), (new_pos.x - pos.x))
         forward_diff = _normalize_radians(new_yaw - pos.yaw)
         backward_diff = _normalize_radians(forward_diff + np.pi)
-        min_diff = min(abs(forward_diff), abs(backward_diff))
-        return min_diff if dist < 25 else min_diff * 25 / dist
+        # Choose the smaller to compute cost
+        ang = min(abs(forward_diff), abs(backward_diff))
+        """ x^2 + (y - 5.5 + 0.5z)^2 = (0.55(z-10))^2  # Cost function based on an oblique cone
+        <=> (x^2 + y^2 -11y)/0.0525 + ((y + 0.55)/0.105)^2 = (z - (y + 0.55)/0.105)^2
+        <=> (r^2 -11y)/0.0525 + ((y + 0.55)/0.105)^2 = (z - (y + 0.55)/0.105)^2
+        <=> (r^2 -11y)/0.0525 + (z_0)^2 = (z - z_0)^2
+        <=> sqrt((r^2 -11y)/0.0525 + (z_0)^2) = |z - z_0|
+        max z=10 when (x, y) = (0, 0.5)
+        """
+        rad_sq = (new_pos.x - pos.x) ** 2 + (new_pos.y - pos.y) ** 2
+        y = np.sqrt(rad_sq) * np.sin(ang)
+        z_0 = (y + 0.55)/0.105
+        lhs = np.sqrt((rad_sq - 11*y)/0.0525 + z_0**2)
+        assert z_0 > 0
+
+        return abs(z_0 - lhs)
 
     next_pos_list.sort(key=pos_key)
     for next_pos in next_pos_list:
