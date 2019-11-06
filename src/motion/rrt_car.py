@@ -27,7 +27,7 @@ class RRT(Planner):
                  max_iter: int = 2000):
         super(RRT, self).__init__()
         if rand_area is None:
-            rand_area = [-2.5, 2.5, -2.5, 2.5]
+            rand_area = [-2.75, 2.75, -2.75, 2.75]
         self.min_xrand = rand_area[0]
         self.max_xrand = rand_area[1]
         self.min_yrand = rand_area[2]
@@ -40,7 +40,7 @@ class RRT(Planner):
         self.dt = 0.1
         self.max_vel = 3
         self.vel_steps = 3
-        self.steer_configs = [0, 0.1, 0.2]
+        self.steer_configs = [0, 0.1, 0.2, 0.3]
         self.vel_configs = [1, 2, 3]
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
@@ -66,17 +66,19 @@ class RRT(Planner):
             nind = self.get_nearest_list_index(rnd)
 
             new_node = self.steer(rnd, nind)
-            node_path = Seg(self.node_list[nind], new_node)
-            if self.check_collision(obstacle_list, node_path):
-                self.node_list.append(new_node)
+            if new_node is not None:
+                node_path = Seg(self.node_list[nind], new_node)
+                if self.check_collision(obstacle_list, node_path):
+                    self.node_list.append(new_node)
 
-            if self.close_to_goal(end, new_node):
-                if self.check_collision(obstacle_list, Seg(new_node, end)):
-                    path = self.gen_final_course(start, end, new_node)
-                    # path = path[::-1]
-                    # for i in range(len(path)):
-                    #   print(path[i])
-                    return path[::-1] #self.path_smoothing(obstacle_list, path[::-1], 100)
+                if self.close_to_goal(end, new_node):
+                    if self.check_collision(obstacle_list, Seg(new_node, end)):
+                        path = self.gen_final_course(start, end, new_node)
+                        # path = path[::-1]
+                        # for i in range(len(path)):
+                        #   print(path[i])
+                        #return path[::-1]
+                        return self.path_smoothing(obstacle_list, path[::-1], 50)
 
         print("Reached max iteration")
         return None
@@ -131,14 +133,16 @@ class RRT(Planner):
                     elif yaw_next < -math.pi:
                         yaw_next = yaw_next + 2*math.pi
 
-                if (abs(x_next) <= self.max_xrand) or (abs(y_next) <= self.max_yrand):
+                if (abs(x_next) <= self.max_xrand) and (abs(y_next) <= self.max_yrand): # Check if configuration is within bounds
                     tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
                     tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
+        new_node = []
         minind = tmp_cost.index(min(tmp_cost))
-        new_node = tmp_node[minind]
-
-        new_node.parent = nearest_node
+        if minind is not None:
+            new_node = tmp_node[minind]
+            new_node.parent = nearest_node
+            
         return new_node
 
     def get_random_point(self, end: Pos) -> list:
@@ -221,7 +225,7 @@ class RRT(Planner):
                 tmp_yaw = tmp_yaw + math.pi
             theta_diff = tmp_yaw - end_theta
 
-            if abs(theta_diff) <= 0.2:
+            if abs(theta_diff) <= 0.3:
                 return True
             else:
                 return False
@@ -250,9 +254,10 @@ class RRT(Planner):
                     end_theta = math.atan2(point1.y - point0.y, point1.x - point0.x)
                     theta_diff = point0.yaw - end_theta
                 else:
-                    theta_diff = point0.yaw - point1.yaw
+                    dir_theta = math.atan2(point1.y - point0.y, point1.x - point0.x)
+                    theta_diff = point0.yaw - dir_theta
 
-                if abs(theta_diff) <= 0.3:
+                if abs(theta_diff) <= 0.15:
                     pass
                 else:
                     continue
@@ -262,22 +267,26 @@ class RRT(Planner):
                 path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
         return path
 
-#
-# a = RRT()
-# p1 = Pos(np.array([-2, 0, 0]))
-# p2 = Pos(np.array([-2, 0.5, 0]))
-#
-# from src.motion.cylobs import CylObs
-# o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
-#
-# import time
-# loops = 1
-# start_time = time.time()
-# for i in range(loops):
-#     p = a.find_path(p1, p2, [o1])
-# elapsed_time = time.time() - start_time
-# # print(elapsed_time/loops)
-# # print(p)
-# # for i in range(len(p)):
-# #     print(p[i])
+"""
+a = RRT()
+p1 = Pos(np.array([-2, 0, 0]))
+p2 = Pos(np.array([2, 0, 0]))
 
+from src.motion.cylobs import CylObs
+o1 = CylObs(Pos(np.array([0, 0, 0])), 1.0)
+
+import time
+loops = 1
+start_time = time.time()
+for i in range(loops):
+    p = a.find_path(p1, p2, [o1])
+elapsed_time = time.time() - start_time
+print(elapsed_time/loops)
+# print(p)
+for i in range(len(p)):
+    print(p[i])
+
+ps = a.path_smoothing([o1], p, 100)
+for i in range(len(ps)):
+    print(ps[i])
+"""
