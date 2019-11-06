@@ -74,9 +74,6 @@ class RRT(Planner):
                 if self.close_to_goal(end, new_node):
                     if self.check_collision(obstacle_list, Seg(new_node, end)):
                         path = self.gen_final_course(start, end, new_node)
-                        # path = path[::-1]
-                        # for i in range(len(path)):
-                        #   print(path[i])
                         #return path[::-1]
                         return self.path_smoothing(obstacle_list, path[::-1], 50)
 
@@ -138,10 +135,13 @@ class RRT(Planner):
                     tmp_node.append(Node(x_next, y_next, 0, yaw_next))
 
         new_node = []
-        minind = tmp_cost.index(min(tmp_cost))
-        if minind is not None:
+        
+        if tmp_cost != []:
+            minind = tmp_cost.index(min(tmp_cost))
             new_node = tmp_node[minind]
             new_node.parent = nearest_node
+        else:
+            new_node = None
             
         return new_node
 
@@ -276,17 +276,17 @@ from src.motion.cylobs import CylObs
 o1 = CylObs(Pos(np.array([0, 0, 0])), 1.0)
 
 import time
-loops = 1
+loops = 100
 start_time = time.time()
 for i in range(loops):
     p = a.find_path(p1, p2, [o1])
 elapsed_time = time.time() - start_time
 print(elapsed_time/loops)
 # print(p)
-for i in range(len(p)):
-    print(p[i])
+# for i in range(len(p)):
+    # print(p[i])
 
-ps = a.path_smoothing([o1], p, 100)
-for i in range(len(ps)):
-    print(ps[i])
+# ps = a.path_smoothing([o1], p, 100)
+# for i in range(len(ps)):
+    # print(ps[i])
 """
