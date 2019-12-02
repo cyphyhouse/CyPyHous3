@@ -1,3 +1,5 @@
+# Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
+
 import math
 
 import numpy as np

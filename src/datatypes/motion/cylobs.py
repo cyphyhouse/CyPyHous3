@@ -1,3 +1,5 @@
+# Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
+
 import copy
 import math
 
@@ -59,15 +61,3 @@ class CylObs(Obstacle):
                 return True
             else:
                 return False
-
-
-"""
-p1 = Pos(np.array([-1.03, -0.1566, 1.10]))
-p2 = Pos(np.array([1.094, 0.29, 1.22]))
-path = Seg(p1, p2)
-
-o1 = CylObs(Pos(np.array([0, 0, 0])), 0.5)
-
-b = o1.collision_check(path)
-print(b)
-"""

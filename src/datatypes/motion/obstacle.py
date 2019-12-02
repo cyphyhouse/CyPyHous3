@@ -1,3 +1,5 @@
+# Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
+
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -28,7 +30,7 @@ class Obstacle(ABC):
     @property
     def position(self) -> pos.Pos:
         """
-        getter method for position"
+        getter method for position
         :return: position of obstacle
         """
         return self.__position

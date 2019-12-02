@@ -1,3 +1,5 @@
+# Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
+
 import numpy as np
 
 import src.datatypes.motion.pos as pos

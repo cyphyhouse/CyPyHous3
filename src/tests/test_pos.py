@@ -1,3 +1,5 @@
+# Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
+
 import unittest
 
 import numpy as np
