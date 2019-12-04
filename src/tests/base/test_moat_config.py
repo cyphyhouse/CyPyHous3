@@ -7,7 +7,7 @@ from src.datatypes.robot import BotType
 from src.motion.simpleplanner import SimplePlanner
 
 
-class TestAgentConfig(unittest.TestCase):
+class TestMoatConfig(unittest.TestCase):
     """
     testing the agent config member access methods
     __moat_class : motion automaton specification

@@ -3,7 +3,7 @@
 import typing as tp
 
 from src.datatypes.robot import BotType
-from src.motion.planner import Planner
+from src.motion.abstract.planner import Planner
 from src.motion.simpleplanner import SimplePlanner
 
 
