@@ -4,7 +4,7 @@ from typing import List, Union
 
 from src.datatypes.motion.pos import Pos, distance
 from src.datatypes.motion.seg import Seg
-from src.motion.planner import Planner
+from src.motion.abstract.planner import Planner
 
 
 class SimplePlanner(Planner):

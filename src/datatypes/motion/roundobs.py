@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 
-from src.datatypes.motion.obstacle import Obstacle
+from src.datatypes.motion.abstract.obstacle import Obstacle
 from src.datatypes.motion.pos import Pos
 from src.datatypes.motion.seg import Seg
 

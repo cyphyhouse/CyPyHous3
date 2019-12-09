@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-import src.motion.planner as planner
+import src.motion.abstract.planner as planner
 from src.datatypes.motion.pos import Pos
 
 

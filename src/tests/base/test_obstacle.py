@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-import src.datatypes.motion.obstacle as obs
+import src.datatypes.motion.abstract.obstacle as obs
 import src.datatypes.motion.pos as pos
 import src.datatypes.motion.seg as seg
 
