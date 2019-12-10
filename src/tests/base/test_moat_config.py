@@ -10,7 +10,6 @@ from src.motion.simpleplanner import SimplePlanner
 class TestMoatConfig(unittest.TestCase):
     """
     testing the agent config member access methods
-    __moat_class : motion automaton specification
     """
 
     def setUp(self):

@@ -2,6 +2,7 @@
 
 import unittest
 
+from src.datatypes.message_types import MsgType
 from src.objects.message import Message
 
 
@@ -12,13 +13,13 @@ class TestMessage(unittest.TestCase):
     """
 
     def setUp(self):
-        self.msg = Message(1, 2, "3", 4.0)
+        self.msg = Message(1, MsgType.MUTEX_RELEASE, "3", 4.0)
 
     def test_sender(self):
         self.assertEqual(self.msg.sender, 1, "test message sender")
 
     def test_type(self):
-        self.assertEqual(self.msg.message_type, 2, "test message type")
+        self.assertEqual(self.msg.message_type, MsgType.MUTEX_RELEASE, "test message type")
 
     def test_content(self):
         self.assertEqual(self.msg.content, "3", "test content")
@@ -27,7 +28,7 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(self.msg.timestamp, 4.0, "test timestamp")
 
     def test_equality(self):
-        self.assertEqual(self.msg, Message(1, 2, "3", 4.0), "testing message equality")
+        self.assertEqual(self.msg, Message(1, MsgType.MUTEX_RELEASE, "3", 4.0), "testing message equality")
 
 
 if __name__ == '__main__':

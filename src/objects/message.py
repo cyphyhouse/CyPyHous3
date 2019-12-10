@@ -1,5 +1,7 @@
 # Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
+from src.datatypes.message_types import MsgType
+
 
 class Message(object):
     """
@@ -11,13 +13,13 @@ class Message(object):
     TODO: move to abstract class, make all messages strings, stop pickling, use msgpack to serialize messages.
     """
 
-    def __init__(self, sender: int, message_type: int, content, timestamp: float):
+    def __init__(self, sender: int, message_type: MsgType, content, timestamp: float):
         """
         init method for message
         :param sender: integer message sender agent pid
         :type sender: int
-        :param message_type: integer message type
-        :type message_type: int
+        :param message_type: message type
+        :type message_type: MsgType
         :param content:  message content
         :type content: Any
         :param timestamp: float timestamp
@@ -80,18 +82,18 @@ class Message(object):
         self.__content = content
 
     @property
-    def message_type(self) -> int:
+    def message_type(self) -> MsgType:
         """
         getter method for message type
-        :return: integer message type
+        :return:  message type
         """
         return self.__message_type
 
     @message_type.setter
-    def message_type(self, message_type: int) -> None:
+    def message_type(self, message_type: MsgType) -> None:
         """
         setter method for message type
-        :param message_type: integer message type
+        :param message_type: message type
         :return: None
         """
         self.__message_type = message_type

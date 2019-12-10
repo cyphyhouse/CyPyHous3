@@ -4,7 +4,6 @@ import numpy as np
 
 import src.datatypes.motion.pos as pos
 
-
 class Seg(object):
     """
     path segment object, specified by a start and an end position

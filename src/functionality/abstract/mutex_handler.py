@@ -25,5 +25,12 @@ class MutexHandler(Thread, ABC):
         return self.__stop_event.is_set()
 
     @abstractmethod
+    def grant_available_mutexes(self, *args, **kwargs) -> None:
+        """
+        abstract method to grant available mutexes
+        """
+        pass
+
+    @abstractmethod
     def run(self):
         pass

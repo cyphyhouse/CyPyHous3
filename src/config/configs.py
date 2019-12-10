@@ -17,32 +17,44 @@ class AgentConfig(object):
     __mutex_handler : mutual exclusion handler object
     __is_leader : property determining whether the agent is leader (used in conflict resolution in various cases
     __moat_class : motion automaton specification
+    __send_ips: IPs with corresponding ports of other participating systems (default is broadcast)
     """
 
     def __init__(self, pid: int, bots: int, rip: str, rport: int, plist: tp.Union[tp.List[int], None] = None,
                  mh: tp.Union[None, classmethod] = None, is_leader=False,
                  moat_class: tp.Union[None, classmethod] = None,
-                 mhargs: tp.Union[tp.List, None] = None):
+                 mhargs: tp.Union[tp.List, None] = None, send_ips: tp.List[tp.Tuple[str, int]] = None):
         """
 
         :param pid : unique integer identifier
         :type pid : int
+
         :param bots : number of robots
         :type bots : int
+
         :param rip : receiver ip
         :type ip : str
+
         :param rport : listener port
         :type rport : int
+
         :param plist : list of listener ports
         :type plist : list(int)
+
         :param mh : mutual handler
         :type mh : classmethod, None
+
         :param is_leader : boolean indicating whether robot is leader
         :type is_leader : bool
+
         :param moat_class : motion automaton class
         :type moat_class : classmethod, None
+
         :param mhargs : mutual handler arguments
         :type mhargs : list
+
+        :param send_ips : list of ips participating in the application, with corresponding ports
+        :type send_ips : List[Tuple[str,int]]
         """
         if plist is None:
             plist = []
@@ -52,6 +64,8 @@ class AgentConfig(object):
             self.__mutex_handler = mh(*mhargs)
         else:
             self.__mutex_handler = None
+        if send_ips is None:
+            send_ips = []
         self.__pid = pid
         self.__bots = bots
         self.__rip = rip
@@ -59,136 +73,81 @@ class AgentConfig(object):
         self.__plist = plist
         self.__is_leader = is_leader
         self.__moat_class = moat_class
+        self.__send_ips = send_ips
 
     # ------------ MEMBER ACCESS METHODS --------------
 
     @property
     def pid(self) -> int:
-        """
-        :return: pid
-        :rtype: int
-        """
         return self.__pid
 
     @property
     def bots(self) -> int:
-        """
-        :return: number of bots
-        :rtype: int
-        """
         return self.__bots
 
     @property
     def rip(self) -> str:
-        """
-        :return: receiver ip
-        :rtype: str
-        """
         return self.__rip
 
     @property
     def rport(self) -> int:
-        """
-        :return: listener port
-        :rtype: int
-        """
         return self.__rport
 
     @property
     def plist(self) -> tp.List[int]:
-        """
-        :return: list of ports
-        :rtype: List[int]
-        """
         return self.__plist
 
     @property
     def is_leader(self) -> bool:
-        """
-        :return: true if leader false otherwise
-        :rtype: bool
-        """
         return self.__is_leader
 
     @property
     def moat_class(self) -> tp.Union[None, classmethod]:
-        """
-        :return: motion automaton object (if any)
-        :rtype: Union[None, classmethod]
-        """
         return self.__moat_class
 
     @property
     def mutex_handler(self) -> tp.Union[None, classmethod]:
-        """
-        :return: mutex handler (if any)
-        :rtype: Union[None,classmethod]
-        """
         return self.__mutex_handler
 
     @pid.setter
     def pid(self, pid: int) -> None:
-        """
-        :param: pid
-        :type: int
-        """
         self.__pid = pid
 
     @bots.setter
     def bots(self, bots: int) -> None:
-        """
-        :param: number of bots
-        :type: int
-        """
         self.__bots = bots
 
     @rip.setter
     def rip(self, rip: str) -> None:
-        """
-        :param: receiver ip
-        :type: str
-        """
         self.__rip = rip
 
     @rport.setter
     def rport(self, rport: int) -> None:
-        """
-        :param: listener port
-        :type: int
-        """
         self.__rport = rport
 
     @plist.setter
     def plist(self, plist: tp.List[int]) -> None:
-        """
-        :param: list of ports
-        :type: List[int]
-        """
         self.__plist = plist
 
     @is_leader.setter
     def is_leader(self, is_leader: bool) -> None:
-        """
-        :param: true if leader false otherwise
-        :type: bool
-        """
         self.__is_leader = is_leader
 
     @moat_class.setter
     def moat_class(self, moat_class: tp.Union[None, classmethod]) -> None:
-        """
-        :param: motion automaton object (if any)
-        :type: Union[None, classmethod]
-        """
         self.__moat_class = moat_class
 
     @mutex_handler.setter
     def mutex_handler(self, mutex_handler: tp.Union[None, classmethod]) -> None:
-        """
-        :param: mutex handler (if any)
-        :type: Union[None,classmethod]
-        """
         self.__mutex_handler = mutex_handler
+
+    @property
+    def send_ips(self) -> tp.List[tp.Tuple[str, int]]:
+        return self.__send_ips
+
+    @send_ips.setter
+    def send_ips(self, send_ips: tp.List[tp.Tuple[str, int]]):
+        self.__send_ips = send_ips
 
     def __repr__(self):
         """
@@ -203,6 +162,7 @@ class AgentConfig(object):
         s += "mutex_handler" + ":" + str(self.mutex_handler) + "\n"
         s += "is_leader" + ":" + str(self.is_leader) + "\n"
         s += "moat_class" + ":" + str(self.moat_class) + "\n"
+        s += "ip_port_list" + ":" + str(self.send_ips)
         return s
 
     # ----------------- OPERATIONS --------------------
@@ -285,158 +245,82 @@ class MoatConfig(object):
 
     @property
     def waypoint_topic(self) -> str:
-        """
-        :return: waypoint ros topic
-        :rtype: str
-        """
         return self.__waypoint_topic
-
-    @waypoint_topic.setter
-    def waypoint_topic(self, waypoint_topic: str) -> None:
-        """
-        :param waypoint_topic: waypoint ros topic
-        :type: waypoint_topic: str
-        """
-        self.__waypoint_topic = waypoint_topic
 
     @property
     def reached_topic(self) -> str:
-        """
-        :return: reached ros topic
-        :rtype: str
-        """
         return self.__reached_topic
-
-    @reached_topic.setter
-    def reached_topic(self, reached_topic: str) -> None:
-        """
-        :param reached_topic: reached ros topic
-        :type: reached_topic: str
-        """
-        self.__reached_topic = reached_topic
 
     @property
     def pos_node(self) -> str:
-        """
-        :return: position node name
-        :rtype: str
-        """
         return self.__pos_node
-
-    @pos_node.setter
-    def pos_node(self, pos_node: str) -> None:
-        """
-        :param pos_node: position node
-        :type pos_node: str
-        """
-        self.__pos_node = pos_node
 
     @property
     def pos_msg_type(self):
-        """
-        :return: pos message type
-        """
         return self.__pos_msg_type
-
-    @pos_msg_type.setter
-    def pos_msg_type(self, pos_msg_type) -> None:
-        """
-        :param pos_msg_type: position message type
-        """
-        self.__pos_msg_type = pos_msg_type
 
     @property
     def rchd_msg_type(self):
-        """
-        :return: reached message type
-        """
         return self.__rchd_msg_type
-
-    @rchd_msg_type.setter
-    def rchd_msg_type(self, rchd_msg_type: str) -> None:
-        """
-        :param rchd_msg_type: reached message type
-        """
-        self.__rchd_msg_type = rchd_msg_type
 
     @property
     def rospy_node(self) -> str:
-        """
-        :return: rospy node
-        :rtype: str
-        """
         return self.__rospy_node
-
-    @rospy_node.setter
-    def rospy_node(self, rospy_node: str) -> None:
-        """
-        :param rospy_node: name of the rospy node
-        :type: str
-        """
-        self.__rospy_node = rospy_node
 
     @property
     def queue_size(self) -> int:
-        """
-        :return: queue size of ros messages
-        :rtype: int
-        """
         return self.__queue_size
-
-    @queue_size.setter
-    def queue_size(self, queue_size: int) -> None:
-        """
-        :param queue_size: queue size setter
-        :type: int
-        """
-        self.__queue_size = queue_size
 
     @property
     def bot_name(self) -> str:
-        """
-        :return: bot name
-        :rtype: str
-        """
         return self.__bot_name
-
-    @bot_name.setter
-    def bot_name(self, bot_name: str) -> None:
-        """
-        :param bot_name: bot name
-        :type: str
-        """
-        self.__bot_name = bot_name
 
     @property
     def bot_type(self):
-        """
-        :return: bot type
-        :rtype: BotType
-        """
         return self.__bot_type
-
-    @bot_type.setter
-    def bot_type(self, bot_type: BotType) -> None:
-        """
-        :param bot_type: bot type
-        :type: BotType
-        """
-        self.__bot_type = bot_type
 
     @property
     def planner(self) -> Planner:
-        """
-        :return: path planner
-        :rtype: Planner
-        """
         return self.__planner
+
+    @waypoint_topic.setter
+    def waypoint_topic(self, waypoint_topic: str) -> None:
+        self.__waypoint_topic = waypoint_topic
+
+    @reached_topic.setter
+    def reached_topic(self, reached_topic: str) -> None:
+        self.__reached_topic = reached_topic
+
+    @pos_node.setter
+    def pos_node(self, pos_node: str) -> None:
+        self.__pos_node = pos_node
+
+    @pos_msg_type.setter
+    def pos_msg_type(self, pos_msg_type) -> None:
+        self.__pos_msg_type = pos_msg_type
+
+    @rchd_msg_type.setter
+    def rchd_msg_type(self, rchd_msg_type) -> None:
+        self.__rchd_msg_type = rchd_msg_type
+
+    @rospy_node.setter
+    def rospy_node(self, rospy_node: str) -> None:
+        self.__rospy_node = rospy_node
+
+    @queue_size.setter
+    def queue_size(self, queue_size: int) -> None:
+        self.__queue_size = queue_size
+
+    @bot_name.setter
+    def bot_name(self, bot_name: str) -> None:
+        self.__bot_name = bot_name
+
+    @bot_type.setter
+    def bot_type(self, bot_type: BotType) -> None:
+        self.__bot_type = bot_type
 
     @planner.setter
     def planner(self, planner: Planner) -> None:
-        """
-        :param planner: path planner
-        :type: Planner
-        """
         self.__planner = planner
 
     def __repr__(self):
@@ -452,6 +336,9 @@ class MoatConfig(object):
         s += "bot_type" + ":" + str(self.bot_type) + "\n"
         s += "planner" + ":" + str(self.planner)
         return s
+
+
+# ------------ PARAMETER GENERATION METHODS --------------
 
 
 def gen_positioning_params(config: MoatConfig) -> tp.Tuple:

@@ -8,11 +8,10 @@ from src.config.configs import AgentConfig
 class TestAgentConfig(unittest.TestCase):
     """
     testing the agent config member access methods
-    __moat_class : motion automaton specification
     """
 
     def setUp(self):
-        self.ac = AgentConfig(0, 1, "127.1.1.1", 2000, [2000], None, True, None, None)
+        self.ac = AgentConfig(0, 1, "127.1.1.1", 2000, [2000], None, True, None, None, None)
 
     def test_pid(self):
         self.assertEqual(self.ac.pid, 0, "pid test")
@@ -37,6 +36,11 @@ class TestAgentConfig(unittest.TestCase):
 
     def test_eq(self):
         self.assertEqual(self.ac, AgentConfig(0, 1, "127.1.1.1", 2000, [2000], None, True, None, None), "equality test")
+
+    def test_ip_ports(self):
+        self.assertEqual(self.ac.send_ips, [], "testing ip_port_list")
+        self.ac.send_ips = [("<broadcast>", 2000)]
+        self.assertEqual(self.ac.send_ips, [("<broadcast>", 2000)], "testing ip_port_list")
 
 
 if __name__ == '__main__':

@@ -4,9 +4,9 @@ from enum import Enum, unique
 
 
 @unique
-class BotType(Enum):
+class ShareType(Enum):
     """
-    add more bot types as needed here
+    add more variable sharing options as needed here
     """
-    QUAD = 1
-    CAR = 2
+    ALL_WRITE = 1
+    ALL_READ = 2
