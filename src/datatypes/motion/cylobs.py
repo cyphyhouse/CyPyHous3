@@ -19,6 +19,7 @@ class CylObs(Obstacle):
         """
         :param point: position of obstacle
         :type point: Pos
+
         :param radius: radius of cylinder (obstacle)
         :type radius: float
         """
@@ -28,8 +29,12 @@ class CylObs(Obstacle):
     def _collision_point(self, point: Pos) -> bool:
         """
         checking whether a point "collides" with the obstacle
+
         :param point: position of point
-        :return: boolean indicator of collision, true if no collision , false if collision
+        :type point: Pos
+
+        :return: true if no collision , false if collision
+        :rtype: bool
         """
         d = (self.position.x - point.x) ** 2 + (self.position.y - point.y) ** 2
 
@@ -38,8 +43,12 @@ class CylObs(Obstacle):
     def _collision_path(self, orig_path: Seg) -> bool:
         """
         checking if there is a collision with a path
-        :param path: segment to check collision against
-        :return: boolean indicator of collision, true if no collision, false if collision
+
+        :param orig_path: segment to check collision against
+        :type orig_path: Seg
+
+        :return: true if no collision, false if collision
+        :rtype: bool
         """
         path = copy.deepcopy(orig_path)
         path.start.z = 0

@@ -4,7 +4,7 @@ import typing as tp
 
 import src.datatypes.robot as robot
 import src.motion.abstract.planner as pl
-import src.motion.simplePlanner as sp
+import src.motion.planning.simplePlanner as sp
 
 
 class AgentConfig(object):

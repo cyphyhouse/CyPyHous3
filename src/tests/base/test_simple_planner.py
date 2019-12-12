@@ -2,7 +2,7 @@
 
 import unittest
 
-import src.motion.simplePlanner as planner
+import src.motion.planning.simplePlanner as planner
 
 
 class TestPlanner(unittest.TestCase):

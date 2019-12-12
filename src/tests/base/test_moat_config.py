@@ -4,7 +4,7 @@ import unittest
 
 from src.config.configs import MoatConfig
 from src.datatypes.robot import BotType
-from src.motion.simplePlanner import SimplePlanner
+from src.motion.planning.simplePlanner import SimplePlanner
 
 
 class TestMoatConfig(unittest.TestCase):

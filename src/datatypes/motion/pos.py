@@ -220,3 +220,25 @@ def distance(x: Pos, y: Pos) -> float:
     d = np.vstack((x.to_arr(), y.to_arr()))
     dist = pdist(d)[0]
     return dist
+
+
+def dot(x: Pos, y: Pos) -> np.ndarray:
+    """
+    dot product
+    :param x: vector (position)
+    :param y: vector (position)
+    :return: dot product
+    """
+    return np.dot(x.to_arr(), y.to_arr())
+
+
+def cross(x: Pos, y: Pos) -> Pos:
+    """
+    cross product
+    :param x: vector
+    :param y: vector
+    :return: vector
+    """
+    return Pos(np.cross(x.to_arr(), y.to_arr()))
+
+

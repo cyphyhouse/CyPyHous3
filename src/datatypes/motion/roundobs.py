@@ -18,6 +18,7 @@ class RoundObs(Obstacle):
         """
         :param point : position of obstacle
         :type point : Pos
+
         :param radius : size of obstacle
         :type radius: float
         """
@@ -26,8 +27,12 @@ class RoundObs(Obstacle):
     def _collision_point(self, point: Pos) -> bool:
         """
         checking whether a point "collides" with the obstacle
+
         :param point: position of point
-        :return: boolean indicator of collision, true if no collision , false if collision
+        :type point: Pos
+
+        :return: true if no collision , false if collision
+        :rtype: bool
         """
         d = (self.position.x - point.x) ** 2 + (self.position.y - point.y) ** 2 + (self.position.z - point.z) ** 2
         return math.sqrt(d) > self.size[0]
@@ -35,8 +40,12 @@ class RoundObs(Obstacle):
     def _collision_path(self, path: Seg) -> bool:
         """
         checking if there is a collision with a path
+
         :param path: segment to check collision against
-        :return: boolean indicator of collision, true if no collision, false if collision
+        :type path: Seg
+
+        :return: true if no collision, false if collision
+        :rtype: bool
         """
         o = path.start.to_arr()
         path_uvec = path.direction().to_arr()
