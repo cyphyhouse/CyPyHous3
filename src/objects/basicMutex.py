@@ -4,7 +4,7 @@ import time
 from typing import Union
 
 from src.harness.commHandler import CommHandler
-from src.harness.msg_handle import mutex_grant_create, mutex_release_create, mutex_request_create
+from src.harness.msg_create import mutex_grant_create, mutex_release_create, mutex_request_create
 from src.objects.abstract.mutex import Mutex
 
 

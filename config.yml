@@ -1,5 +1,5 @@
 agent:
-  motion_automaton: MoatTestCar
+  motion_automaton: MoatCar
   on_device: hotdec_car
   pid: 0
   plist: []
@@ -10,7 +10,7 @@ device:
   motion_automata:
   - MoatTestCar
   planner: RRT_CAR
-  port: 2000
+  r_port: 2000
   positioning_topic:
     topic: vrpn_client_node/
     type: PoseStamped
@@ -23,5 +23,5 @@ device:
     topic: waypoint
     type: PoseStamped
 leader_pid: 0
-mutex_handler: BaseMutexHandler
+mutex_handler: BasicMutexHandler
 num_agents: 1

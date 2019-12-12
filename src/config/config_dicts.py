@@ -17,8 +17,8 @@ planner_dict['RRT_CAR'] = RRT_CAR
 
 msg_type_dict = dict()
 
-from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import String
+# from geometry_msgs.msg import PoseStamped
+# from std_msgs.msg import String
 
 msg_type_dict['PoseStamped'] = PoseStamped
 msg_type_dict['String'] = String

@@ -2,22 +2,25 @@
 
 from typing import Tuple, Optional
 
+import yamale
 import yaml
 
 from src.config.config_dicts import *
 from src.config.configs import AgentConfig, MoatConfig
 
 
-def __validate(cfg) -> bool:
-    # TODO validate yaml file according to a schema
+def __validate(yamlfile, schemafile) -> bool:
+    schema = yamale.make_schema(schemafile)
+    data = yamale.make_data(yamlfile)
+    yamale.validate(schema, data)
     return True
 
 
-def get_configs(config_filename: str) \
+def get_configs(config_filename: str, schema_filename: str) \
         -> Tuple[AgentConfig, Optional[MoatConfig]]:
     with open(config_filename) as f:
-        cfg = yaml.load(f)
-    if not __validate(cfg):
+        cfg = yaml.safe_load(f)
+    if not __validate(config_filename, schema_filename):
         raise ValueError("Invalid YAML file" + config_filename)
 
     agent_dict = cfg['agent']
@@ -30,19 +33,19 @@ def get_configs(config_filename: str) \
     if not is_using_moat:
         moat_class = None
     else:
-        # from .config_dicts import moat_class_dict
         moat_class = moat_class_dict[agent_dict['motion_automaton']]
 
-    # from .config_dicts import mutex_handler_dict
     mh = mutex_handler_dict[cfg['mutex_handler']]
 
     agent_conf = AgentConfig(
         # Shared configs
         bots=cfg['num_agents'],
+
         # Device specific configs
         moat_class=moat_class,
         rip=device_dict['ip'],
-        r_port=device_dict['rport'],
+        r_port=device_dict['r_port'],
+
         # Agent specific configs
         pid=pid,
         is_leader=is_leader,
@@ -53,8 +56,7 @@ def get_configs(config_filename: str) \
 
     if not is_using_moat:
         return agent_conf, None
-    # else:
-    # from .config_dicts import planner_dict, bot_type_dict
+
     moat_conf = MoatConfig(
         bot_name=device_dict['bot_name'],
         bot_type=bot_type_dict[device_dict['bot_type']],
@@ -73,5 +75,5 @@ def get_configs(config_filename: str) \
 if __name__ == "__main__":
     import sys
 
-    new_conf = get_configs(sys.argv[1])
+    new_conf = get_configs(sys.argv[1], sys.argv[2])
     print(new_conf)

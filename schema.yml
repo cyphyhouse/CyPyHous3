@@ -9,7 +9,7 @@ device:
   ip: ip()
   motion_automata: list()
   planner: str()
-  port: int()
+  r_port: int()
   positioning_topic:
     topic: str()
     type: str()
