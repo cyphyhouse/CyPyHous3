@@ -9,15 +9,37 @@ from src.config.config_dicts import *
 from src.config.configs import AgentConfig, MoatConfig
 
 
-def __validate(yamlfile, schemafile) -> bool:
-    schema = yamale.make_schema(schemafile)
-    data = yamale.make_data(yamlfile)
+def __validate(yaml_file: str, schema_file: str) -> bool:
+    """
+    validation function
+    :param yaml_file: config filename
+    :type yaml_file: str
+
+    :param schema_file: reference valid schema
+    :type schema_file: str
+
+    :return: whether or not config is valid
+    :rtype: bool
+    """
+    schema = yamale.make_schema(schema_file)
+    data = yamale.make_data(yaml_file)
     yamale.validate(schema, data)
     return True
 
 
 def get_configs(config_filename: str, schema_filename: str) \
         -> Tuple[AgentConfig, Optional[MoatConfig]]:
+    """
+
+    :param config_filename: config filename
+    :type config_filename: str
+
+    :param schema_filename: reference schema filename
+    :type schema_filename: str
+
+    :return: configuration objects
+    :rtype: Tuple[AgentConfig, MoatConfig)
+    """
     with open(config_filename) as f:
         cfg = yaml.safe_load(f)
     if not __validate(config_filename, schema_filename):
