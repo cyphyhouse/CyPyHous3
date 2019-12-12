@@ -1,8 +1,8 @@
 # Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
-from typing import Dict, Union
+import typing as tp
 
-import src.datatypes.vartypes as vt
+import src.datatypes.var_types as vt
 
 
 class DSM(object):
@@ -10,7 +10,7 @@ class DSM(object):
     distributed shared memory object
     __name : variable name
     __data_type : data type
-    __size : size (number of robots in the system/sharing the variable, if allread)
+    __size : size (number of robots in the system/sharing the variable, if ALL_READ)
     __pid : pid of agent with corresponding dsm
     __value : value
     __last_updated : last updated time stamp
@@ -20,25 +20,32 @@ class DSM(object):
     """
 
     def __init__(self, name: str, data_type: type, size: int, pid: int,
-                 value: Union[int, bool, float, list, object, tuple, None] = None,
+                 value: tp.Union[int, bool, float, list, object, tuple, None] = None,
                  share_scope: vt.ShareType = vt.ShareType.ALL_WRITE,
                  last_updated: float = 0.0):
         """
 
         :param name: variable name
         :type name: str
+
         :param data_type: variable datatype
         :type data_type: type
+
         :param size: number of agents
         :type size: int
+
         :param pid: unique integer identifier of current agent
         :type pid: int
+
         :param value: value of dsm
-        :type value: Any
+        :type value: int, bool, float, list, object, tuple, None
+
         :param share_scope: shared variable scope
         :type share_scope: ShareType
+
         :param last_updated: last update
         :type last_updated: float
+
         """
         self.__name = name
         self.__data_type = data_type
@@ -100,13 +107,17 @@ class DSM(object):
 
     # ------------ MEMBER ACCESS METHODS FOR POTENTIALLY LIST ITEMS--------------
 
-    def last_update(self, pid: int = -1) -> Union[float, Dict]:
+    def last_update(self, pid: int = -1) -> tp.Union[float, tp.Dict]:
         """
         getter method for timestamp of last update
+
         :param pid: pid of agent to get the update time for
+        :type pid: int
+
         :return: update time stamp
+        :rtype: float,dict
         """
-        if self.owner is not vt.ShareType.ALL_WRITE:
+        if self.__owner is not vt.ShareType.ALL_WRITE:
             return self.__last_updated[pid]
         else:
             return self.__last_updated
@@ -114,33 +125,41 @@ class DSM(object):
     def set_update(self, update_time_stamp: float, pid: int = -1) -> None:
         """
         setter method for timestamp of last update
+
         :param update_time_stamp: updated time stamp
+        :type update_time_stamp: float
+
         :param pid: pid of agent to set the update time for
+        :type pid: int
         """
-        if self.owner is not vt.ShareType.ALL_WRITE:
+        if self.__owner is vt.ShareType.ALL_READ:
             self.__last_updated[pid] = update_time_stamp
         else:
             self.__last_updated = update_time_stamp
 
-    def get_val(self, pid: int = -1) -> Union[
-        int, bool, float, list, object, tuple]:  # -> Any (not available in python 3.5)
+    def get_val(self, pid: int = -1) -> tp.Union[
+        int, bool, float, list, object, tuple, None]:  # -> Any (not available in python 3.5)
         """
-        getter method for value of shared variable
+        getter method for value of shared
+
         :param pid: pid of agent to get the value of
+        :type pid: int
+
         :return: value of shared variable for pid
+        :rtype: int,bool,float,list,object,tuple,None
         """
-        if self.owner is vt.ShareType.ALL_READ:
+        if self.__owner is vt.ShareType.ALL_READ:
             return self.__value[pid]
         else:
             return self.__value
 
-    def set_val(self, value: Union[int, bool, float, list, object, tuple], pid: int = -1) -> None:
+    def set_val(self, value: tp.Union[int, bool, float, list, object, tuple], pid: int = -1) -> None:
         """
         setter method for value of shared variable
         :param value : value to be set
         :param pid: pid of agent to set the value of
         """
-        if self.owner is vt.ShareType.ALL_READ:
+        if self.__owner is vt.ShareType.ALL_READ:
             self.__value[pid] = value
         else:
             self.__value = value

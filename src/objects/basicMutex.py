@@ -8,8 +8,10 @@ from src.harness.msg_handle import mutex_grant_create, mutex_release_create, mut
 from src.objects.abstract.mutex import Mutex
 
 
-class BaseMutex(Mutex):
+class BasicMutex(Mutex):
     """
+    Basic mutex type
+    
     __mutex_id : integer id of mutex
     __mutex_request list : list of agent pids who have requested access to this mutex
     __mutex_holder : agent holding current mutex
@@ -17,12 +19,14 @@ class BaseMutex(Mutex):
     __agent_comm_handler : "reference" to agent comm handler
     """
 
-    def __init__(self, mutex_id: int):
+    def __init__(self, mutex_id: str):
         """
         base init method for mutex
+        
         :param mutex_id: mutex id
+        :type mutex_id: str
         """
-        super(BaseMutex, self).__init__()
+        super(BasicMutex, self).__init__()
         self.__mutex_id = mutex_id
         self.__mutex_request_list = []
         self.__mutex_holder = None
@@ -31,7 +35,7 @@ class BaseMutex(Mutex):
     # ------------ MEMBER ACCESS METHODS --------------
 
     @property
-    def mutex_id(self) -> int:
+    def mutex_id(self) -> str:
         return self.__mutex_id
 
     @property
@@ -47,7 +51,7 @@ class BaseMutex(Mutex):
         return self.__agent_comm_handler
 
     @mutex_id.setter
-    def mutex_id(self, mutex_id: int) -> None:
+    def mutex_id(self, mutex_id: str) -> None:
         self.__mutex_id = mutex_id
 
     @mutex_holder.setter
@@ -67,26 +71,26 @@ class BaseMutex(Mutex):
     def request_mutex(self, req_num: int) -> None:
         """
         method to request mutex
+
         :param req_num: request number
         :type req_num: int
         """
-        msg = mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid,
-                                   self.agent_comm_handler.agent_gvh.round_num)
+        msg = mutex_request_create(self.__mutex_id, req_num, self.__agent_comm_handler.agent_gvh.pid,
+                                   self.__agent_comm_handler.agent_gvh.round_num)
         # print(self.ip_port_list)
-        self.agent_comm_handler.agent_gvh.send(msg)
+        self.__agent_comm_handler.agent_gvh.send(msg)
 
-    def grant_mutex(self, mutexnum: int) -> None:
+    def grant_mutex(self, mutex_num: int) -> None:
         """
         method to grant mutex, if leader
-        :return:
         """
-        if self.mutex_holder is None and len(self.mutex_request_list) is not 0:
-            agent_id = self.mutex_request_list[0][0]
-            self.mutex_holder = agent_id
-            self.mutex_request_list = self.mutex_request_list[1:]
-            msg = mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
+        if self.__mutex_holder is None and len(self.__mutex_request_list) is not 0:
+            agent_id = self.__mutex_request_list[0][0]
+            self.__mutex_holder = agent_id
+            self.__mutex_request_list = self.__mutex_request_list[1:]
+            msg = mutex_grant_create(self.__mutex_id, agent_id, self.__agent_comm_handler.agent_gvh.pid, mutex_num,
                                      time.time())
-            self.agent_comm_handler.agent_gvh.send(msg)
+            self.__agent_comm_handler.agent_gvh.send(msg)
         else:
             pass
 
@@ -94,6 +98,6 @@ class BaseMutex(Mutex):
         """
         method to release mutex
         """
-        msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid,
-                                   self.agent_comm_handler.agent_gvh.round_num)
-        self.agent_comm_handler.agent_gvh.send(msg)
+        msg = mutex_release_create(self.__mutex_id, self.__agent_comm_handler.agent_gvh.pid,
+                                   self.__agent_comm_handler.agent_gvh.round_num)
+        self.__agent_comm_handler.agent_gvh.send(msg)

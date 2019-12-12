@@ -1,14 +1,17 @@
 # Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
-from abc import ABC, abstractmethod
-from threading import Thread, Event
+import abc
+import threading
 
 
-class MutexHandler(Thread, ABC):
+class MutexHandler(threading.Thread, abc.ABC):
+    """
+    abstract mutual exclusion handler class
+    """
 
     def __init__(self):
         super(MutexHandler, self).__init__()
-        self.__stop_event = Event()
+        self.__stop_event = threading.Event()
 
     def stop(self) -> None:
         """
@@ -24,13 +27,13 @@ class MutexHandler(Thread, ABC):
         """
         return self.__stop_event.is_set()
 
-    @abstractmethod
+    @abc.abstractmethod
     def grant_available_mutexes(self, *args, **kwargs) -> None:
         """
         abstract method to grant available mutexes
         """
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def run(self):
         pass

@@ -4,18 +4,25 @@
 import pickle
 import socket
 
+import src.objects.message as message
+
 MAX_UDP_SIZE = 65507  # https://en.wikipedia.org/wiki/User_Datagram_Protocol
 
-from src.objects.message import Message
 
-
-def send(msg: Message, ip: str, port: int, retry=1) -> None:
+def send(msg: message.Message, ip: str, port: int, retry=1) -> None:
     """
     :param msg: message to be sent
+    :type msg: Message
+
     :param ip: ip to be sent to
+    :type ip: str
+
     :param port: port to be sent to
+    :type port: int
+
     :param retry: number of re-sends of the message
-    :return: Nothing
+    :type retry: int
+
     TODO: USE different serialization .
     TODO: write test
     """

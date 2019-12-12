@@ -20,7 +20,7 @@ class TestAgentConfig(unittest.TestCase):
         self.assertEqual(self.ac.rip, "127.1.1.1", "receiver ip test")
 
     def test_rport(self):
-        self.assertEqual(self.ac.rport, 2000, "listener port test")
+        self.assertEqual(self.ac.r_port, 2000, "listener port test")
 
     def test_plist(self):
         self.assertEqual(self.ac.plist, [2000], "listener ip list test")

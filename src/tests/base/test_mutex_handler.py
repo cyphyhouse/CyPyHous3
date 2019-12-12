@@ -2,7 +2,7 @@
 
 import unittest
 
-import src.functionality.abstract.mutex_handler as mh
+import src.functionality.abstract.mutexHandler as mh
 
 
 class DummyHandler(mh.MutexHandler):

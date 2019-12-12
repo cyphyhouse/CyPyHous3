@@ -1,13 +1,13 @@
 # Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
-from typing import List, Union
+import typing as tp
 
-from src.datatypes.motion.pos import Pos, distance
-from src.datatypes.motion.seg import Seg
-from src.motion.abstract.planner import Planner
+import src.datatypes.motion.pos as pos
+import src.datatypes.motion.seg as seg
+import src.motion.abstract.planner as planner
 
 
-class SimplePlanner(Planner):
+class SimplePlanner(planner.Planner):
     """
     simple path planner. returns a path consisting of straight line path segments from start position to goal position.
     __num_seg : number of segments in a path
@@ -15,37 +15,33 @@ class SimplePlanner(Planner):
 
     def __init__(self, num_seg=1):
         """
-        initialize with number of segments
         :param num_seg: number of segments
         :type num_seg: int
         """
         super(SimplePlanner, self).__init__()
         self.__num_seg = num_seg
 
+    # ------------ MEMBER ACCESS METHODS --------------
+
     @property
     def num_seg(self) -> int:
-        """
-        getter method for number of path segments returned by the planner
-        :return: integer number of segments
-        """
         return self.__num_seg
 
     @num_seg.setter
     def num_seg(self, num_seg: int) -> None:
-        """
-        setter method for number of path segments
-        :param num_seg: integer number of segments
-        :return: Nothing
-        """
         self.__num_seg = num_seg
 
-    def find_path(self, start_point: Pos, end_point: Pos, obstacles: Union[List[Pos], None] = None) -> list:
+    def find_path(self, start_point: pos.Pos, end_point: pos.Pos,
+                  obstacles: tp.Union[tp.List[pos.Pos], None] = None) -> list:
         """
         find path of length num_seg between start and end point
+
         :param start_point: starting point
         :type start_point: Pos
+
         :param end_point: end point
         :type end_point: Pos
+
         :param obstacles: obstacles
         :type obstacles: List
         :return: path
@@ -55,11 +51,16 @@ class SimplePlanner(Planner):
 
         if obstacles is None:
             obstacles = []
-        # calculating the unit vector along the line
-        dist = distance(start_point, end_point)
-        segment = Seg(start_point, end_point)
 
-        direction = segment.direction()  # direction is the unit vector along the line segment.
+        # calculating the unit vector along the line
+
+        dist = pos.distance(start_point, end_point)
+        segment = seg.Seg(start_point, end_point)
+
+        # direction is the unit vector along the line segment.
+
+        direction = segment.direction()
+
         seg_length = dist / self.num_seg
         path = [start_point]
         last_point = start_point

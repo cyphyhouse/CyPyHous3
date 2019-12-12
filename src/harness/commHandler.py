@@ -32,7 +32,7 @@ class CommHandler(Thread):
         """
         super(CommHandler, self).__init__()
         self.__ip = a.rip
-        self.__r_port = a.rport
+        self.__r_port = a.r_port
         self.__agent_gvh = agent_gvh
         self.__stop_event = Event()
         self.__timeout = timeout
@@ -41,73 +41,41 @@ class CommHandler(Thread):
 
         self.start()
 
+    # ------------ MEMBER ACCESS METHODS --------------
+
     @property
     def timeout(self) -> float:
-        """
-        getter method of timeout
-        :return:
-        """
         return self.__timeout
 
     @timeout.setter
     def timeout(self, timeout: float) -> None:
-        """
-        setter method for timeout
-        :param timeout: float value to be set
-        :return:
-        """
         self.__timeout = timeout
 
     @property
     def agent_gvh(self) -> Gvh:
-        """
-        getter method for agent gvh
-        :return: associated agent gvh
-        """
         return self.__agent_gvh
 
     @agent_gvh.setter
     def agent_gvh(self, agent_gvh: Gvh) -> None:
-        """
-        agent gvh setter method
-        :param agent_gvh: agent gvh to be linked
-        :return: None
-        """
         self.__agent_gvh = agent_gvh
 
     @property
     def r_port(self) -> int:
-        """
-        getter method for the receiver port
-        :return: integer port
-        """
         return self.__r_port
 
     @r_port.setter
     def r_port(self, r_port: int) -> None:
-        """
-        setter method for the port
-        :param r_port: port number to set
-        :return: None
-        """
         self.__r_port = r_port
 
     @property
     def ip(self) -> str:
-        """
-        getter method for sender ip
-        :return: str ip
-        """
         return self.__ip
 
     @ip.setter
     def ip(self, ip: str) -> None:
-        """
-        setter method for sender ip
-        :param ip: string ip
-        :return: None
-        """
         self.__ip = ip
+
+    # ------------ METHODS FOR A GRACEFUL EXIT --------------
 
     def stop(self) -> None:
         """
@@ -129,6 +97,8 @@ class CommHandler(Thread):
         :return: true if stop event is set, false otherwise
         """
         return self.__stop_event.is_set()
+
+    # ------------ COMMUNICATION HANDLING THREAD BEHAVIOR --------------
 
     def run(self):
         """

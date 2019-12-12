@@ -43,7 +43,7 @@ class TestGvh(unittest.TestCase):
 
     def test_single_args(self):
         msg = Message(1, 1, 1, 1.0)
-        self.assertEqual(self.tgvh.mk_single_msg_args(msg), [msg, "<broadcast>", self.tgvh.rport],
+        self.assertEqual(self.tgvh.mk_single_msg_args(msg), [msg, "<broadcast>", self.tgvh.r_port],
                          "testing single message args")
 
     def test_multi_args(self):

@@ -2,7 +2,7 @@
 
 import unittest
 
-from src.datatypes.vartypes import ShareType
+from src.datatypes.var_types import ShareType
 from src.objects.dsm import DSM
 
 
