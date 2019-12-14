@@ -1,11 +1,10 @@
 #  Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
-# from geometry_msgs.msg import PoseStamped
-# from std_msgs.msg import String
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import String
 
 from src.datatypes.robot import BotType
 from src.functionality.basicMutexHandler import BasicMutexHandler
-
 from src.motion.automata.moatCar import MoatCar
 from src.motion.automata.moatDrone import MoatDrone
 from src.motion.planning.rrt_car import RRT as RRT_CAR

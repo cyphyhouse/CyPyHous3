@@ -1,23 +1,24 @@
 # Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
-# base test suite
+# basic test suite
 
 import unittest
 
-import src.tests.base.test_agent_config as test_agent_config
-import src.tests.base.test_cylobs as test_cylobs
-import src.tests.base.test_dsm as test_dsm
-import src.tests.base.test_gvh as test_gvh
-import src.tests.base.test_message as test_message
-import src.tests.base.test_moat_config as test_moat_config
-import src.tests.base.test_mutex_handler as test_mutex_handler
-import src.tests.base.test_obstacle as test_obstacle
-import src.tests.base.test_planner as test_planner
-import src.tests.base.test_pos as test_pos
-import src.tests.base.test_roundobs as test_roundobs
-import src.tests.base.test_seg as test_seg
-import src.tests.base.test_simple_planner as test_simple_planner
-import src.tests.base.test_msg_create as test_message_create
+import src.tests.basic.test_agent_config as test_agent_config
+import src.tests.basic.test_cylobs as test_cylobs
+import src.tests.basic.test_dsm as test_dsm
+import src.tests.basic.test_get_configs as test_get_configs
+import src.tests.basic.test_gvh as test_gvh
+import src.tests.basic.test_message as test_message
+import src.tests.basic.test_moat_config as test_moat_config
+import src.tests.basic.test_msg_create as test_message_create
+import src.tests.basic.test_mutex_handler as test_mutex_handler
+import src.tests.basic.test_obstacle as test_obstacle
+import src.tests.basic.test_planner as test_planner
+import src.tests.basic.test_pos as test_pos
+import src.tests.basic.test_roundobs as test_roundobs
+import src.tests.basic.test_seg as test_seg
+import src.tests.basic.test_simple_planner as test_simple_planner
 
 
 # noinspection PyTypeChecker
@@ -38,6 +39,8 @@ def main():
     suite.addTest(loader.loadTestsFromModule(test_dsm))
     suite.addTest(loader.loadTestsFromModule(test_gvh))
     suite.addTest(loader.loadTestsFromModule(test_message_create))
+    suite.addTest(loader.loadTestsFromModule(test_get_configs))
+
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
     return result

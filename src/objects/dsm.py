@@ -58,10 +58,7 @@ class DSM(object):
             self.__value = {}
             self.__last_updated = {}
             for i in range(size):
-                if i == pid:
-                    self.__value[i] = value
-                else:
-                    self.__value[i] = None
+                self.__value[i] = value
                 self.__last_updated[i] = last_updated
         self.__owner = share_scope
 

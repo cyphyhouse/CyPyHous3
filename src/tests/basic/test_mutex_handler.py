@@ -10,6 +10,9 @@ class DummyHandler(mh.MutexHandler):
     def __init__(self):
         super(DummyHandler, self).__init__()
 
+    def grant_available_mutexes(self):
+        pass
+
     def run(self):
         pass
 

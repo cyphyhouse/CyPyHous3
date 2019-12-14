@@ -9,9 +9,6 @@ class Mutex(ABC):
     """
 
     def __init__(self):
-        """
-        base init method
-        """
         pass
 
     @abstractmethod

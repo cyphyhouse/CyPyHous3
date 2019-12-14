@@ -1,30 +1,28 @@
 # Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
 import time
-from typing import Union
+import typing
 
-from src.harness.commHandler import CommHandler
-from src.harness.msg_create import mutex_grant_create, mutex_release_create, mutex_request_create
-from src.objects.abstract.mutex import Mutex
+import src.harness.commHandler as commHandler
+import src.harness.msg_create as mc
+import src.objects.abstract.mutex as mutex
 
 
-class BasicMutex(Mutex):
+class BasicMutex(mutex.Mutex):
     """
     Basic mutex type
-    
     __mutex_id : integer id of mutex
-    __mutex_request list : list of agent pids who have requested access to this mutex
+    __mutex_request list : list of agents who have requested access to this mutex
     __mutex_holder : agent holding current mutex
-    __ip_port_list : list of ports in case sending to same machine. else broadcast to self commhandler receiver port.
+    __ip_port_list : list of ports in case sending to same machine. else broadcast to self comm handler receiver port.
     __agent_comm_handler : "reference" to agent comm handler
     """
 
     def __init__(self, mutex_id: str):
         """
-        base init method for mutex
-        
         :param mutex_id: mutex id
         :type mutex_id: str
+
         """
         super(BasicMutex, self).__init__()
         self.__mutex_id = mutex_id
@@ -43,11 +41,11 @@ class BasicMutex(Mutex):
         return self.__mutex_request_list
 
     @property
-    def mutex_holder(self) -> Union[None, int]:
+    def mutex_holder(self) -> typing.Union[None, int]:
         return self.__mutex_holder
 
     @property
-    def agent_comm_handler(self) -> CommHandler:
+    def agent_comm_handler(self) -> commHandler.CommHandler:
         return self.__agent_comm_handler
 
     @mutex_id.setter
@@ -55,7 +53,7 @@ class BasicMutex(Mutex):
         self.__mutex_id = mutex_id
 
     @mutex_holder.setter
-    def mutex_holder(self, mutex_holder: Union[int, None]) -> None:
+    def mutex_holder(self, mutex_holder: typing.Union[int, None]) -> None:
         self.__mutex_holder = mutex_holder
 
     @mutex_request_list.setter
@@ -63,7 +61,7 @@ class BasicMutex(Mutex):
         self.__mutex_request_list = mutex_request_list
 
     @agent_comm_handler.setter
-    def agent_comm_handler(self, agent_comm_handler: CommHandler) -> None:
+    def agent_comm_handler(self, agent_comm_handler: commHandler.CommHandler) -> None:
         self.__agent_comm_handler = agent_comm_handler
 
     # ------------ MUTEX HANDLING METHODS --------------
@@ -75,9 +73,8 @@ class BasicMutex(Mutex):
         :param req_num: request number
         :type req_num: int
         """
-        msg = mutex_request_create(self.__mutex_id, req_num, self.__agent_comm_handler.agent_gvh.pid,
-                                   self.__agent_comm_handler.agent_gvh.round_num)
-        # print(self.ip_port_list)
+        msg = mc.mutex_request_create(self.__mutex_id, req_num, self.__agent_comm_handler.agent_gvh.pid,
+                                      self.__agent_comm_handler.agent_gvh.round_num)
         self.__agent_comm_handler.agent_gvh.send(msg)
 
     def grant_mutex(self, mutex_num: int) -> None:
@@ -88,8 +85,8 @@ class BasicMutex(Mutex):
             agent_id = self.__mutex_request_list[0][0]
             self.__mutex_holder = agent_id
             self.__mutex_request_list = self.__mutex_request_list[1:]
-            msg = mutex_grant_create(self.__mutex_id, agent_id, self.__agent_comm_handler.agent_gvh.pid, mutex_num,
-                                     time.time())
+            msg = mc.mutex_grant_create(self.__mutex_id, agent_id, self.__agent_comm_handler.agent_gvh.pid, mutex_num,
+                                        time.time())
             self.__agent_comm_handler.agent_gvh.send(msg)
         else:
             pass
@@ -98,6 +95,6 @@ class BasicMutex(Mutex):
         """
         method to release mutex
         """
-        msg = mutex_release_create(self.__mutex_id, self.__agent_comm_handler.agent_gvh.pid,
-                                   self.__agent_comm_handler.agent_gvh.round_num)
+        msg = mc.mutex_release_create(self.__mutex_id, self.__agent_comm_handler.agent_gvh.pid,
+                                      self.__agent_comm_handler.agent_gvh.round_num)
         self.__agent_comm_handler.agent_gvh.send(msg)

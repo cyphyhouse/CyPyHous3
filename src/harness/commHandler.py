@@ -3,14 +3,15 @@
 import pickle
 import socket
 import time
-from threading import Thread, Event
+import typing as tp
+import threading
 
-from src.config.configs import AgentConfig
-from src.harness.gvh import Gvh
-from src.harness.msg_handle import message_handler
+import src.config.configs as configs
+import src.harness.gvh as gvh
+import src.harness.msg_handle as msg_handle
 
 
-class CommHandler(Thread):
+class CommHandler(threading.Thread):
     """
     communication handler object for the agent application thread.
 
@@ -23,18 +24,22 @@ class CommHandler(Thread):
     __timeout : timeout to try receiving a message
     """
 
-    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 100.0):
+    def __init__(self, a: configs.AgentConfig, agent_gvh: tp.Union[gvh.Gvh, None] = None, timeout: float = 100.0):
         """
-        init method for receiver object thread
         :param a: agent configuration
+        :type a: AgentConfig
+
         :param agent_gvh: agent gvh
-        :param timeout:
+        :type agent_gvh: Gvh
+
+        :param timeout: receiver port timeout
+        :type timeout:float
         """
         super(CommHandler, self).__init__()
         self.__ip = a.rip
         self.__r_port = a.r_port
         self.__agent_gvh = agent_gvh
-        self.__stop_event = Event()
+        self.__stop_event = threading.Event()
         self.__timeout = timeout
         self.__msgs = []
         self.receiver_socket = None
@@ -52,11 +57,11 @@ class CommHandler(Thread):
         self.__timeout = timeout
 
     @property
-    def agent_gvh(self) -> Gvh:
+    def agent_gvh(self) -> gvh.Gvh:
         return self.__agent_gvh
 
     @agent_gvh.setter
-    def agent_gvh(self, agent_gvh: Gvh) -> None:
+    def agent_gvh(self, agent_gvh: gvh.Gvh) -> None:
         self.__agent_gvh = agent_gvh
 
     @property
@@ -80,7 +85,6 @@ class CommHandler(Thread):
     def stop(self) -> None:
         """
          a flag to set to to safely exit the thread
-        :return: None
         """
         if self.agent_gvh is not None:
             self.agent_gvh.is_alive = False
@@ -94,7 +98,9 @@ class CommHandler(Thread):
     def stopped(self) -> bool:
         """
         set the stop flag
+
         :return: true if stop event is set, false otherwise
+        :rtype: bool
         """
         return self.__stop_event.is_set()
 
@@ -103,9 +109,8 @@ class CommHandler(Thread):
     def run(self):
         """
         create receiver socket, receive messages.
-        :return:
         """
-        UDP_MAX = 2 ** 16 - 1
+        udp_max = 2 ** 16 - 1
 
         self.receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -118,12 +123,9 @@ class CommHandler(Thread):
 
         while not self.stopped():
             try:
-                data, addr = self.receiver_socket.recvfrom(UDP_MAX)
+                data, addr = self.receiver_socket.recvfrom(udp_max)
                 msg = pickle.loads(data)
                 self.agent_gvh.add_recv_msg(msg)
-            except KeyboardInterrupt:
-                print("interrupted")
-                self.stop()
             except socket.timeout:
                 print("agent", self.agent_gvh.pid, "timed out")
                 self.stop()
@@ -131,20 +133,18 @@ class CommHandler(Thread):
                 print("unexpected os error on agent", self.agent_gvh.pid)
         try:
             self.receiver_socket.close()
-        except:
+        except OSError:
             print("maybe socket already closed")
 
     def handle_msgs(self) -> None:
         """
         handle messages method to call message_handle functions. Must be outside the run so that it can be called from
         gvh or agent thread, to avoid blocking receive messages.
-        TODO: better explanation
-        :return: none
         """
 
         current_list = self.agent_gvh.recv_msg_list.copy()
 
         for msg in current_list:
-            if msg.message_type in list(message_handler.keys()):
-                message_handler[msg.message_type](msg, self.agent_gvh)
+            if msg.message_type in list(msg_handle.message_handler.keys()):
+                msg_handle.message_handler[msg.message_type](msg, self.agent_gvh)
         self.agent_gvh.recv_msg_list = self.agent_gvh.recv_msg_list[len(current_list):]

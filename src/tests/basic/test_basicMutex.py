@@ -3,7 +3,7 @@
 from unittest import TestCase, main
 
 
-class TestBaseMutex(TestCase):
+class TestBasicMutex(TestCase):
     def setUp(self):
         pass
 

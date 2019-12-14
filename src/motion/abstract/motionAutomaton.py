@@ -1,17 +1,17 @@
 #  Copyright (c) 2019 CyPhyHouse. All Rights Reserved.
 
+import abc
 import threading
 import time
-from abc import ABC, abstractmethod
-from typing import Union, List
+import typing
 
-from src.config.configs import MoatConfig, gen_positioning_params, gen_reached_params, gen_way_point_params
-from src.datatypes.motion.pos import Pos
+import src.config.configs as configs
+import src.datatypes.motion.pos as pos
 
 
-class MotionAutomaton(threading.Thread, ABC):
+class MotionAutomaton(threading.Thread, abc.ABC):
 
-    def __init__(self, config: MoatConfig):
+    def __init__(self, config: configs.MoatConfig):
         """
         :param config: motion automaton configuration
         :type config: MoatConfig
@@ -28,10 +28,10 @@ class MotionAutomaton(threading.Thread, ABC):
         try:
             import rospy
             rospy.init_node(config.ros_py_node, anonymous=True)
-            self.__pub = rospy.Publisher(*gen_way_point_params(config), queue_size=config.queue_size)
-            self.__sub_reached = rospy.Subscriber(*gen_reached_params(config), self._get_reached,
+            self.__pub = rospy.Publisher(*configs.gen_way_point_params(config), queue_size=config.queue_size)
+            self.__sub_reached = rospy.Subscriber(*configs.gen_reached_params(config), self._get_reached,
                                                   queue_size=config.queue_size)
-            self.__sub_positioning = rospy.Subscriber(*gen_positioning_params(config), self._get_positioning,
+            self.__sub_positioning = rospy.Subscriber(*configs.gen_positioning_params(config), self._get_positioning,
                                                       queue_size=config.queue_size)
 
         except ImportError:
@@ -47,18 +47,18 @@ class MotionAutomaton(threading.Thread, ABC):
 
     # ------------ MOTION AUTOMATON STARTUP AND EXIT METHODS --------------
 
-    @abstractmethod
+    @abc.abstractmethod
     def moat_init_action(self):
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def moat_exit_action(self):
         pass
 
     # ------------ MEMBER ACCESS METHODS --------------
 
     @property
-    def path(self) -> Union[Pos, List[Pos]]:
+    def path(self) -> typing.Union[pos.Pos, typing.List[pos.Pos]]:
         if self.__path is not []:
             return self.__path
         else:
@@ -73,12 +73,12 @@ class MotionAutomaton(threading.Thread, ABC):
         return self.__pub
 
     @property
-    def position(self) -> Pos:
+    def position(self) -> pos.Pos:
         return self.__position
 
     @position.setter
-    def position(self, pos: Pos) -> None:
-        self.__position = pos
+    def position(self, new_pos: pos.Pos) -> None:
+        self.__position = new_pos
 
     @property
     def way_point_count(self) -> int:
@@ -114,29 +114,28 @@ class MotionAutomaton(threading.Thread, ABC):
 
     # ------------ CALLBACK METHODS FOR POSITIONING AND REACHED METHODS --------------
 
-    @abstractmethod
-    def _get_positioning(self, data) -> Pos:
+    @abc.abstractmethod
+    def _get_positioning(self, data) -> pos.Pos:
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def _get_reached(self, data) -> bool:
         pass
 
     # ------------ ABSTRACT METHOD FOR  GOING TO POINT AND FOLLOWING PATH --------------
 
-    @abstractmethod
-    def go_to(self, dest: Pos, wp_type: int = None) -> None:
+    @abc.abstractmethod
+    def go_to(self, dest: pos.Pos, wp_type: int = None) -> None:
         pass
 
-    @abstractmethod
-    def follow_path(self, path: List[Pos]) -> None:
+    @abc.abstractmethod
+    def follow_path(self, path: typing.List[pos.Pos]) -> None:
         pass
 
     # ------------ THREAD BEHAVIOR --------------
 
-    @abstractmethod
+    @abc.abstractmethod
     def run(self):
-
         """
         abstract method for running the motion automaton thread
         """

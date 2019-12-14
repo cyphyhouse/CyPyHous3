@@ -17,8 +17,6 @@ class Message(object):
 
     def __init__(self, sender: int, message_type: MsgType, content, timestamp: float):
         """
-        init method for message
-
         :param sender: integer message sender agent pid
         :type sender: int
 
