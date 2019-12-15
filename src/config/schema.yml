@@ -1,0 +1,26 @@
+agent:
+  motion_automaton: str()
+  on_device: str()
+  pid: int(min=0)
+  plist: list(int(min=0))
+device:
+  bot_name: str()
+  bot_type: str()
+  ip: ip()
+  motion_automata: list(str())
+  planner: str()
+  port: int(min=2000, max=65535)
+  positioning_topic: include('ros_topic')
+  queue_size: int(min=0)
+  reached_topic: include('ros_topic')
+  ros_node_prefix: str()
+  waypoint_topic: include('ros_topic')
+leader_pid: int(min=0)
+mutex_handler: str()
+num_agents: int(min=1)
+
+---
+
+ros_topic:
+    topic: str()
+    type: str()
