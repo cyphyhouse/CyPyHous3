@@ -19,6 +19,7 @@ import src.tests.basic.test_pos as test_pos
 import src.tests.basic.test_roundobs as test_roundobs
 import src.tests.basic.test_seg as test_seg
 import src.tests.basic.test_simple_planner as test_simple_planner
+import src.tests.basic.test_basicMutex as test_basicMutex
 
 
 # noinspection PyTypeChecker
@@ -40,6 +41,7 @@ def main():
     suite.addTest(loader.loadTestsFromModule(test_gvh))
     suite.addTest(loader.loadTestsFromModule(test_message_create))
     suite.addTest(loader.loadTestsFromModule(test_get_configs))
+    suite.addTest(loader.loadTestsFromModule(test_basicMutex))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
