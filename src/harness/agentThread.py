@@ -8,7 +8,6 @@ from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
 from src.harness.message_handler import stop_comm_msg_create, round_update_msg_create, stop_msg_create
-from src.motion.moat_withlidar import MoatWithLidar
 from src.objects.base_mutex import BaseMutex
 
 
