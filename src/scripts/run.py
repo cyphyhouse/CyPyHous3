@@ -64,6 +64,7 @@ def run_app(appfile, cfg) -> AgentThread:
 def main(appfile, cfg) -> None:
     try:
         agent_thread = run_app(appfile, cfg)
+        agent_thread.start()
         agent_thread.join()
     except KeyboardInterrupt:
         print("User sent SIGINT. Stopping agent thread")
