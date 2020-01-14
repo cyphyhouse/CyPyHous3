@@ -31,6 +31,8 @@ class AgentThread(ABC, Thread):
         self.__stop_event = Event()
         self.__mutex_handler = self.__agent_gvh.mutex_handler
 
+        self.log = lambda msg: print(msg, end="")  # TODO logging besides printing
+
         self.requestedlocks = {}
         self.ackedlocks = {}
 
