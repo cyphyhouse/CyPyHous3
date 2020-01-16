@@ -2,6 +2,7 @@ import pickle
 import select
 import socket
 from threading import Thread, Event
+from queue import Queue
 
 from src.config.configs import AgentConfig
 from src.harness.gvh import Gvh
@@ -16,13 +17,12 @@ class CommHandler(Thread):
     communication handler object for the agent application thread.
 
     __ip : ip of the socket to receive messages on
-    __agent_gvh : associated agent gvh .
     __r_port : receive messages on this port
     __timeout : timeout to try receiving a message
     __retries : retries
     """
 
-    def __init__(self, a: AgentConfig, agent_gvh=None, timeout: float = 100.0, retries: int = RETRY_VAL):
+    def __init__(self, a: AgentConfig, timeout: float = 100.0, retries: int = RETRY_VAL):
         """
         init method for receiver object thread
         :param ip:
@@ -31,12 +31,14 @@ class CommHandler(Thread):
         :param retries:
         """
         super(CommHandler, self).__init__()
+        self.__pid = a.pid
+        self.__is_leader = a.is_leader
         self.__ip = a.rip
         self.__r_port = a.rport
-        self.__agent_gvh = agent_gvh
         self.__stop_event = Event()
         self.__timeout = timeout
         self.receiver_socket = None
+        self.__recv_msg_queue = Queue()
 
         self.start()
 
@@ -58,21 +60,20 @@ class CommHandler(Thread):
         self.__timeout = timeout
 
     @property
-    def agent_gvh(self) -> Gvh:
+    def pid(self) -> int:
         """
-        getter method for agent gvh
-        :return: associated agent gvh
+        getter method for pid
+        :return: associated pid
         """
-        return self.__agent_gvh
+        return self.__pid
 
-    @agent_gvh.setter
-    def agent_gvh(self, agent_gvh: Gvh) -> None:
+    @property
+    def is_leader(self) -> bool:
         """
-        agent gvh setter method
-        :param agent_gvh: agent gvh to be linked
-        :return: None
+        getter method for is_leader
+        :return: associated is_leader
         """
-        self.__agent_gvh = agent_gvh
+        return self.__is_leader
 
     @property
     def r_port(self) -> int:
@@ -113,8 +114,6 @@ class CommHandler(Thread):
          a flag to set to to safely exit the thread
         :return: None
         """
-        if self.agent_gvh is not None:
-            self.agent_gvh.is_alive = False
         self.__stop_event.set()
 
     def stopped(self) -> bool:
@@ -149,31 +148,30 @@ class CommHandler(Thread):
                     data, addr = self.receiver_socket.recvfrom(8192)
                     #print("packet length",len(data))
                     msg = pickle.loads(data)
-                    self.agent_gvh.add_recv_msg(msg)
+                    self.__recv_msg_queue.put(msg)
             except socket.timeout:
-                print("agent", self.agent_gvh.pid, "timed out")
+                print("agent", self.__pid, "timed out")
                 self.stop()
             except OSError as e:
                 print(e)
-                print("unexpected os error on agent", self.agent_gvh.pid)
+                print("unexpected os error on agent", self.__pid)
 
-    def handle_msgs(self) -> None:
+    def handle_msgs(self, agent_gvh: Gvh) -> None:
         """
         handle messages method to call message_handle functions. Must be outside the run so that it can be called from
         gvh or agent thread, to avoid blocking receive messages.
         TODO: better explanation
         :return: none
         """
-
-        current_list = self.agent_gvh.recv_msg_list.copy()
-
-        for msg in current_list:
-            if msg.message_type == 5 and msg.sender == self.agent_gvh.pid:
-                print("stopping commhandler on agent", self.agent_gvh.pid)
+        curr_size = self.__recv_msg_queue.qsize()
+        # Since only AgentThread is calling this function, other threads will only increase qsize
+        for _ in range(0, curr_size):
+            msg = self.__recv_msg_queue.get()
+            if msg.message_type == 5 and msg.sender == self.__pid:
+                print("stopping commhandler on agent", self.__pid)
                 self.stop()
             if msg.message_type in list(message_handler.keys()):
-                message_handler[msg.message_type](msg, self.agent_gvh)
-        self.agent_gvh.recv_msg_list = self.agent_gvh.recv_msg_list[len(current_list):]
+                message_handler[msg.message_type](msg, agent_gvh)
 
 
 class CommTimeoutError(Exception):
