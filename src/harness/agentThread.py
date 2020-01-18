@@ -34,6 +34,7 @@ class AgentThread(ABC, Thread):
         self.log = lambda msg: print(msg, end="")  # TODO logging besides printing
         self.any = any
         self.all = all
+        self.midpoint = lambda p0, p1: (p0 + p1) / 2
 
         self.requestedlocks = {}
         self.ackedlocks = {}
@@ -217,6 +218,18 @@ class AgentThread(ABC, Thread):
         else:
             return self.agent_gvh.get(var_name)
         pass
+
+    def read_from_sensor(self, var_name: str):
+        if var_name == 'Motion.position':
+            return self.agent_gvh.moat.position
+        else:
+            raise KeyError("Cannot find module sensor '" + var_name + "'")
+
+    def write_to_actuator(self, var_name: str, value) -> None:
+        if var_name == 'Motion.target':
+            self.agent_gvh.moat.goTo(value)
+        else:
+            raise KeyError("Cannot find module actuator '" + var_name + "'")
 
     def release_unnecessary_mutexes(self):
         for i in list(self.baselocks.keys()):
