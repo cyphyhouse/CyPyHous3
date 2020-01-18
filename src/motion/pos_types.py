@@ -88,6 +88,14 @@ class Pos(object):
         """
         return Pos(np.array(self.mk_arr() * other))
 
+    def __truediv__(self, other: typing.Union[int, float]):
+        """
+        scalar division
+        :param other: scalar
+        :return: vector
+        """
+        return Pos(np.array(self.mk_arr() / other))
+
     def __eq__(self, other):
         """
         comparision operator
