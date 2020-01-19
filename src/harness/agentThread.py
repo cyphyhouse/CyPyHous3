@@ -8,6 +8,7 @@ from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
 from src.harness.message_handler import stop_comm_msg_create, round_update_msg_create, stop_msg_create
+from src.motion.pos_types import pos3d
 from src.objects.base_mutex import BaseMutex
 
 
@@ -34,6 +35,7 @@ class AgentThread(ABC, Thread):
         self.log = lambda msg: print(msg, end="")  # TODO logging besides printing
         self.any = any
         self.all = all
+        self.pos3d = pos3d
         self.midpoint = lambda p0, p1: (p0 + p1) / 2
 
         self.requestedlocks = {}
@@ -222,6 +224,8 @@ class AgentThread(ABC, Thread):
     def read_from_sensor(self, var_name: str):
         if var_name == 'Motion.position':
             return self.agent_gvh.moat.position
+        if var_name == 'Motion.reached':
+            return self.agent_gvh.moat.reached
         else:
             raise KeyError("Cannot find module sensor '" + var_name + "'")
 
