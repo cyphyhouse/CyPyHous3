@@ -37,6 +37,7 @@ class AgentThread(ABC, Thread):
         self.all = all
         self.pos3d = pos3d
         self.midpoint = lambda p0, p1: (p0 + p1) / 2
+        self.toList = lambda *args: list(args)
 
         self.requestedlocks = {}
         self.ackedlocks = {}
@@ -135,6 +136,7 @@ class AgentThread(ABC, Thread):
         """
         if self.agent_gvh.moat is not None:
             self.agent_gvh.moat.moat_exit_action()
+            self.agent_gvh.moat.join()
             # todo: msg = tERMINATE_MSG() best termination message
             # TODO: send(msg,"",best_post,time.time()) best termination message.
         if self.agent_gvh.mutex_handler is not None:
@@ -232,6 +234,8 @@ class AgentThread(ABC, Thread):
     def write_to_actuator(self, var_name: str, value) -> None:
         if var_name == 'Motion.target':
             self.agent_gvh.moat.goTo(value)
+        if var_name == 'Motion.path':
+            self.agent_gvh.moat.follow_path(value)
         else:
             raise KeyError("Cannot find module actuator '" + var_name + "'")
 
