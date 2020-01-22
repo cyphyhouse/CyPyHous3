@@ -3,6 +3,7 @@ import typing
 
 import numpy as np
 from scipy.spatial.distance import pdist
+from scipy.spatial.transform import Rotation as R
 
 
 class Pos(object):
@@ -236,6 +237,14 @@ class pos3d(Pos):
     def __init__(self, x: float, y: float, z: float, yaw=0.0):
         super(pos3d, self).__init__(np.array([x, y, z, yaw]))
         self.yaw = yaw
+
+
+def ros_pose_to_pos3d(pose) -> Pos:
+    pos = pose.position
+    quat = pose.orientation
+    euler = R.from_quat(quat=(quat.x, quat.y, quat.z, quat.w)).as_euler('zyx')
+
+    return pos3d(pos.x, pos.y, pos.z, euler[0])
 
 
 def mid_pt(p1: Pos, p2: Pos):
