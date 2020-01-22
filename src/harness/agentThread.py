@@ -234,7 +234,7 @@ class AgentThread(ABC, Thread):
     def write_to_actuator(self, var_name: str, value) -> None:
         if var_name == 'Motion.target':
             self.agent_gvh.moat.goTo(value)
-        if var_name == 'Motion.path':
+        elif var_name == 'Motion.path':
             self.agent_gvh.moat.follow_path(value)
         else:
             raise KeyError("Cannot find module actuator '" + var_name + "'")
