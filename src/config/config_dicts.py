@@ -8,6 +8,7 @@ from src.motion.demo_planner import DemoPlan
 from src.motion.moat_test_car import MoatTestCar
 from src.motion.moat_test_drone import MoatTestDrone
 from src.motion.moat_withlidar import MoatWithLidar
+from src.motion.moat_withlidar_drone import MoatWithLidarDrone
 from src.motion.rrt_star import RRT as RRT_STAR_CAR
 from src.motion.rrt_drone import RRT as RRT_DRONE
 from src.motion.rrt_star_drone import RRT as RRT_STAR_DRONE
@@ -44,3 +45,4 @@ moat_class_dict['MoatTestCar'] = MoatTestCar
 moat_class_dict['MoatTestDrone'] = MoatTestDrone
 moat_class_dict['MoatTestDroneBad'] = MoatTestDroneBad
 moat_class_dict['MoatWithLidar'] = MoatWithLidar
+moat_class_dict['MoatWithLidarDrone'] = MoatWithLidarDrone

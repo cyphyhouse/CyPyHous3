@@ -13,7 +13,6 @@ import rospy
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 LIDAR_RANGE = 2.5
 LIDAR_ANGLE_MIN, LIDAR_ANGLE_MAX = -np.pi, np.pi
 
@@ -22,6 +21,7 @@ Grid = Tuple[int, int]
 
 def _normalize_radians(rad: float) -> float:
     return (rad + np.pi) % (2 * np.pi) - np.pi
+
 
 
 class GridMap:
@@ -70,9 +70,12 @@ class GridMap:
             for y in range(GridMap.GRID_WIDTH):
                 _x, _y = x - GridMap.HALF_GRID_WIDTH, y - GridMap.HALF_GRID_WIDTH
                 viz_map[y][x] = self.__grid_map[_x][_y]  # XXX the image has to be transposed
-
-        plt.imshow(viz_map, origin='lower')
+        ax = plt.gca()
+        im = ax.imshow(viz_map, origin='lower')
+        cbar = ax.figure.colorbar(im, ax=ax)
+        cbar.ax.set_ylabel("Height in meters", rotation=-90, va="bottom")
         plt.pause(0.5)
+        cbar.remove()
 
     @staticmethod
     def quantize(x: float, y: float) -> Grid:
@@ -110,20 +113,6 @@ class GridMap:
 
         return frontier
 
-    # def get_farthest_grid(self, curr_grid: Grid) -> Grid:
-    #     maxDist = 0
-    #     ret = (0,0)
-    #     for x in range(-GridMap. HALF_GRID_WIDTH, GridMap.HALF_GRID_WIDTH):
-    #         for y in range(-GridMap. HALF_GRID_WIDTH, GridMap.HALF_GRID_WIDTH):
-    #             if self[x,y] != GridMap.UNKNOWN:
-    #                 dist = (curr_grid[0]-x)*(curr_grid[0]-x) + (curr_grid[1]-y)*(curr_grid[1]-y)
-    #                 if dist > maxDist:
-    #                     maxDist = dist
-    #                     ret = (x,y)
-
-    #     return ret
-
-
 class BasicFollowApp(AgentThread):
 
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
@@ -154,6 +143,8 @@ class BasicFollowApp(AgentThread):
         self.agent_gvh.create_aw_var('global_map', type(GridMap), GridMap())
         self.initialize_lock('GUpdate')
         self.locals['obstacle'] = []  # obstacle list for path planner
+        self.locals['scanHeight'] = 1
+        self.locals['heightDirection'] = 1
 
     def loop_body(self):
         if self.locals['i'] > 800:
@@ -170,7 +161,8 @@ class BasicFollowApp(AgentThread):
             self.locals['path'] = pick_path_to_frontier(self.locals['map'],
                                                         self.agent_gvh.moat.position,
                                                         self.agent_gvh.moat.planner,
-                                                        self.locals['obstacle'])
+                                                        self.locals['obstacle'],
+                                                        self.locals['scanHeight'])
             if len(self.locals['path']) > 0:
                 rospy.loginfo("Target position: " + str(self.locals['path'][-1]))
                 self.agent_gvh.moat.follow_path(self.locals['path'])
@@ -197,6 +189,9 @@ class BasicFollowApp(AgentThread):
                 self.dump("GUpdate")
                 self.unlock('GUpdate')
                 self.locals['newpoint'] = True
+                self.locals['scanHeight'] += 0.25 * self.locals['heightDirection']
+                if self.locals['scanHeight'] > 4.0 or self.locals['scanHeight'] < 1.0: 
+                    self.locals['heightDirection'] = -self.locals['heightDirection']
             else:
                 return
 
@@ -242,7 +237,7 @@ def get_obstacle_map(pos, scan, cur_obstacles) -> GridMap:
             if not flag:
                 obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
                 cur_obstacles.append(obs_pos)
-        ret_map[obs_x][obs_y] = GridMap.OCCUPIED
+        ret_map[obs_x][obs_y] = pos.z
         count += 1
     return ret_map
 
@@ -291,13 +286,13 @@ def get_empty_map(pos, scan) -> GridMap:
     return ret_map
 
 
-def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> List[pos3d]:
+def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list, scanHeight) -> List[pos3d]:
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
-    next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
-    # next_grid = m.get_farthest_grid(curr_grid)
+    next_pos_list = [pos3d(n[0] + .5, n[1] + .5, scanHeight, pos.yaw) for n in next_grids]
+    # # next_grid = m.get_farthest_grid(curr_grid)
 
-    # XXX BFS returns from closest to furthest. We can add random permutation here
+    # # XXX BFS returns from closest to furthest. We can add random permutation here
     def pos_key(new_pos: pos3d) -> float:
         dist = (new_pos.x - pos.x) ** 2 + (new_pos.y - pos.y) ** 2
         new_yaw = np.arctan2((new_pos.y-pos.y), (new_pos.x-pos.x))
@@ -306,14 +301,15 @@ def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> Lis
         min_diff = min(abs(forward_diff), abs(backward_diff))
         return min_diff if dist < 25 else min_diff * 25 / dist
 
-    # path = planner.find_path(pos, pos3d(next_grid[0]+0.5, next_grid[1]+0.5, 0, pos.yaw), obstacle_list=obstacle_list)
-    # if path:
-    #     return path
+    # # path = planner.find_path(pos, pos3d(next_grid[0]+0.5, next_grid[1]+0.5, 0, pos.yaw), obstacle_list=obstacle_list)
+    # # if path:
+    # #     return path
     next_pos_list.sort(key=pos_key)
     for next_pos in next_pos_list:
         # TODO add obstacles from map
         path = planner.find_path(pos, next_pos, obstacle_list=obstacle_list)
         if path:
+            print("the path is ", path)
             return path
 
-    return []
+    return [pos3d(pos.x, pos.y, pos.z + 1, pos.yaw)]

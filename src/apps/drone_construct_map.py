@@ -294,7 +294,7 @@ def get_empty_map(pos, scan) -> GridMap:
 def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> List[pos3d]:
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
-    next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
+    next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 1.0, pos.yaw) for n in next_grids]
     # next_grid = m.get_farthest_grid(curr_grid)
 
     # XXX BFS returns from closest to furthest. We can add random permutation here
