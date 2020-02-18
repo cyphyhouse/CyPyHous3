@@ -4,7 +4,7 @@ import typing as tp
 
 from src.datatypes.robot import BotType
 from src.motion.abstract.planner import Planner
-from src.motion.simpleplanner import SimplePlanner
+from src.motion.planners.simpleplanner import SimplePlanner
 
 
 class AgentConfig(object):
