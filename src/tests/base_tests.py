@@ -14,7 +14,7 @@ import src.tests.base.test_planner as test_planner
 import src.tests.base.test_pos as test_pos
 import src.tests.base.test_roundobs as test_roundobs
 import src.tests.base.test_seg as test_seg
-import src.tests.base.test_simple_planner as test_simple_planner
+import src.tests.base.test_msg_create as test_msg_create
 
 
 def main():
@@ -30,7 +30,7 @@ def main():
     suite.addTest(loader.loadTestsFromModule(test_seg))
     suite.addTest(loader.loadTestsFromModule(test_cylobs))
     suite.addTest(loader.loadTestsFromModule(test_message))
-    suite.addTest(loader.loadTestsFromModule(test_simple_planner))
+    suite.addTest(loader.loadTestsFromModule(test_msg_create))
     runner = unittest.TextTestRunner(verbosity=3)
     result = runner.run(suite)
     return result
