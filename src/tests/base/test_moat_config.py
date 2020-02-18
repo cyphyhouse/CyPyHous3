@@ -4,7 +4,6 @@ import unittest
 
 from src.config.configs import MoatConfig
 from src.datatypes.robot import BotType
-from src.motion.planners.simpleplanner import SimplePlanner
 
 
 class TestMoatConfig(unittest.TestCase):
@@ -44,7 +43,7 @@ class TestMoatConfig(unittest.TestCase):
         self.assertEqual(self.mc.rchd_msg_type, 6, "test reached message type")
 
     def test_planner(self):
-        self.assertEqual(type(self.mc.planner), type(SimplePlanner()), "test planner")
+        self.assertEqual(type(self.mc.planner), type(None), "test planner")
 
 
 if __name__ == '__main__':

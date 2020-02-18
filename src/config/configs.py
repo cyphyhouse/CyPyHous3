@@ -4,7 +4,6 @@ import typing as tp
 
 from src.datatypes.robot import BotType
 from src.motion.abstract.planner import Planner
-from src.motion.planners.simpleplanner import SimplePlanner
 
 
 class AgentConfig(object):
@@ -238,7 +237,7 @@ class MoatConfig(object):
 
     def __init__(self, waypoint_topic: str, reached_topic: str, rospy_node: str, bot_name: str, queue_size: int,
                  bot_type: BotType, pos_node: str, pos_msg_type=None, rchd_msg_type=None,
-                 planner: Planner = SimplePlanner()):
+                 planner: tp.Union[Planner, None] = None):
         """
         :param waypoint_topic: waypoint message rostopic
         :type waypoint_topic: str
