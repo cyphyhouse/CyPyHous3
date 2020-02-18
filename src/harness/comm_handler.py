@@ -170,8 +170,10 @@ class CommHandler(Thread):
             if msg.message_type == 5 and msg.sender == self.__pid:
                 print("stopping commhandler on agent", self.__pid)
                 self.stop()
-            if msg.message_type in list(message_handler.keys()):
+            if msg.message_type in message_handler:
                 message_handler[msg.message_type](msg, agent_gvh)
+            else:
+                print("Warning: unexpected message type id", msg.message_type)
 
 
 class CommTimeoutError(Exception):
