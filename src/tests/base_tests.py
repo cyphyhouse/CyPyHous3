@@ -15,6 +15,8 @@ import src.tests.base.test_pos as test_pos
 import src.tests.base.test_roundobs as test_roundobs
 import src.tests.base.test_seg as test_seg
 import src.tests.base.test_msg_create as test_msg_create
+import src.tests.base.test_dsm as test_dsm
+
 
 
 def main():
@@ -31,6 +33,7 @@ def main():
     suite.addTest(loader.loadTestsFromModule(test_cylobs))
     suite.addTest(loader.loadTestsFromModule(test_message))
     suite.addTest(loader.loadTestsFromModule(test_msg_create))
+    suite.addTest(loader.loadTestsFromModule(test_dsm))
     runner = unittest.TextTestRunner(verbosity=3)
     result = runner.run(suite)
     return result
