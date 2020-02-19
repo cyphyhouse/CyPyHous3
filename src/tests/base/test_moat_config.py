@@ -43,7 +43,7 @@ class TestMoatConfig(unittest.TestCase):
         self.assertEqual(self.mc.rchd_msg_type, 6, "test reached message type")
 
     def test_planner(self):
-        self.assertEqual(type(self.mc.planner), type(None), "test planner")
+        self.assertEqual(self.mc.planner, None, "test planner")
 
 
 if __name__ == '__main__':

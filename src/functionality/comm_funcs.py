@@ -34,4 +34,3 @@ def send(msg: message.Message, ip: str, port: int, retry=1) -> None:
             if len(a) > MAX_UDP_SIZE:
                 raise ValueError('Message too large')
             client_sock.sendto(a, (ip, port))
-        client_sock.close()
