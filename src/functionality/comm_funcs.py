@@ -27,11 +27,11 @@ def send(msg: message.Message, ip: str, port: int, retry=1) -> None:
     TODO: write test
     """
 
-    client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    for i in range(retry):
-        a = pickle.dumps(msg)
-        if len(a) > MAX_UDP_SIZE:
-            raise ValueError('Message too large')
-        client_sock.sendto(a, (ip, port))
-    client_sock.close()
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client_sock:
+        client_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        for i in range(retry):
+            a = pickle.dumps(msg)
+            if len(a) > MAX_UDP_SIZE:
+                raise ValueError('Message too large')
+            client_sock.sendto(a, (ip, port))
+        client_sock.close()

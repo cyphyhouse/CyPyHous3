@@ -69,15 +69,3 @@ class Message(object):
     @property
     def message_type(self) -> MsgType:
         return self.__message_type
-
-    @sender.setter
-    def sender(self, sender: int) -> None:
-        self.__sender = sender
-
-    @content.setter
-    def content(self, content) -> None:
-        self.__content = content
-
-    @message_type.setter
-    def message_type(self, message_type: MsgType) -> None:
-        self.__message_type = message_type
