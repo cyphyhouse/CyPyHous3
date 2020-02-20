@@ -58,7 +58,7 @@ class dsm(ABC):
         pass
 
     @abstractmethod
-    def get_val(self):
+    def get_val(self, **kwargs):
         """
         abstract getter method for value of shared
         """

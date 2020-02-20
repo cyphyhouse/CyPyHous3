@@ -43,10 +43,10 @@ class dsmAllRead(dsm):
         """
         super().__init__(name, data_type)
         self.__pid = pid
-        self.__value = {}
+        self.__value_dict = {}
         self.__last_updated_dict = {}
         for i in range(size):
-            self.__value[i] = value
+            self.__value_dict[i] = value
             self.__last_updated_dict[i] = last_updated
 
     def __repr__(self):
@@ -96,7 +96,7 @@ class dsmAllRead(dsm):
         :return: value of shared variable for pid
         :rtype: int,bool,float,list,object,tuple,None
         """
-        return self.__value[pid]
+        return self.__value_dict[pid]
 
     def set_val(self, value: tp.Union[int, bool, float, list, object, tuple], pid: int) -> None:
         """
@@ -104,4 +104,4 @@ class dsmAllRead(dsm):
         :param value : value to be set
         :param pid: pid of agent to set the value of
         """
-        self.__value[pid] = value
+        self.__value_dict[pid] = value
