@@ -44,10 +44,10 @@ class dsmAllRead(dsm):
         super().__init__(name, data_type)
         self.__pid = pid
         self.__value = {}
-        self.__last_updated = {}
+        self.__last_updated_dict = {}
         for i in range(size):
             self.__value[i] = value
-            self.__last_updated[i] = last_updated
+            self.__last_updated_dict[i] = last_updated
 
     def __repr__(self):
         """
@@ -71,7 +71,7 @@ class dsmAllRead(dsm):
         :return: update time stamp
         :rtype: float,dict
         """
-        return self.__last_updated[pid]
+        return self.__last_updated_dict[pid]
 
     def set_update(self, update_time_stamp: float, pid: int) -> None:
         """
@@ -83,7 +83,7 @@ class dsmAllRead(dsm):
         :param pid: pid of agent to set the update time for
         :type pid: int
         """
-        self.__last_updated[pid] = update_time_stamp
+        self.__last_updated_dict[pid] = update_time_stamp
 
     def get_val(self, pid: int) -> tp.Union[
         int, bool, float, list, object, tuple, None]:  # -> Any (not available in python 3.5)
