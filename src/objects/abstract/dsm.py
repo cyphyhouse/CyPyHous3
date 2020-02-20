@@ -22,7 +22,6 @@ class dsm(ABC):
         """
         self.__name = name
         self.__data_type = data_type
-        self.__last_updated = None
 
     def __repr__(self):
         """
