@@ -2,6 +2,7 @@
 
 from enum import Enum, unique
 
+
 @unique
 class BotType(Enum):
     """
@@ -9,4 +10,3 @@ class BotType(Enum):
     """
     QUAD = 1
     CAR = 2
-

@@ -45,10 +45,11 @@ class Message(object):
         equality
         """
         try:
-            return self.sender == other.sender and \
-                   self.message_type == other.message_type and \
-                   self.content == other.content and \
-                   self.timestamp == other.timestamp
+            return \
+                self.sender == other.sender and \
+                self.message_type == other.message_type and \
+                self.content == other.content and \
+                self.timestamp == other.timestamp
         except AttributeError:
             return False
 
