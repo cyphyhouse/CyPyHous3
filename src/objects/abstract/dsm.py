@@ -22,6 +22,7 @@ class dsm(ABC):
         """
         self.__name = name
         self.__data_type = data_type
+        self.__last_updated = None
 
     def __repr__(self):
         """
@@ -35,22 +36,14 @@ class dsm(ABC):
     def name(self) -> str:
         return self.__name
 
-    @name.setter
-    def name(self, name: str) -> None:
-        self.__name = name
-
     @property
     def data_type(self) -> type:
         return self.__data_type
 
-    @data_type.setter
-    def data_type(self, data_type: type) -> None:
-        self.__data_type = data_type
-
     # ------------ MEMBER ACCESS METHODS FOR POTENTIALLY LIST ITEMS--------------
 
     @abstractmethod
-    def last_update(self):
+    def last_update(self, **kwargs):
         """
         abstract method for timestamp of last update
 

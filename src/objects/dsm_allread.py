@@ -2,8 +2,10 @@
 
 import typing as tp
 
+from src.objects.abstract.dsm import dsm
 
-class dsmAllRead(object):
+
+class dsmAllRead(dsm):
     """
     distributed shared memory object
     __name : variable name
@@ -39,8 +41,7 @@ class dsmAllRead(object):
         :type last_updated: float
 
         """
-        self.name = name
-        self.data_type = data_type
+        super().__init__(name, data_type)
         self.__pid = pid
         self.__value = {}
         self.__last_updated = {}
@@ -59,10 +60,6 @@ class dsmAllRead(object):
     @property
     def pid(self) -> int:
         return self.__pid
-
-    @pid.setter
-    def pid(self, pid: int) -> None:
-        self.__pid = pid
 
     def last_update(self, pid: int) -> float:
         """

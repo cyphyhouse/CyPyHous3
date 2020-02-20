@@ -2,8 +2,10 @@
 
 import typing as tp
 
+from src.objects.abstract.dsm import dsm
 
-class dsmAllWrite(object):
+
+class dsmAllWrite(dsm):
     """
     distributed shared memory object
     __name : variable name
@@ -41,8 +43,7 @@ class dsmAllWrite(object):
         :type last_updated: float
 
         """
-        self.name = name
-        self.data_type = data_type
+        super().__init__(name, data_type)
         self.__value = value
         self.__last_updated = last_updated
 
@@ -53,22 +54,6 @@ class dsmAllWrite(object):
         return str(self.name) + " " + str(self.get_val())
 
         # ------------ MEMBER ACCESS METHODS --------------
-
-    @property
-    def name(self) -> str:
-        return self.__name
-
-    @name.setter
-    def name(self, name: str) -> None:
-        self.__name = name
-
-    @property
-    def data_type(self) -> type:
-        return self.__data_type
-
-    @data_type.setter
-    def data_type(self, data_type: type) -> None:
-        self.__data_type = data_type
 
     # ------------ MEMBER ACCESS METHODS FOR POTENTIALLY LIST ITEMS--------------
 

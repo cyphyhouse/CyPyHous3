@@ -5,13 +5,10 @@ import unittest
 from src.objects.abstract.dsm import dsm
 
 
-
 class DummyDsm(dsm):
 
-    def __init__(self, name:str, dtype:type):
-        super(dsm, self).__init__()
-        self.name = name
-        self.data_type = dtype
+    def __init__(self, name: str, dtype: type):
+        super().__init__(name, dtype)
 
     def last_update(self):
         pass
@@ -35,13 +32,11 @@ class TestDsm(unittest.TestCase):
     def setUp(self):
         self.dsm = DummyDsm("x", int)
 
-
     def test_name(self):
         self.assertEqual(self.dsm.name, "x", "testing name access")
 
     def test_dtype(self):
         self.assertEqual(self.dsm.data_type, int, "testing type access")
-
 
 
 if __name__ == '__main__':
