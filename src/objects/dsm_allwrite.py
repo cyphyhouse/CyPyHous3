@@ -7,12 +7,8 @@ from src.objects.abstract.dsm import dsm
 
 class dsmAllWrite(dsm):
     """
-    distributed shared memory object
-    __name : variable name
-    __data_type : data type
     __value : value
     __last_updated : last updated time stamp
-
 
     """
 
@@ -27,17 +23,8 @@ class dsmAllWrite(dsm):
         :param data_type: variable datatype
         :type data_type: type
 
-        :param size: number of agents
-        :type size: int
-
-        :param pid: unique integer identifier of current agent
-        :type pid: int
-
         :param value: value of dsm
         :type value: int, bool, float, list, object, tuple, None
-
-        :param share_scope: shared variable scope
-        :type share_scope: ShareType
 
         :param last_updated: last update
         :type last_updated: float
@@ -53,9 +40,8 @@ class dsmAllWrite(dsm):
         """
         return str(self.name) + " " + str(self.get_val())
 
-        # ------------ MEMBER ACCESS METHODS --------------
 
-    # ------------ MEMBER ACCESS METHODS FOR POTENTIALLY LIST ITEMS--------------
+    # ------------ MEMBER ACCESS METHODS--------------
 
     def last_update(self) -> float:
         """

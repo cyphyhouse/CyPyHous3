@@ -7,12 +7,9 @@ from src.objects.abstract.dsm import dsm
 
 class dsmAllRead(dsm):
     """
-    distributed shared memory object
-    __name : variable name
-    __data_type : data type
     __pid : pid of agent with corresponding dsm
-    __value : value
-    __last_updated : last updated time stamp
+    __value_dict : value
+    __last_updated_dict : last updated time stamp
 
 
     """
