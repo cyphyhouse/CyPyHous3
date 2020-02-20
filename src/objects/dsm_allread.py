@@ -6,15 +6,30 @@ from src.objects.abstract.dsm import dsm
 
 
 class dsmAllRead(dsm):
-    """
-    __pid : pid of agent with corresponding dsm
-    __value_dict : value
-    __last_updated_dict : last updated time stamp
-    """
 
     def __init__(self, name: str, data_type: type, size: int, pid: int,
                  value: tp.Union[int, bool, float, list, object, tuple, None] = None,
                  last_updated: float = 0.0):
+        """
+        :param name: variable name
+        :type name: str
+
+        :param data_type: datatype of variable
+        :type data_type: type
+
+        :param size: number of robots in system
+        :type size: int
+
+        :param pid: pid of current robot
+        :type pid: int
+
+        :param value: value of variable
+        :type value: [int,bool,float,list,object,tuple,None]
+
+        :param last_updated: timestamp of last update
+        :type last_updated: float
+        """
+
         super().__init__(name, data_type)
         self.__pid = pid
         self.__value_dict = {}

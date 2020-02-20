@@ -6,15 +6,24 @@ from src.objects.abstract.dsm import dsm
 
 
 class dsmAllWrite(dsm):
-    """
-    __value : value
-    __last_updated : last updated time stamp
-
-    """
 
     def __init__(self, name: str, data_type: type,
                  value: tp.Union[int, bool, float, list, object, tuple, None] = None,
                  last_updated: float = 0.0):
+        """
+        :param name: variable name
+        :type name: str
+
+        :param data_type: datatype of variable
+        :type data_type: type
+
+        :param value: value of variable
+        :type value: [int,bool,float,list,object,tuple,None]
+
+        :param last_updated: timestamp of last update
+        :type last_updated: float
+        """
+
         super().__init__(name, data_type)
         self.__value = value
         self.__last_updated = last_updated
