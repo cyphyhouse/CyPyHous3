@@ -2,8 +2,6 @@
 
 import typing as tp
 
-import src.datatypes.var_types as vt
-
 
 class dsmAllWrite(object):
     """
@@ -52,7 +50,7 @@ class dsmAllWrite(object):
         """
         string representation
         """
-        return str(self.name) + " " + str(self.get_val(self.pid))
+        return str(self.name) + " " + str(self.get_val())
 
         # ------------ MEMBER ACCESS METHODS --------------
 
@@ -71,14 +69,6 @@ class dsmAllWrite(object):
     @data_type.setter
     def data_type(self, data_type: type) -> None:
         self.__data_type = data_type
-
-    @property
-    def owner(self) -> vt.ShareType:
-        return self.__owner
-
-    @owner.setter
-    def owner(self, owner: vt.ShareType) -> None:
-        self.__owner = owner
 
     # ------------ MEMBER ACCESS METHODS FOR POTENTIALLY LIST ITEMS--------------
 
