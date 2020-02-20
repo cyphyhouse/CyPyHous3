@@ -15,7 +15,9 @@ import src.tests.base.test_pos as test_pos
 import src.tests.base.test_roundobs as test_roundobs
 import src.tests.base.test_seg as test_seg
 import src.tests.base.test_msg_create as test_msg_create
-
+import src.tests.base.test_dsm as test_dsm
+import src.tests.base.test_dsm_allread as test_dsm_allread
+import src.tests.base.test_dsm_allwrite as test_dsm_allwrite
 
 def main():
     suite = unittest.TestSuite()
@@ -31,6 +33,9 @@ def main():
     suite.addTest(loader.loadTestsFromModule(test_cylobs))
     suite.addTest(loader.loadTestsFromModule(test_message))
     suite.addTest(loader.loadTestsFromModule(test_msg_create))
+    suite.addTest(loader.loadTestsFromModule(test_dsm))
+    suite.addTest(loader.loadTestsFromModule(test_dsm_allread))
+    suite.addTest(loader.loadTestsFromModule(test_dsm_allwrite))
     runner = unittest.TextTestRunner(verbosity=3)
     result = runner.run(suite)
     return result
