@@ -20,7 +20,7 @@ jobs:
 
 install:
   - pip3 install ${PIP_USER_FLAG} --upgrade pip
-  - pip install ${PIP_USER_FLAG} pycodestyle
+  - pip install ${PIP_USER_FLAG} setuptools pycodestyle
   - pip install ${PIP_USER_FLAG} .
 
 script:
