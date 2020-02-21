@@ -9,6 +9,10 @@ jobs:
       dist: xenial
       language: shell
       env: PIP_USER_FLAG=--user
+      addons:
+        apt:
+          packages:
+            - python3-pip
     - name: "Python 3.5 in virtualenv on Ubuntu 16.04 LTS"
       dist: xenial
       language: python  # This creates virtual env and only works with Linux in Travis CI
@@ -17,6 +21,7 @@ jobs:
 install:
   - pip3 install ${PIP_USER_FLAG} --upgrade pip
   - pip install ${PIP_USER_FLAG} pycodestyle
+  - pip install ${PIP_USER_FLAG} .
 
 script:
   - pycodestyle --first --ignore=E501 .  # Check for coding style
