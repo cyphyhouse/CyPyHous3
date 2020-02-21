@@ -59,7 +59,8 @@ class dsmAllWrite(dsm):
         self.__last_updated = update_time_stamp
 
     def get_val(self) -> tp.Union[
-        int, bool, float, list, object, tuple, None]:  # -> Any (not available in python 3.5)
+            int, bool, float, list, object, tuple, None]:
+        # -> Any (not available in python 3.5)
         """
         getter method for value of shared
 

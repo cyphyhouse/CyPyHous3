@@ -210,14 +210,15 @@ class AgentConfig(object):
         """
         checking equality
         """
-        return self.pid == other.pid and \
-               self.bots == other.bots and \
-               self.rip == other.rip and \
-               self.rport == other.rport and \
-               self.plist == other.plist and \
-               self.mutex_handler == other.mutex_handler and \
-               self.is_leader == other.is_leader and \
-               self.moat_class == other.moat_class
+        return \
+            self.pid == other.pid and \
+            self.bots == other.bots and \
+            self.rip == other.rip and \
+            self.rport == other.rport and \
+            self.plist == other.plist and \
+            self.mutex_handler == other.mutex_handler and \
+            self.is_leader == other.is_leader and \
+            self.moat_class == other.moat_class
 
 
 class MoatConfig(object):

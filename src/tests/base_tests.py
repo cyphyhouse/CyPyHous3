@@ -19,23 +19,27 @@ import src.tests.base.test_dsm as test_dsm
 import src.tests.base.test_dsm_allread as test_dsm_allread
 import src.tests.base.test_dsm_allwrite as test_dsm_allwrite
 
+
 def main():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
-    suite.addTest(loader.loadTestsFromModule(test_agent_config))
-    suite.addTest(loader.loadTestsFromModule(test_moat_config))
-    suite.addTest(loader.loadTestsFromModule(test_mutex_handler))
-    suite.addTest(loader.loadTestsFromModule(test_obstacle))
-    suite.addTest(loader.loadTestsFromModule(test_planner))
-    suite.addTest(loader.loadTestsFromModule(test_pos))
-    suite.addTest(loader.loadTestsFromModule(test_roundobs))
-    suite.addTest(loader.loadTestsFromModule(test_seg))
-    suite.addTest(loader.loadTestsFromModule(test_cylobs))
-    suite.addTest(loader.loadTestsFromModule(test_message))
-    suite.addTest(loader.loadTestsFromModule(test_msg_create))
-    suite.addTest(loader.loadTestsFromModule(test_dsm))
-    suite.addTest(loader.loadTestsFromModule(test_dsm_allread))
-    suite.addTest(loader.loadTestsFromModule(test_dsm_allwrite))
+    modules = [
+        test_agent_config,
+        test_moat_config,
+        test_mutex_handler,
+        test_obstacle,
+        test_planner,
+        test_pos,
+        test_roundobs,
+        test_seg,
+        test_cylobs,
+        test_message,
+        test_msg_create,
+        test_dsm,
+        test_dsm_allread,
+        test_dsm_allwrite
+    ]
+    suite.addTests(loader.loadTestsFromModule(m) for m in modules)
     runner = unittest.TextTestRunner(verbosity=3)
     result = runner.run(suite)
     return result

@@ -1,0 +1,28 @@
+notifications:
+  email:
+    on_success: change  # When failure -> success
+    on_failure: change  # When success -> failure
+
+jobs:
+  include:
+    - name: "Python 3 on Ubuntu 16.04 LTS" # Default versions used in our field testing
+      dist: xenial
+      language: shell
+      env: PIP_USER_FLAG=--user
+      addons:
+        apt:
+          packages:
+            - python3-pip
+    - name: "Python 3.5 in virtualenv on Ubuntu 16.04 LTS"
+      dist: xenial
+      language: python  # This creates virtual env and only works with Linux in Travis CI
+      python: 3.5
+
+install:
+  - pip3 install ${PIP_USER_FLAG} --upgrade pip
+  - pip install ${PIP_USER_FLAG} setuptools pycodestyle
+  - pip install ${PIP_USER_FLAG} .
+
+script:
+  - pycodestyle --first --ignore=E501 .  # Check for coding style
+  - python3 -m unittest discover  # Run unit tests

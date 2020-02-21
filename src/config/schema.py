@@ -6,7 +6,7 @@ import yamale
 # TODO: refine validation schema. using yamale.
 
 """
-commandline validation of config. 
+commandline validation of config.
 """
 
 if len(sys.argv) < 3:
