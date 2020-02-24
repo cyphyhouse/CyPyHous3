@@ -88,6 +88,14 @@ class Pos(object):
         """
         return Pos(np.array(self.mk_arr() * other))
 
+    def __truediv__(self, other: typing.Union[int, float]):
+        """
+        scalar division
+        :param other: scalar
+        :return: vector
+        """
+        return Pos(np.array(self.mk_arr() / other))
+
     def __eq__(self, other):
         """
         comparision operator
@@ -174,6 +182,7 @@ class Node(Pos):
         self.path_yaw = []
         self.cost = 0.0
         self.parent = None
+        self.children = set()
 
     def to_pos(self):
         return Pos(np.array([self.x, self.y, self.z, self.yaw]))

@@ -74,4 +74,4 @@ class Obstacle(ABC):
         pass
 
     def __eq__(self, other):
-        return self.position == other.position and self.size == other.size()
+        return self.position == other.position and self.size.all() == other.size.all()

@@ -79,6 +79,11 @@ class GridMap:
         return tuple(np.floor([x, y]).astype(int))
 
     @staticmethod
+    def grid_to_center_pos(grid: Tuple[int, int], yaw: float = 0) -> pos3d:
+        x, y = grid
+        return pos3d(x + 0.5, y + 0.5, 0, yaw)
+
+    @staticmethod
     def _nbr_grids(grid: Grid) -> List[Grid]:
         x, y = grid
         return [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
@@ -148,15 +153,15 @@ class BasicFollowApp(AgentThread):
     def initialize_vars(self):
         rospy.loginfo("Initializing variables")
         self.locals['i'] = 1
+        self.locals['obstacle'] = []  # obstacle list for path planner
         self.locals['map'] = GridMap()
         self.update_local_map()
         self.locals['newpoint'] = True
         self.agent_gvh.create_aw_var('global_map', type(GridMap), GridMap())
         self.initialize_lock('GUpdate')
-        self.locals['obstacle'] = []  # obstacle list for path planner
 
     def loop_body(self):
-        if self.locals['i'] > 800:
+        if self.locals['i'] > 5000:
             self.trystop()
             return
         self.locals['i'] += 1
@@ -205,10 +210,21 @@ class BasicFollowApp(AgentThread):
             try:
                 ipos, iscan = self.agent_gvh.moat.tsync.get_nowait()
                 empty_map = get_empty_map(ipos, iscan)
-                obs_map = get_obstacle_map(ipos, iscan, self.locals['obstacle'])
+                obs_map = get_obstacle_map(ipos, iscan)
                 self.locals['map'] = self.locals['map'] + empty_map + obs_map
             except queue.Empty:
                 pass
+        cur_obstacles = self.locals['obstacle']
+        for x in range(-GridMap.HALF_GRID_WIDTH, GridMap.HALF_GRID_WIDTH):
+            for y in range(-GridMap.HALF_GRID_WIDTH, GridMap.HALF_GRID_WIDTH):
+                if self.locals['map'][x][y] != GridMap.OCCUPIED:
+                    continue
+                if any(GridMap.quantize(cur_obs.position.x, cur_obs.position.y) == (x, y) for cur_obs in cur_obstacles):
+                    continue  # Obstacle is already marked
+                # else:  # Add obstacle
+                obs_pos = GridMap.grid_to_center_pos((x, y))
+                obs = CylObs(obs_pos, np.array([0.6]))
+                cur_obstacles.append(obs)
 
 
 def get_obstacles(pos: Pos, scan: list) -> list:
@@ -226,24 +242,11 @@ def get_obstacles(pos: Pos, scan: list) -> list:
     return obstacles
 
 
-def get_obstacle_map(pos, scan, cur_obstacles) -> GridMap:
+def get_obstacle_map(pos, scan) -> GridMap:
     ret_map = GridMap()
-    count = 0
     for pos_x, pos_y in get_obstacles(pos, scan):
         obs_x, obs_y = GridMap.quantize(pos_x, pos_y)
-        if len(cur_obstacles) == 0:
-            obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
-            cur_obstacles.append(obs_pos)
-        else:
-            flag = 0
-            for cur_obs in cur_obstacles:
-                if cur_obs.position.x == obs_x and cur_obs.position.y == obs_y:
-                    flag = 1 
-            if not flag:
-                obs_pos = CylObs(Pos(np.array([obs_x, obs_y, 0.0])), np.array([0.6]))
-                cur_obstacles.append(obs_pos)
         ret_map[obs_x][obs_y] = GridMap.OCCUPIED
-        count += 1
     return ret_map
 
 
@@ -294,17 +297,29 @@ def get_empty_map(pos, scan) -> GridMap:
 def pick_path_to_frontier(m: GridMap, pos: pos3d, planner, obstacle_list) -> List[pos3d]:
     curr_grid = GridMap.quantize(pos.x, pos.y)
     next_grids = m.get_frontier_grids(curr_grid)
-    next_pos_list = [pos3d(n[0] + .5, n[1] + .5, 0, pos.yaw) for n in next_grids]
-    # next_grid = m.get_farthest_grid(curr_grid)
+    next_pos_list = [GridMap.grid_to_center_pos(n, pos.yaw) for n in next_grids]
 
     # XXX BFS returns from closest to furthest. We can add random permutation here
     def pos_key(new_pos: pos3d) -> float:
-        dist = (new_pos.x - pos.x) ** 2 + (new_pos.y - pos.y) ** 2
-        new_yaw = np.arctan2((new_pos.y-pos.y), (new_pos.x-pos.x))
+        new_yaw = np.arctan2((new_pos.y - pos.y), (new_pos.x - pos.x))
         forward_diff = _normalize_radians(new_yaw - pos.yaw)
         backward_diff = _normalize_radians(forward_diff + np.pi)
-        min_diff = min(abs(forward_diff), abs(backward_diff))
-        return min_diff if dist < 25 else min_diff * 25 / dist
+        # Choose the smaller to compute cost
+        ang = min(abs(forward_diff), abs(backward_diff))
+        """ x^2 + (y - 5.5 + 0.5z)^2 = (0.55(z-10))^2  # Cost function based on an oblique cone
+        <=> (x^2 + y^2 -11y)/0.0525 + ((y + 0.55)/0.105)^2 = (z - (y + 0.55)/0.105)^2
+        <=> (r^2 -11y)/0.0525 + ((y + 0.55)/0.105)^2 = (z - (y + 0.55)/0.105)^2
+        <=> (r^2 -11y)/0.0525 + (z_0)^2 = (z - z_0)^2
+        <=> sqrt((r^2 -11y)/0.0525 + (z_0)^2) = |z - z_0|
+        max z=10 when (x, y) = (0, 0.5)
+        """
+        rad_sq = (new_pos.x - pos.x) ** 2 + (new_pos.y - pos.y) ** 2
+        y = np.sqrt(rad_sq) * np.sin(ang)
+        z_0 = (y + 0.55)/0.105
+        lhs = np.sqrt((rad_sq - 11*y)/0.0525 + z_0**2)
+        assert z_0 > 0
+
+        return abs(z_0 - lhs)
 
     # path = planner.find_path(pos, pos3d(next_grid[0]+0.5, next_grid[1]+0.5, 0, pos.yaw), obstacle_list=obstacle_list)
     # if path:

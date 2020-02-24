@@ -48,7 +48,7 @@ class RRT(Planner):
         print("here, start:",start, "end:",end)
         start = to_node(start)
         end = to_node(end)
-        if end.z != 0:
+        if end.z > 0.01 or end.z < -0.01:
             print("z != 0, point not valid for car")
             return None
 
@@ -292,6 +292,7 @@ def gen_final_course(node_list: list, start: Node, end: Node, goal_ind: int) -> 
         node = node_list[goal_ind]
         path.append(Pos(np.array([node.x, node.y, 0])))
         goal_ind = node.parent
+        print(node.parent)
     path.append(Pos(np.array([start.x, start.y, 0])))
     return path
 

@@ -124,7 +124,7 @@ class BaseMutex(Mutex):
         :param req_num: request number
         :return:
         """
-        msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.agent_gvh.pid, time.time())
+        msg = base_mutex_request_create(self.mutex_id, req_num, self.agent_comm_handler.pid, time.time())
         if not self.ip_port_list == []:
             for port in self.ip_port_list:
                 send(msg, AgentConfig.BROADCAST_ADDR, port)
@@ -132,8 +132,8 @@ class BaseMutex(Mutex):
             send(msg, AgentConfig.BROADCAST_ADDR, self.agent_comm_handler.r_port)
 
     def ack_request(self, grantee, reqnum):
-        if self.agent_comm_handler.agent_gvh.is_leader:
-            msg = base_mutex_ack_create(self.agent_comm_handler.agent_gvh.pid, grantee, self.mutex_id, reqnum, time.time())
+        if self.agent_comm_handler.is_leader:
+            msg = base_mutex_ack_create(self.agent_comm_handler.pid, grantee, self.mutex_id, reqnum, time.time())
             if not self.ip_port_list == []:
                 for port in self.ip_port_list:
                     send(msg, AgentConfig.BROADCAST_ADDR, port)
@@ -150,7 +150,7 @@ class BaseMutex(Mutex):
 
             self.__mutex_holder = agent_id
             #self.__mutex_request_list = self.mutex_request_list[1:]
-            msg = base_mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.agent_gvh.pid, mutexnum,
+            msg = base_mutex_grant_create(self.mutex_id, agent_id, self.agent_comm_handler.pid, mutexnum,
                                           time.time())
 
             if not self.ip_port_list == []:
@@ -163,7 +163,7 @@ class BaseMutex(Mutex):
 
     def release_mutex(self):
         #print("releasing mutex",self.agent_comm_handler.agent_gvh.pid)
-        msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.agent_gvh.pid, time.time())
+        msg = mutex_release_create(self.mutex_id, self.agent_comm_handler.pid, time.time())
         if not self.ip_port_list == []:
             for port in self.ip_port_list:
                 send(msg, AgentConfig.BROADCAST_ADDR, port)

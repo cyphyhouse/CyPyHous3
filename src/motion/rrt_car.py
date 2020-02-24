@@ -56,7 +56,7 @@ class RRT(Planner):
         end = to_node(end)
         # print("Start ", start)
         # print("End", end)
-        if end.z != 0:
+        if end.z > 0.01 or end.z < -0.01:
             #print("z != 0, point not valid for car")
             return None
 

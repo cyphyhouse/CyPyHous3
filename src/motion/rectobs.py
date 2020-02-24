@@ -59,21 +59,21 @@ class RectObs(Obstacle):
             u = cross_product((q-p), r)/r_x_s
 
             if t <= 1.0 and t >= 0.0 and u <= 1.0 and u >= 0.0:
-                return True
+                return False
 
 
-        return False
+        return True
 
 def cross_product(v: np.ndarray, w: np.ndarray) -> float:
     return v[0]*w[1] - v[1]*w[0]
 
 
 
-# p1 = Pos(np.array([1.5, 0, 1]))
-# p2 = Pos(np.array([1.1, 1, 1]))
-# path = Seg(p1, p2)
+p1 = Pos(np.array([1.5, 0, 1]))
+p2 = Pos(np.array([1, 1, 1]))
+path = Seg(p1, p2)
 
-# o1 = RectObs(Pos(np.array([0.5, 0.5, 0])), np.array([1, 1, 1]))
+o1 = RectObs(Pos(np.array([0.5, 0.5, 0])), np.array([1, 1, 1]))
 
-# b = o1.collision_check(path)
-# print(b)
+b = o1.collision_check(path)
+print(b)

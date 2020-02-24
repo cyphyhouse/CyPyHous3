@@ -1,11 +1,15 @@
 import rospy
 from std_msgs.msg import String
+from gazebo_msgs.msg import ModelStates
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.harness.agentThread import AgentThread
 from src.motion.deconflict import clear_path
 from src.objects.udt import Task
 from src.motion.pos_types import Pos
+from src.motion.rectobs import RectObs
+
+import numpy as np
 
 
 class TaskApp(AgentThread):
@@ -35,6 +39,8 @@ class TaskApp(AgentThread):
     def __init__(self, agent_config: AgentConfig, moat_config: MoatConfig):
         super(TaskApp, self).__init__(agent_config, moat_config)
         self._pub_marker = rospy.Publisher("gazebo_marker", String, queue_size=10)
+        # NOTE: to enable obstacle detection from position system, comment line below
+        # self._obstacle_listener = rospy.Subscriber("/gazebo/model_states", ModelStates, self.updateObstacles)
         if self.agent_gvh.is_leader:
             self.init_all_task_markers()
 
@@ -63,6 +69,7 @@ class TaskApp(AgentThread):
                 for i in range(len(self.locals['tasks'])):
                     if not self.locals['tasks'][i].assigned:
                         self.locals['my_task'] = self.locals['tasks'][i]
+                        print("Obstacles are: ", self.locals['obstacles'])
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location,
@@ -141,3 +148,14 @@ class TaskApp(AgentThread):
             ])
             rospy.sleep(0.4)
             self._pub_marker.publish(marker_str)
+
+    def updateObstacles(self, data):
+        for name in data.name:
+            if "cube" in name or "box" in name:
+                index = data.name.index(name)
+                obstacle = RectObs(Pos(np.array([data.pose[index].position.x, data.pose[index].position.y, 0])), np.array([1,1,1]))
+                try:
+                    if obstacle not in self.locals['obstacles']:
+                        self.locals['obstacles'].append(obstacle)
+                except KeyError:
+                    pass

@@ -8,7 +8,7 @@ from src.functionality.comm_funcs import send
 from src.harness.comm_handler import CommHandler
 from src.harness.gvh import Gvh
 from src.harness.message_handler import stop_comm_msg_create, round_update_msg_create, stop_msg_create
-from src.motion.moat_withlidar import MoatWithLidar
+from src.motion.pos_types import pos3d
 from src.objects.base_mutex import BaseMutex
 
 
@@ -26,21 +26,24 @@ class AgentThread(ABC, Thread):
         """
         super(AgentThread, self).__init__()
         self.__agent_gvh = Gvh(agent_config, moat_config)
-        self.__agent_comm_handler = CommHandler(agent_config, self.__agent_gvh)
+        self.__agent_comm_handler = CommHandler(agent_config)
         self.__agent_gvh.start_moat()
         self.__agent_gvh.start_mh()
         self.__stop_event = Event()
         self.__mutex_handler = self.__agent_gvh.mutex_handler
+
+        self.log = lambda msg: print(msg, end="")  # TODO logging besides printing
+        self.any = any
+        self.all = all
+        self.pos3d = pos3d
+        self.midpoint = lambda p0, p1: (p0 + p1) / 2
+        self.toList = lambda *args: list(args)
 
         self.requestedlocks = {}
         self.ackedlocks = {}
 
         self.baselocks = {}
         self.locals = {}
-        self.initialize_vars()
-
-        # create init messages, and keep sending until leader acks, then start app thread.
-        # leader only starts once everyone has received an ack.
 
     def create_ar_var(self, name, dtype, initial_value=None):
         self.agent_gvh.create_ar_var(name, dtype, initial_value)
@@ -133,6 +136,7 @@ class AgentThread(ABC, Thread):
         """
         if self.agent_gvh.moat is not None:
             self.agent_gvh.moat.moat_exit_action()
+            self.agent_gvh.moat.join()
             # todo: msg = tERMINATE_MSG() best termination message
             # TODO: send(msg,"",best_post,time.time()) best termination message.
         if self.agent_gvh.mutex_handler is not None:
@@ -140,6 +144,7 @@ class AgentThread(ABC, Thread):
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
             send(stop_comm_msg_create(self.pid(), time.time()), AgentConfig.BROADCAST_ADDR, self.receiver_port())
+            self.msg_handle()  # Let comm_handler try to stop itself first
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
                 self.agent_comm_handler.join()  # Wait until comm_handler finishes
@@ -186,7 +191,7 @@ class AgentThread(ABC, Thread):
     def msg_handle(self):
         time.sleep(0.1)
         self.agent_gvh.flush_msgs()
-        self.agent_comm_handler.handle_msgs()
+        self.agent_comm_handler.handle_msgs(self.agent_gvh)
         time.sleep(0.1)
 
     @abstractmethod
@@ -218,6 +223,22 @@ class AgentThread(ABC, Thread):
             return self.agent_gvh.get(var_name)
         pass
 
+    def read_from_sensor(self, var_name: str):
+        if var_name == 'Motion.position':
+            return self.agent_gvh.moat.position
+        if var_name == 'Motion.reached':
+            return self.agent_gvh.moat.reached
+        else:
+            raise KeyError("Cannot find module sensor '" + var_name + "'")
+
+    def write_to_actuator(self, var_name: str, value) -> None:
+        if var_name == 'Motion.target':
+            self.agent_gvh.moat.goTo(value)
+        if var_name == 'Motion.path':
+            self.agent_gvh.moat.follow_path(value)
+        else:
+            raise KeyError("Cannot find module actuator '" + var_name + "'")
+
     def release_unnecessary_mutexes(self):
         for i in list(self.baselocks.keys()):
             if self.agent_gvh.mutex_handler.has_mutex(self.baselocks[i].mutex_id):
@@ -237,6 +258,8 @@ class AgentThread(ABC, Thread):
         needs to be implemented for any agentThread
         :return:
         """
+        # create init messages, and keep sending until leader acks, then start app thread.
+        # leader only starts once everyone has received an ack.
         from src.harness.message_handler import init_msg_create
         init_msg = init_msg_create(self.pid(), self.agent_gvh.round_num)
         while not self.agent_gvh.init:
@@ -254,30 +277,23 @@ class AgentThread(ABC, Thread):
             self.msg_handle()
             self.release_unnecessary_mutexes()
             if not self.agent_gvh.is_alive:
-                print("stopping app thread on ", self.pid())
+                # print("stopping app thread on ", self.pid())
                 self.stop()
                 continue
-
-            try:
+            # Keep sending round update message until receive confirmation from leader
+            # I.e., msg_handle() will set `agent_gvh.update_round` to True only when confirmed
+            if not self.agent_gvh.update_round:
                 round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num,
-                                                           self.agent_gvh.round_num)
-                while not self.agent_gvh.update_round:
-                    if self.stopped():
-                        break
-
-                    # print("sending init", self.pid())
-                    self.msg_handle()
-                    if len(self.agent_gvh.port_list) is not 0:
-                        for port in self.agent_gvh.port_list:
-                            send(round_update_msg, AgentConfig.BROADCAST_ADDR, port)
-                    else:
-                        send(round_update_msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
-                    time.sleep(0.1)
-
-                if self.stopped():
-                    break
-                # print("executing round", self.agent_gvh.round_num)
-
+                                                           time.time())
+                if len(self.agent_gvh.port_list) is not 0:
+                    for port in self.agent_gvh.port_list:
+                        send(round_update_msg, AgentConfig.BROADCAST_ADDR, port)
+                else:
+                    send(round_update_msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
+                continue
+            # else:
+            # print("Agent", self.pid(), "executing round", self.agent_gvh.round_num)
+            try:
                 self.loop_body()
                 # resetting motion automaton
                 if self.agent_gvh.moat is not None:
