@@ -40,7 +40,7 @@ class TaskApp(AgentThread):
         super(TaskApp, self).__init__(agent_config, moat_config)
         self._pub_marker = rospy.Publisher("gazebo_marker", String, queue_size=10)
         # NOTE: to enable obstacle detection from position system, comment line below
-        # self._obstacle_listener = rospy.Subscriber("/gazebo/model_states", ModelStates, self.updateObstacles)
+        self._obstacle_listener = rospy.Subscriber("/gazebo/model_states", ModelStates, self.updateObstacles)
         if self.agent_gvh.is_leader:
             self.init_all_task_markers()
 

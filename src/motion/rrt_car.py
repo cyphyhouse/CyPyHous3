@@ -17,6 +17,7 @@ import numpy as np
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node, Seg
 
+import pygame
 
 class RRT(Planner):
     """
@@ -24,10 +25,10 @@ class RRT(Planner):
     """
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.5, goal_sample_rate: int = 15,
-                 max_iter: int = 2000):
+                 max_iter: int = 2000, animation=True):
         super(RRT, self).__init__()
         if rand_area is None:
-            rand_area = [-2.5, 2.5, -2.5, 2.5]
+            rand_area = [-10, 10, -10, 10]
         self.min_xrand = rand_area[0]
         self.max_xrand = rand_area[1]
         self.min_yrand = rand_area[2]
@@ -42,6 +43,13 @@ class RRT(Planner):
         self.vel_steps = 3
         self.steer_configs = [0, 0.1, 0.2]
         self.vel_configs = [1, 2, 3]
+
+        self.animation = animation
+        if self.animation:
+            XDIM = 1000
+            YDIM = 1000
+            windowSize = [XDIM, YDIM]
+            self.screen = pygame.display.set_mode(windowSize)
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
@@ -60,6 +68,8 @@ class RRT(Planner):
             #print("z != 0, point not valid for car")
             return None
 
+        self.start = start
+        self.end = end
         self.node_list = [start]
         for i in range(self.max_iter):
             rnd = self.get_random_point(end)
@@ -77,6 +87,11 @@ class RRT(Planner):
                     # for i in range(len(path)):
                     #   print(path[i])
                     return path[::-1] #self.path_smoothing(obstacle_list, path[::-1], 100)
+
+            if self.animation:
+                # self.update_obstacles()
+                self.obstacle_list = obstacle_list
+                self.DrawGraph()
 
         print("Reached max iteration")
         return None
@@ -261,6 +276,34 @@ class RRT(Planner):
                     continue
                 path = path[0:pickPoints[0]+1] + path[pickPoints[1]:]
         return path
+
+    def DrawGraph(self, drawPath=True, separate_tree=None):
+        self.screen.fill((255, 255, 255))
+        for node in self.node_list:
+            if node.parent is not None:
+                # print(node.parent)
+                pygame.draw.line(self.screen, (0, 255, 0), [int((node.parent.x + 10) * 50),
+                                                            int((node.parent.y + 10) * 50)],
+                                 [int((node.x + 10) * 50), int((node.y + 10) * 50)])
+
+        for node in self.node_list:
+            if len(node.children) == 0:
+                pygame.draw.circle(self.screen, (255, 0, 255), [int((node.x + 10) * 50), int((node.y + 10) * 50)], 2)
+
+        for ob in self.obstacle_list:
+            pygame.draw.rect(self.screen, (0, 0, 0),
+                             [((ob.position.x - ob.size[0] / 2 + 10) * 50, (ob.position.y - ob.size[1] / 2 + 10) * 50),
+                              (ob.size[0] * 50, ob.size[1] * 50)])
+
+        if separate_tree:
+            for idx in separate_tree:
+                pygame.draw.circle(self.screen, (255, 204, 0),
+                                   [int((separate_tree[idx].x + 10) * 50), int((separate_tree[idx].y + 10) * 50)], 5)
+
+        pygame.draw.circle(self.screen, (255, 0, 0), [int((self.start.x + 10) * 50), int((self.start.y + 10) * 50)], 10)
+        pygame.draw.circle(self.screen, (0, 0, 255), [int((self.end.x + 10) * 50), int((self.end.y + 10) * 50)], 10)
+
+        pygame.display.update()
 
 #
 # a = RRT()

@@ -28,7 +28,7 @@ class RRT(Planner):
     ARENA_WIDTH = 10
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.25, goal_sample_rate: int = 15,
-                 max_iter: int = 5000, animation=True, getPath=True):
+                 max_iter: int = 1000, animation=True, getPath=True):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-RRT.ARENA_WIDTH, RRT.ARENA_WIDTH]
@@ -43,6 +43,13 @@ class RRT(Planner):
         self.obstacle_list = []
         self.nodeInd = 0
         self.getPath = getPath
+
+        self.d = 0.33
+        self.dt = 0.1
+        self.max_vel = 3
+        self.vel_steps = 3
+        self.steer_configs = [0, 0.1, 0.2]
+        self.vel_configs = [1, 2, 3]
 
         self.animation = animation  
         if self.animation:
@@ -73,6 +80,7 @@ class RRT(Planner):
         
         self.start = start 
         self.end = end
+        self.nodeInd = 0
         self.node_list = {self.nodeInd: self.start}
         self.node_list[self.nodeInd].parent = None
 
@@ -80,10 +88,10 @@ class RRT(Planner):
             self.nodeInd += 1
             rnd = self.get_random_point(end) # with goal bias
             nind = self.get_nearest_list_index(rnd)
-            new_node = self.steer(rnd, nind)
+            new_node = self.steerD(rnd, nind)
             node_path = Seg(self.node_list[nind], new_node)
             if self.__collision_check(node_path):
-                nearinds = self.find_near_nodes(new_node, 3)
+                nearinds = self.find_near_nodes(new_node, 2)
                 new_node = self.choose_parent(new_node, nearinds)
                 self.node_list[self.nodeInd] = new_node
                 self.rewire(self.nodeInd, new_node, nearinds)
@@ -102,20 +110,19 @@ class RRT(Planner):
                         self.node_list[self.node_list[ind].parent].children.discard(ind)
                         self.node_list.pop(ind)
 
-            # generate course
-            if self.getPath and not search_until_max_iter:
-                last_index = self.get_best_last_index()
-                if last_index:
-                    path = self.gen_final_course(last_index)
-                    #path = path[::2]
-                    return path[::-1]
+                # generate course
+                if self.getPath and (self.close_to_goal(new_node) or self.get_best_last_index()):
+                    if self.__collision_check(Seg(new_node, self.end)):
+                        path = self.gen_final_course(self.nodeInd)
+                        #path = path[::2]
+                        return path[::-1]
 
             if self.animation:
-                self.update_obstacles()
+                # self.update_obstacles()
                 self.DrawGraph()
 
         print("Reached max iteration")
-
+        self.node_list.clear()
         last_index = self.get_best_last_index()
         if self.getPath and last_index:
             path = self.gen_final_course(last_index)
@@ -139,9 +146,13 @@ class RRT(Planner):
                         o1 = RectObs(Pos(np.array([(e.pos[0]/50)-10, (e.pos[1]/50)-10, 1])), np.array([0.5, 0.5, 0.5]))
                         self.obstacle_list.append(o1)
                         separate_tree = self.path_validation()
+                        print("got separate tree", separate_tree)
                         self.tree_validation(separate_tree)
+                        print("tree validation complete")
                         self.reconnect(separate_tree)
+                        print("got reconnect")
                         self.regrow()
+                        print("got regrow")
         else:
             print("update obs")
             print(self.obstacle_list != obstacles)
@@ -172,7 +183,7 @@ class RRT(Planner):
             self.nodeInd += 1
             rnd = self.get_random_point(self.end)  # with goal bias
             nind = self.get_nearest_list_index(rnd)
-            new_node = self.steer(rnd, nind)
+            new_node = self.steerD(rnd, nind)
             node_path = Seg(self.node_list[nind], new_node)
             if self.__collision_check(node_path):
                 nearinds = self.find_near_nodes(new_node, 3)
@@ -194,6 +205,12 @@ class RRT(Planner):
                         ind = leaves[random.randint(0, len(leaves) - 1)]
                         self.node_list[self.node_list[ind].parent].children.discard(ind)
                         self.node_list.pop(ind)
+
+                if self.getPath and self.close_to_goal(new_node):
+                    if self.__collision_check(Seg(new_node, self.end)):
+                        path = self.gen_final_course(self.nodeInd)
+                        # path = path[::2]
+                        return path[::-1]
 
             if self.animation:
                 self.update_obstacles()
@@ -309,13 +326,80 @@ class RRT(Planner):
         new_node.parent = nind
         return new_node
 
+    def steerD(self, rnd: list, nind: int) -> Node:
+        """
+        steer vehicle.
+        :param rnd:
+        :param nind:
+        :return:
+        """
+        # expand tree
+        nearest_node = self.node_list[nind]
+
+        nnx = nearest_node.x
+        nny = nearest_node.y
+        nnyaw = nearest_node.yaw
+
+        theta_rnd = math.atan2(rnd[1] - nny, rnd[0] - nnx)
+        theta_diff = nnyaw - theta_rnd
+        if abs(theta_diff) <= math.pi/2:
+            vel = 1
+            if theta_diff <= 0:
+                dir = 1
+            else:
+                dir = -1
+        else:
+            vel = -1
+            if theta_diff <= 0:
+                dir = -1
+            else:
+                dir = 1
+
+        tmp_cost = []
+        tmp_node = []
+
+        for steer in self.steer_configs:
+            for speed in self.vel_configs:
+                cmd_vel = speed*self.dt*vel
+                if steer == 0:
+                    x_next = cmd_vel*math.cos(nnyaw) + nnx
+                    y_next = cmd_vel*math.sin(nnyaw) + nny
+                    yaw_next = nnyaw
+                else:
+                    tan_theta = math.tan(dir*steer)
+                    c = cmd_vel*tan_theta / self.d
+                    x_next = self.d*(math.sin(c + nnyaw) - math.sin(nnyaw))/tan_theta + nnx
+                    y_next = self.d*(math.cos(nnyaw) - math.cos(c + nnyaw))/tan_theta + nny
+                    yaw_next = c + nnyaw
+                    if yaw_next > math.pi:
+                        yaw_next = yaw_next - 2*math.pi
+                    elif yaw_next < -math.pi:
+                        yaw_next = yaw_next + 2*math.pi
+
+                if (abs(x_next) <= self.max_rand) or (abs(y_next) <= self.max_rand):
+                    tmp_cost.append((x_next - rnd[0]) ** 2 + (y_next - rnd[1]) ** 2)
+                    tmp_node.append(Node(x_next, y_next, 0, yaw_next))
+
+        if tmp_cost != []:
+            minind = tmp_cost.index(min(tmp_cost))
+            new_node = tmp_node[minind]
+            new_node.parent = nind
+        else:
+            new_node = None
+        return new_node
+
     def get_random_point(self, node: Pos) -> list:
         """
         function to get a random point near the end
         :param node:
         :return:
         """
-        if random.randint(0, 100) > self.goal_sample_rate:
+
+        node_path = Seg(self.start, self.end)
+        sample_rate = self.goal_sample_rate
+        if self.__collision_check(node_path):
+            sample_rate = 40
+        if random.randint(0, 100) > sample_rate:
             rnd = [random.uniform(self.min_rand, self.max_rand),
                    random.uniform(self.min_rand, self.max_rand), 0]
         else:  # goal point sampling
@@ -332,7 +416,7 @@ class RRT(Planner):
         """
 
         disglist = [(key, self.calc_dist_to_goal(node.x, node.y)) for key, node in self.node_list.items()]
-        goalinds = [key for key, distance in disglist if distance <= self.expand_dis]
+        goalinds = [key for key, distance in disglist if distance <= self.expand_dis*2]
 
         if len(goalinds) == 0:
             return None
@@ -461,6 +545,27 @@ class RRT(Planner):
         """
         return np.linalg.norm([x - self.end.x, y - self.end.y])
 
+    def close_to_goal(self, node: Node) -> bool:
+        dist = math.sqrt((self.end.x - node.x) ** 2 + (self.end.y - node.y) ** 2)
+        if dist <= self.expand_dis:
+            if dist <= 0.2:
+                return True
+
+            end_theta = math.atan2(self.end.y - node.y, self.end.x - node.x)
+            if end_theta < 0:
+                end_theta = end_theta + math.pi
+            tmp_yaw = node.yaw
+            if tmp_yaw < 0:
+                tmp_yaw = tmp_yaw + math.pi
+            theta_diff = tmp_yaw - end_theta
+
+            if abs(theta_diff) <= 0.2:
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def DrawGraph(self, drawPath=True, separate_tree=None):
         self.screen.fill((255, 255, 255))
         for node in self.node_list.values():
@@ -494,15 +599,14 @@ class RRT(Planner):
             
         pygame.display.update()
 
-
 if __name__ == "__main__":
     pygame.init()
     fpsClock = pygame.time.Clock()
     pygame.display.set_caption('Performing RRT')
 
     planner = RRT(animation=True, getPath=False)
-    p1 = Pos(np.array([-5, 0, 0]))
-    p2 = Pos(np.array([5, 5, 0]))
+    p1 = Pos(np.array([random.randint(1, 9), random.randint(1, 9), 0]))
+    p2 = Pos(np.array([random.randint(1, 9), random.randint(1, 9), 0]))
     
     from src.motion.rectobs import RectObs
     o1 = RectObs(Pos(np.array([0, 0, 0])), np.array([1, 10, 1]))

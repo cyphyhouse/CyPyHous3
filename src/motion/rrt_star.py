@@ -17,6 +17,7 @@ import numpy as np
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node, Seg
 
+import pygame
 
 class RRT(Planner):
     """
@@ -26,7 +27,7 @@ class RRT(Planner):
     ARENA_WIDTH = 10
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.25, goal_sample_rate: int = 15,
-                 max_iter: int = 500):
+                 max_iter: int = 500, animation=True):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-RRT.ARENA_WIDTH, RRT.ARENA_WIDTH]
@@ -35,6 +36,13 @@ class RRT(Planner):
         self.expand_dis = expand_dis
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
+
+        self.animation = animation
+        if self.animation:
+            XDIM = 1000
+            YDIM = 1000
+            windowSize = [XDIM, YDIM]
+            self.screen = pygame.display.set_mode(windowSize)
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
                   search_until_max_iter: bool = False) -> \
@@ -48,10 +56,10 @@ class RRT(Planner):
         print("here, start:",start, "end:",end)
         start = to_node(start)
         end = to_node(end)
-        if end.z > 0.01 or end.z < -0.01:
-            print("z != 0, point not valid for car")
-            return None
-
+        if end.z > 0.1 or end.z < -0.1:
+            end.z = 0
+        self.start = start
+        self.end = end
         node_list = [start]
         for i in range(self.max_iter):
             rnd = self.get_random_point(end)
@@ -72,6 +80,12 @@ class RRT(Planner):
                     path = gen_final_course(node_list, start, end, last_index)
                     #path = path[::2]
                     return path[::-1]
+
+            if self.animation:
+                # self.update_obstacles()
+                self.node_list = node_list
+                self.obstacle_list = obstacle_list
+                self.DrawGraph()
 
         print("Reached max iteration")
 
@@ -140,8 +154,8 @@ class RRT(Planner):
         else:
             new_node.x = nearest_node.x + self.expand_dis * math.cos(theta)
             new_node.y = nearest_node.y + self.expand_dis * math.sin(theta)
-        new_node.cost = float("inf")
-        new_node.parent = None
+        new_node.cost = nearest_node.cost + self.expand_dis
+        new_node.parent = nind
         return new_node
 
     def get_random_point(self, end: Pos) -> list:
@@ -243,6 +257,34 @@ class RRT(Planner):
                 print("obstacle might not be correctly formatted")
 
         return True  # safe
+
+    def DrawGraph(self, drawPath=True, separate_tree=None):
+        self.screen.fill((255, 255, 255))
+        for node in self.node_list:
+            if node.parent is not None:
+                # print(node.parent)
+                pygame.draw.line(self.screen, (0, 255, 0), [int((self.node_list[node.parent].x + 10) * 50),
+                                                            int((self.node_list[node.parent].y + 10) * 50)],
+                                 [int((node.x + 10) * 50), int((node.y + 10) * 50)])
+
+        for node in self.node_list:
+            if len(node.children) == 0:
+                pygame.draw.circle(self.screen, (255, 0, 255), [int((node.x + 10) * 50), int((node.y + 10) * 50)], 2)
+
+        for ob in self.obstacle_list:
+            pygame.draw.rect(self.screen, (0, 0, 0),
+                             [((ob.position.x - ob.size[0] / 2 + 10) * 50, (ob.position.y - ob.size[1] / 2 + 10) * 50),
+                              (ob.size[0] * 50, ob.size[1] * 50)])
+
+        if separate_tree:
+            for idx in separate_tree:
+                pygame.draw.circle(self.screen, (255, 204, 0),
+                                   [int((separate_tree[idx].x + 10) * 50), int((separate_tree[idx].y + 10) * 50)], 5)
+
+        pygame.draw.circle(self.screen, (255, 0, 0), [int((self.start.x + 10) * 50), int((self.start.y + 10) * 50)], 10)
+        pygame.draw.circle(self.screen, (0, 0, 255), [int((self.end.x + 10) * 50), int((self.end.y + 10) * 50)], 10)
+
+        pygame.display.update()
 
 
 def get_nearest_list_index(node_list: list, rnd: list) -> int:
