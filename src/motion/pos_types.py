@@ -102,7 +102,8 @@ class Pos(object):
         :param other: other vector
         :return: true or false based on whether the other position is the same
         """
-        return self.x == other.x and self.y == other.y and self.z == other.z
+        # return self.x == other.x and self.y == other.y and self.z == other.z
+        return abs(self.x-other.x) <= 0.01 and abs(self.y-other.y) <= 0.01 and abs(self.z-other.z) <= 0.01
 
     def to_pose(self):
         """
@@ -120,6 +121,12 @@ class Pos(object):
 
     def to_obs(self, size, z):
         return RoundObs(self.x, self.y, size, z)
+
+    def to_list(self):
+        """
+        :return:
+        """
+        return [self.x, self.y, self.z]
 
 
 class Seg(object):

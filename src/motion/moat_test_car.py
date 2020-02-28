@@ -3,11 +3,16 @@ import numpy as np
 from src.motion.motionautomaton import MotionAutomaton
 from src.motion.pos_types import Pos
 
+import rospy
+from std_msgs.msg import String
+
 
 class MoatTestCar(MotionAutomaton):
-
     def __init__(self, config):
         super(MoatTestCar, self).__init__(config)
+
+        print(config.rospy_node)
+        self.pub_stop = rospy.Publisher(config.rospy_node+'/stopMotion', String, queue_size=10)
 
     def _getPositioning(self, data) -> None:
         quat = data.pose.orientation
@@ -35,7 +40,7 @@ class MoatTestCar(MotionAutomaton):
         else:
             frame_id = '1'
 
-        import rospy
+        # import rospy
         from geometry_msgs.msg import PoseStamped
 
         pose = PoseStamped()
@@ -47,13 +52,17 @@ class MoatTestCar(MotionAutomaton):
         self.waypoint_count += 1
         self.pub.publish(pose)
 
+    def stop(self) -> None:
+        print("STOP")
+        self.pub_stop.publish('stop')
+
     def follow_path(self, path: list) -> None:
-        import rospy
+        # import rospy
         for wp in path[:-1]:
             self.goTo(wp, 0)
             rospy.sleep(0.1)
         self.goTo(path[-1], 1)
 
     def run(self):
-        import rospy
+        # import rospy
         rospy.spin()

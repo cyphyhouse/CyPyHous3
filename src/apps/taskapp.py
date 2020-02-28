@@ -52,7 +52,7 @@ class TaskApp(AgentThread):
         self.locals['test_route'] = None
         self.locals['doing'] = False
         self.locals['tasks'] = []
-        self.locals['obstacles'] = []
+        self.locals['obstacles'] = {}
 
     def loop_body(self):
         if not self.locals['doing']:
@@ -73,7 +73,7 @@ class TaskApp(AgentThread):
                         self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location,
-                                                                                          self.locals['obstacles'])
+                                                                                          self.locals['obstacles'].values())
                         if clear_path([path for path in
                                        [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
                                       self.locals['test_route'], self.pid(), tolerance=1.0):
@@ -155,7 +155,6 @@ class TaskApp(AgentThread):
                 index = data.name.index(name)
                 obstacle = RectObs(Pos(np.array([data.pose[index].position.x, data.pose[index].position.y, 0])), np.array([1,1,1]))
                 try:
-                    if obstacle not in self.locals['obstacles']:
-                        self.locals['obstacles'].append(obstacle)
+                    self.locals['obstacles'][name] = obstacle
                 except KeyError:
                     pass
