@@ -28,7 +28,7 @@ class RRT(Planner):
     ARENA_WIDTH = 10
 
     def __init__(self, rand_area: list = None, expand_dis: float = 0.25, goal_sample_rate: int = 15,
-                 max_iter: int = 1000, animation=True, getPath=True):
+                 max_iter: int = 2000, animation=True, getPath=True):
         super(RRT, self).__init__()
         if rand_area is None:
             rand_area = [-RRT.ARENA_WIDTH, RRT.ARENA_WIDTH]
@@ -131,7 +131,7 @@ class RRT(Planner):
 
         return None
 
-    def update_obstacles(self, obstacles=None):
+    def update_obstacles(self, obstacles=None, position=None):
         """
         this function adds obstacle to the obstacles in 2 ways
         if input param is None, then use pygame to catch mouse input to add obstacle
@@ -154,14 +154,45 @@ class RRT(Planner):
                         self.regrow()
                         print("got regrow")
         else:
-            print("update obs")
-            print(self.obstacle_list != obstacles)
+            print("planner receives the update obs signal")
+            # print(self.obstacle_list != obstacles)
             if self.obstacle_list != obstacles:
-                self.obstacle_list = copy.deepcopy(obstacles)
+                # self.obstacle_list = copy.deepcopy(obstacles)
+                self.obstacle_list = obstacles
                 separate_tree = self.path_validation()
+                print("create separate tree: ", separate_tree)
+                if not separate_tree:
+                    print("path not blocked")
+                    last_index = self.get_best_last_index()
+                    if self.getPath and last_index:
+                        path = self.gen_final_course(last_index)
+                        # path = path[::2]
+                        # for node in path:
+                        #     if (node-position).magnitude() < mindist:
+                        minind = np.argmin([(node-position).magnitude() for node in path])
+                        path = path[:minind]
+                        return path[::-1]
+                print("prune the tree")
                 self.tree_validation(separate_tree)
-                self.reconnect(separate_tree)
-                self.regrow()
+                print("try reconnect")
+                reconnect_node = self.reconnect(separate_tree)
+                if reconnect_node:
+                    print("reconnect succeeds")
+                    last_index = self.get_best_last_index()
+                    if self.getPath and last_index:
+                        path = self.gen_final_course(last_index)
+                        # path = path[::2]
+                        # for node in path:
+                        #     if (node-position).magnitude() < mindist:
+                        minind = np.argmin([(node - self.node_list[reconnect_node]).magnitude() for node in path])
+                        path = path[:minind]
+                        return path[::-1]
+                else:
+                    print("reconnect failed, regrow")
+                    path = self.regrow()
+                    minind = np.argmin([(node - position).magnitude() for node in path])
+                    path = path[:minind]
+                    return path[::-1]
 
     def reconnect(self, separate_tree):
         """
@@ -176,11 +207,13 @@ class RRT(Planner):
                 nodePath = Seg(node, self.node_list[nodeInd])
                 if self.__collision_check(nodePath):
                     node.parent = nodeInd
-                    return
+                    return nodeInd
+        return None
 
     def regrow(self):
         while self.nodeInd < self.max_iter:
             self.nodeInd += 1
+            print('in regrow', self.nodeInd)
             rnd = self.get_random_point(self.end)  # with goal bias
             nind = self.get_nearest_list_index(rnd)
             new_node = self.steerD(rnd, nind)
@@ -188,6 +221,7 @@ class RRT(Planner):
             if self.__collision_check(node_path):
                 nearinds = self.find_near_nodes(new_node, 3)
                 new_node = self.choose_parent(new_node, nearinds)
+                print(new_node)
                 self.node_list[self.nodeInd] = new_node
                 self.rewire(self.nodeInd, new_node, nearinds)
                 self.node_list[new_node.parent].children.add(self.nodeInd)
@@ -215,6 +249,14 @@ class RRT(Planner):
             if self.animation:
                 self.update_obstacles()
                 self.DrawGraph()
+
+        print("Reached max iteration")
+        self.node_list.clear()
+        last_index = self.get_best_last_index()
+        if self.getPath and last_index:
+            path = self.gen_final_course(last_index)
+            # path = path[::2]
+            return path[::-1]
 
     def path_validation(self):
         """
@@ -398,7 +440,7 @@ class RRT(Planner):
         node_path = Seg(self.start, self.end)
         sample_rate = self.goal_sample_rate
         if self.__collision_check(node_path):
-            sample_rate = 40
+            sample_rate = 60
         if random.randint(0, 100) > sample_rate:
             rnd = [random.uniform(self.min_rand, self.max_rand),
                    random.uniform(self.min_rand, self.max_rand), 0]

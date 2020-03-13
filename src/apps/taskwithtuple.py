@@ -82,6 +82,18 @@ class TaskApp(AgentThread):
             if self.locals['obstaclesUpdated']:
                 self.agent_gvh.moat.stop()
                 self.locals['obstaclesUpdated'] = False
+                self.locals['test_route'] = self.agent_gvh.moat.planner.update_obstacles(self.locals['obstacles'].values(), self.agent_gvh.moat.position)
+                if clear_path([[pos3d(*i) for i in path] for path in
+                               [self.read_from_shared('route', pid) for pid in range(self.num_agents())]],
+                              self.locals['test_route'], self.pid(), tolerance=1.00):
+                    print("continue going to task")
+                    self.locals['doing'] = True
+                    self.sharePath()
+                else:
+                    self.agent_gvh.put('route', [self.agent_gvh.moat.position.to_list()],
+                                       self.pid())
+                    self.locals['my_task'] = None
+                    self.locals['doing'] = False
             if self.agent_gvh.moat.reached:
                 if self.locals['my_task'] is not None:
                     self.locals['my_task'] = None
@@ -97,13 +109,17 @@ class TaskApp(AgentThread):
         for name in data.name:
             if "cube" in name or "box" in name:
                 index = data.name.index(name)
+
                 obstacle = RectObs(Pos(np.array([data.pose[index].position.x, data.pose[index].position.y, 0])), np.array([1,1,1]))
                 try:
                     if name not in self.locals['obstacles']:
                         self.locals['obstacles'][name] = obstacle
                     if obstacle not in self.locals['obstacles'].values():
-                        print(name, "obstacle has changed to ", obstacle.position)
+                        # print(name, "obstacle has changed to ", obstacle.position)
+                        # moved_dist = (obstacle.position-self.locals['obstacles'][name].position).magnitude()
+                        # print(moved_dist)
                         self.locals['obstaclesUpdated'] = True
                         self.locals['obstacles'][name] = obstacle
                 except KeyError:
                     pass
+
