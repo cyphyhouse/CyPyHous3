@@ -48,8 +48,10 @@ class RRT(Planner):
         self.dt = 0.1
         self.max_vel = 3
         self.vel_steps = 3
-        self.steer_configs = [0, 0.1, 0.2]
+        self.steer_configs = [0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35]
         self.vel_configs = [1, 2, 3]
+        self.steer_configs.reverse()
+        self.vel_configs.reverse()
 
         self.animation = animation  
         if self.animation:
@@ -89,11 +91,15 @@ class RRT(Planner):
             rnd = self.get_random_point(end) # with goal bias
             nind = self.get_nearest_list_index(rnd)
             new_node = self.steerD(rnd, nind)
+            if new_node.x > RRT.ARENA_WIDTH or new_node.x < -RRT.ARENA_WIDTH or new_node.y > RRT.ARENA_WIDTH or new_node.y < -RRT.ARENA_WIDTH:
+                    continue
             node_path = Seg(self.node_list[nind], new_node)
             if self.__collision_check(node_path):
-                nearinds = self.find_near_nodes(new_node, 2)
+                nearinds = self.find_near_nodes(new_node, 5)
                 new_node = self.choose_parent(new_node, nearinds)
                 self.node_list[self.nodeInd] = new_node
+                if new_node.x > RRT.ARENA_WIDTH or new_node.x < -RRT.ARENA_WIDTH or new_node.y > RRT.ARENA_WIDTH or new_node.y < -RRT.ARENA_WIDTH:
+                    continue
                 self.rewire(self.nodeInd, new_node, nearinds)
                 self.node_list[new_node.parent].children.add(self.nodeInd)
 
@@ -122,7 +128,7 @@ class RRT(Planner):
                 self.DrawGraph()
 
         print("Reached max iteration")
-        self.node_list.clear()
+        # self.node_list.clear()
         last_index = self.get_best_last_index()
         if self.getPath and last_index:
             path = self.gen_final_course(last_index)
@@ -131,7 +137,7 @@ class RRT(Planner):
 
         return None
 
-    def update_obstacles(self, obstacles=None, position=None):
+    def update_obstacles(self, obstacles=None, position=None, tooClose=True):
         """
         this function adds obstacle to the obstacles in 2 ways
         if input param is None, then use pygame to catch mouse input to add obstacle
@@ -155,10 +161,14 @@ class RRT(Planner):
                         print("got regrow")
         else:
             print("planner receives the update obs signal")
-            # print(self.obstacle_list != obstacles)
+
             if self.obstacle_list != obstacles:
-                # self.obstacle_list = copy.deepcopy(obstacles)
                 self.obstacle_list = obstacles
+                if self.animation:
+                    self.DrawGraph()
+                
+                if not tooClose:
+                    return None
                 separate_tree = self.path_validation()
                 print("create separate tree: ", separate_tree)
                 if not separate_tree:
@@ -166,33 +176,19 @@ class RRT(Planner):
                     last_index = self.get_best_last_index()
                     if self.getPath and last_index:
                         path = self.gen_final_course(last_index)
-                        # path = path[::2]
-                        # for node in path:
-                        #     if (node-position).magnitude() < mindist:
+
                         minind = np.argmin([(node-position).magnitude() for node in path])
                         path = path[:minind]
                         return path[::-1]
                 print("prune the tree")
                 self.tree_validation(separate_tree)
-                print("try reconnect")
-                reconnect_node = self.reconnect(separate_tree)
-                if reconnect_node:
-                    print("reconnect succeeds")
-                    last_index = self.get_best_last_index()
-                    if self.getPath and last_index:
-                        path = self.gen_final_course(last_index)
-                        # path = path[::2]
-                        # for node in path:
-                        #     if (node-position).magnitude() < mindist:
-                        minind = np.argmin([(node - self.node_list[reconnect_node]).magnitude() for node in path])
-                        path = path[:minind]
-                        return path[::-1]
-                else:
-                    print("reconnect failed, regrow")
-                    path = self.regrow()
-                    minind = np.argmin([(node - position).magnitude() for node in path])
-                    path = path[:minind]
-                    return path[::-1]
+                print("regrow")
+                path = self.regrow()
+                if not path:
+                    return None
+                minind = np.argmin([(node - position).magnitude() for node in path])
+                path = path[:minind]
+                return path[::-1]
 
     def reconnect(self, separate_tree):
         """
@@ -202,7 +198,7 @@ class RRT(Planner):
         """
         for node in separate_tree.values():
             for nodeInd in self.node_list:
-                if np.linalg.norm([node.x - self.node_list[nodeInd].x, node.y - self.node_list[nodeInd].y]) > 0.5:
+                if np.linalg.norm([node.x - self.node_list[nodeInd].x, node.y - self.node_list[nodeInd].y]) > 0.1:
                     continue
                 nodePath = Seg(node, self.node_list[nodeInd])
                 if self.__collision_check(nodePath):
@@ -217,11 +213,14 @@ class RRT(Planner):
             rnd = self.get_random_point(self.end)  # with goal bias
             nind = self.get_nearest_list_index(rnd)
             new_node = self.steerD(rnd, nind)
+            if new_node.x > RRT.ARENA_WIDTH or new_node.x < -RRT.ARENA_WIDTH or new_node.y > RRT.ARENA_WIDTH or new_node.y < -RRT.ARENA_WIDTH:
+                    continue
             node_path = Seg(self.node_list[nind], new_node)
             if self.__collision_check(node_path):
-                nearinds = self.find_near_nodes(new_node, 3)
+                nearinds = self.find_near_nodes(new_node, 5)
                 new_node = self.choose_parent(new_node, nearinds)
-                print(new_node)
+                if new_node.x > RRT.ARENA_WIDTH or new_node.x < -RRT.ARENA_WIDTH or new_node.y > RRT.ARENA_WIDTH or new_node.y < -RRT.ARENA_WIDTH:
+                    continue
                 self.node_list[self.nodeInd] = new_node
                 self.rewire(self.nodeInd, new_node, nearinds)
                 self.node_list[new_node.parent].children.add(self.nodeInd)
@@ -240,22 +239,25 @@ class RRT(Planner):
                         self.node_list[self.node_list[ind].parent].children.discard(ind)
                         self.node_list.pop(ind)
 
-                if self.getPath and self.close_to_goal(new_node):
-                    if self.__collision_check(Seg(new_node, self.end)):
-                        path = self.gen_final_course(self.nodeInd)
-                        # path = path[::2]
-                        return path[::-1]
+                last_index = self.get_best_last_index()
+                print(last_index)
+                if self.getPath and last_index:
+                    path = self.gen_final_course(last_index)
+                    # path = path[::2]
+                    return path
 
             if self.animation:
-                self.update_obstacles()
+                # self.update_obstacles()
                 self.DrawGraph()
 
         print("Reached max iteration")
-        self.node_list.clear()
+        # self.node_list.clear()
         last_index = self.get_best_last_index()
+        print(last_index)
         if self.getPath and last_index:
             path = self.gen_final_course(last_index)
             # path = path[::2]
+            print(path)
             return path[::-1]
 
     def path_validation(self):
@@ -293,7 +295,10 @@ class RRT(Planner):
                 continue
             if nodeInd == 0:
                 continue
-            nodePath = Seg(self.node_list[nodeInd], self.node_list[self.node_list[nodeInd].parent])
+            try: 
+                nodePath = Seg(self.node_list[nodeInd], self.node_list[self.node_list[nodeInd].parent])
+            except KeyError:
+                continue
             if not self.__collision_check(nodePath):
                 self.node_list[self.node_list[nodeInd].parent].children.discard(nodeInd)
                 self.remove_branch(nodeInd)
@@ -613,22 +618,22 @@ class RRT(Planner):
         for node in self.node_list.values():
             if node.parent is not None:
                 # print(node.parent)
-                pygame.draw.line(self.screen, (0,255,0), [int((self.node_list[node.parent].x+10)*50), int((self.node_list[node.parent].y+10)*50)], [int((node.x+10)*50), int((node.y+10)*50)])
+                pygame.draw.line(self.screen, (0,255,0), [int((self.node_list[node.parent].y+10)*50), int((self.node_list[node.parent].x+10)*50)], [int((node.y+10)*50), int((node.x+10)*50)])
         
         for node in self.node_list.values():
             if len(node.children) == 0:
-                pygame.draw.circle(self.screen, (255, 0, 255), [int((node.x+10)*50), int((node.y+10)*50)], 2)
+                pygame.draw.circle(self.screen, (255, 0, 255), [int((node.y+10)*50), int((node.x+10)*50)], 2)
 
         for ob in self.obstacle_list:
-            pygame.draw.rect(self.screen,(0,0,0), [((ob.position.x-ob.size[0]/2+10)*50, (ob.position.y-ob.size[1]/2+10)*50),(ob.size[0]*50, ob.size[1]*50)])
+            pygame.draw.rect(self.screen,(0,0,0), [((ob.position.y-ob.size[0]/2+10)*50, (ob.position.x-ob.size[1]/2+10)*50),(ob.size[0]*50, ob.size[1]*50)])
 
         if separate_tree:
             for idx in separate_tree:
                 pygame.draw.circle(self.screen, (255, 204, 0),
-                                   [int((separate_tree[idx].x + 10) * 50), int((separate_tree[idx].y + 10) * 50)], 5)
+                                   [int((separate_tree[idx].y + 10) * 50), int((separate_tree[idx].x + 10) * 50)], 5)
 
-        pygame.draw.circle(self.screen, (255,0,0), [int((self.start.x+10)*50), int((self.start.y+10)*50)], 10)
-        pygame.draw.circle(self.screen, (0,0,255), [int((self.end.x+10)*50), int((self.end.y+10)*50)], 10)
+        pygame.draw.circle(self.screen, (255,0,0), [int((self.start.y+10)*50), int((self.start.x+10)*50)], 10)
+        pygame.draw.circle(self.screen, (0,0,255), [int((self.end.y+10)*50), int((self.end.x+10)*50)], 10)
 
         if drawPath:
             lastIndex = self.get_best_last_index()
@@ -636,7 +641,7 @@ class RRT(Planner):
                 path = self.gen_final_course(lastIndex)
                 ind = len(path)
                 while ind > 1:
-                    pygame.draw.line(self.screen, (255, 0, 0), [int((path[ind-2].x+10)*50), int((path[ind-2].y+10)*50)], [int((path[ind-1].x+10)*50),int((path[ind-1].y+10)*50)])
+                    pygame.draw.line(self.screen, (255, 0, 0), [int((path[ind-2].y+10)*50), int((path[ind-2].x+10)*50)], [int((path[ind-1].y+10)*50),int((path[ind-1].x+10)*50)])
                     ind-=1
             
         pygame.display.update()

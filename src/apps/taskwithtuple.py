@@ -20,12 +20,12 @@ class TaskApp(AgentThread):
 
     def initialize_vars(self):
         self.initialize_lock('pick_route')
-        self.agent_gvh.create_aw_var('tasks', list, [0 for i in get_tasks(taskfile='/home/mjiang24/Documents/CyPyHous3/src/apps/tasks.txt')])
+        self.agent_gvh.create_aw_var('tasks', list, [0 for i in get_tasks(taskfile='/home/cym/Documents/CyPyHous3/src/apps/tasks.txt')])
         self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position.to_list()])
 
         self.locals['my_task'] = None
         self.locals['doing'] = False
-        self.locals['tasklist'] = get_tasks(taskfile='/home/mjiang24/Documents/CyPyHous3/src/apps/tasks.txt')
+        self.locals['tasklist'] = get_tasks(taskfile='/home/cym/Documents/CyPyHous3/src/apps/tasks.txt')
         self.locals['obstacles'] = {}
         self.locals['obstaclesUpdated'] = False
 
