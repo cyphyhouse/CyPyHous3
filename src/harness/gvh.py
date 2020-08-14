@@ -2,7 +2,6 @@ import time
 from typing import Union
 
 from src.config.configs import AgentConfig, MoatConfig
-from src.functionality.base_mutex_handler import BaseMutexHandler
 from src.functionality.comm_funcs import send
 from src.functionality.synchronizer import Synchronizer
 from src.objects.dsm import DSM
@@ -55,7 +54,7 @@ class Gvh(object):
         self.ack_nums = {}
         self.init = False
         self.init_counter = []
-        if self.is_leader:
+        if self.__is_leader:
             self.init_counter.append(a.pid)
         self.start_time = 0.0
         self.round_num = 0
@@ -74,15 +73,6 @@ class Gvh(object):
         """
         return self.__rport
 
-    @rport.setter
-    def rport(self, rport):
-        """
-        setter method for rport.
-        :param rport:
-        :return:
-        """
-        self.__rport = rport
-
     def start_moat(self):
         if self.moat is not None:
             self.moat.start()
@@ -99,15 +89,6 @@ class Gvh(object):
         """
         return self.__moat
 
-    @moat.setter
-    def moat(self, moat):  # -> NoReturn:
-        """
-        setter method for moAT
-        :param moat: motionautomaton
-        :return:
-        """
-        self.__moat = moat
-
     @property
     def dsm(self) -> list:
         """
@@ -115,15 +96,6 @@ class Gvh(object):
         :return:
         """
         return self.__dsm
-
-    @dsm.setter
-    def dsm(self, dsm: list) -> None:
-        """
-        setter method for dsm of the current gvh .
-        :param dsm:
-        :return:
-        """
-        self.__dsm = dsm
 
     def create_aw_var(self, varname: str, dtype: type, value: Union[int, bool, float, list, object, tuple]) -> None:
         """
@@ -209,15 +181,6 @@ class Gvh(object):
         """
         return self.__port_list
 
-    @port_list.setter
-    def port_list(self, port_list: list):
-        """
-        set the port list of the same machine.
-        :param port_list:
-        :return:
-        """
-        self.__port_list = port_list
-
     def grant_available_mutexes(self):
         """
         method to grant available mutexes by the leader.
@@ -236,15 +199,6 @@ class Gvh(object):
         """
         return self.__mutex_handler
 
-    @mutex_handler.setter
-    def mutex_handler(self, mutex_handler: BaseMutexHandler):
-        """
-        setter method for mutex handler
-        :param mutex_handler:
-        :return:
-        """
-        self.__mutex_handler = mutex_handler
-
     @property
     def is_leader(self) -> bool:
         """
@@ -252,15 +206,6 @@ class Gvh(object):
         :return:
         """
         return self.__is_leader
-
-    @is_leader.setter
-    def is_leader(self, leader: bool) -> None:
-        """
-        setter method for leader
-        :param leader:
-        :return:
-        """
-        self.__is_leader = leader
 
     @property
     def is_alive(self) -> bool:
@@ -279,30 +224,13 @@ class Gvh(object):
         """
         self.__is_alive = liveness
 
-    @property
-    def recv_msg_list(self) -> list:
-        """
-        might get rid of this, tracks received messages.
-        :return:
-        """
-        return self.__recv_msg_list
-
-    @recv_msg_list.setter
-    def recv_msg_list(self, recv_msg_list) -> None:
-        """
-        sets received message list
-        :param recv_msg_list:
-        :return:
-        """
-        self.__recv_msg_list = recv_msg_list
-
     def add_recv_msg(self, msg):
         """
         add received message to list of recvd messages.
         :param msg:
         :return:
         """
-        self.recv_msg_list.append(msg)
+        self.__recv_msg_list.append(msg)
 
     @property
     def msg_list(self) -> list:
@@ -312,15 +240,6 @@ class Gvh(object):
         """
         return self.__msg_list
 
-    @msg_list.setter
-    def msg_list(self, msg_list: list) -> None:
-        """
-
-        :param msg_list:
-        :return:
-        """
-        self.__msg_list = msg_list
-
     @property
     def synchronizer(self) -> Synchronizer:
         """
@@ -328,15 +247,6 @@ class Gvh(object):
         :return: synchronizer object of the current agent
         """
         return self.__synchronizer
-
-    @synchronizer.setter
-    def synchronizer(self, synchronizer: Synchronizer) -> None:
-        """
-        setter method for agent synchronizer object
-        :param synchronizer: synchronizer object to be set
-        :return: None
-        """
-        self.__synchronizer = synchronizer
 
     @property
     def pid(self) -> int:
@@ -346,15 +256,6 @@ class Gvh(object):
         """
         return self.__pid
 
-    @pid.setter
-    def pid(self, pid: int) -> None:
-        """
-        setter method for agent pid
-        :param pid: integer pid to be set
-        :return: None
-        """
-        self.__pid = pid
-
     @property
     def participants(self):
         """
@@ -363,22 +264,13 @@ class Gvh(object):
         """
         return self.__participants
 
-    @participants.setter
-    def participants(self, participants: int) -> None:
-        """
-        setter method for number of participants
-        :param participants: number of participants to be set
-        :return: nothing
-        """
-        self.__participants = participants
-
     def add_msg(self, msg: Message) -> None:
         """
         add message to list
         :param msg:
         :return:
         """
-        self.msg_list.append(msg)
+        self.__msg_list.append(msg)
 
     def flush_msgs(self) -> None:
         """
@@ -392,7 +284,7 @@ class Gvh(object):
                     send(msg, AgentConfig.BROADCAST_ADDR, port)
             else:
                 send(msg, AgentConfig.BROADCAST_ADDR, self.__rport)
-        self.msg_list = []
+        self.__msg_list = []
 
 
 def dsm_update_create(pid: int, dsmvar_updated, owner, ts):
