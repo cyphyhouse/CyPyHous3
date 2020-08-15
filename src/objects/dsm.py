@@ -48,17 +48,9 @@ class DSM(object):
     def name(self):
         return self.__name
 
-    @name.setter
-    def name(self, name):
-        self.__name = name
-
     @property
     def dtype(self):
         return self.__dtype
-
-    @dtype.setter
-    def dtype(self, dtype):
-        self.__dtype = dtype
 
     @property
     def value(self):
@@ -80,12 +72,8 @@ class DSM(object):
         if self.owner is not 0:
             self.__value[pid] = value
         else:
-            self.value = value
+            self.__value = value
 
     @property
     def owner(self):
         return self.__owner
-
-    @owner.setter
-    def owner(self, owner):
-        self.__owner = owner
