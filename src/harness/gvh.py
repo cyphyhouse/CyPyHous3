@@ -1,8 +1,12 @@
+import time
 from typing import Union
 
-from src.config.configs import AgentConfig, MoatConfig
+from src.config.configs import AgentConfig
 from src.functionality.comm_funcs import send
 from src.functionality.synchronizer import Synchronizer
+from src.harness.comm_handler import CommHandler
+from src.harness.message_handler import stop_msg_confirm_create, init_msg_confirm_create, dsm_update_create, \
+    round_update_msg_confirm_create
 from src.objects.dsm import DSM
 from src.objects.message import Message
 
@@ -37,6 +41,7 @@ class Gvh(object):
         self.__rport = a.rport
         self.__is_leader = a.is_leader
         self.__is_alive = True
+        self.__comm_handler = CommHandler(a)
         self.__dsm = []
         self.__synchronizer = None
         self.__mutex_handler = a.mutex_handler
@@ -66,6 +71,14 @@ class Gvh(object):
     def start_mh(self):
         if self.mutex_handler is not None:
             self.mutex_handler.start()
+
+    @property
+    def comm_handler(self) -> CommHandler:
+        """
+        getter method for the communication handler
+        :return:
+        """
+        return self.__comm_handler
 
     @property
     def dsm(self) -> list:
@@ -202,14 +215,6 @@ class Gvh(object):
         """
         self.__is_alive = liveness
 
-    def add_recv_msg(self, msg):
-        """
-        add received message to list of recvd messages.
-        :param msg:
-        :return:
-        """
-        self.__recv_msg_list.append(msg)
-
     @property
     def msg_list(self) -> list:
         """
@@ -252,11 +257,10 @@ class Gvh(object):
 
     def flush_msgs(self) -> None:
         """
-
-        :param msg_list:
-        :return:
+        Send all messages to be sent; then process all received messages in queue
         """
-        for msg in self.msg_list:
+        # Send messages
+        for msg in self.__msg_list:
             if not self.__port_list == []:
                 for port in self.__port_list:
                     send(msg, AgentConfig.BROADCAST_ADDR, port)
@@ -264,15 +268,227 @@ class Gvh(object):
                 send(msg, AgentConfig.BROADCAST_ADDR, self.__rport)
         self.__msg_list = []
 
+        # Process received messages
+        curr_size = self.__comm_handler.recv_msg_queue.qsize()
+        # Since only AgentThread is calling this function, other threads will only increase qsize
+        for _ in range(0, curr_size):
+            received_msg = self.__comm_handler.recv_msg_queue.get()
+            if received_msg.message_type == 5 and received_msg.sender == self.__comm_handler.pid:
+                print("stopping comm_handler on agent", self.__comm_handler.pid)
+                self.__comm_handler.stop()
+            if received_msg.message_type in message_handler:
+                message_handler[received_msg.message_type](received_msg, self)
+            else:
+                print("Warning: unexpected message type id", received_msg.message_type)
 
-def dsm_update_create(pid: int, dsmvar_updated, owner, ts):
+
+def round_update_msg_handle(msg: Message, agent_gvh: Gvh):
+    rounding,round_num = msg.sender,msg.content
+    if agent_gvh.is_leader:
+        if rounding in agent_gvh.round_counter:
+            pass
+        else:
+            #print(rounding, agent_gvh.round_counter)
+            agent_gvh.round_counter.append(rounding)
+        leaderid = -1
+        if agent_gvh.is_leader:
+            leaderid = agent_gvh.pid
+
+        msg_contents = (leaderid, agent_gvh.round_num)
+        msg1 = round_update_msg_confirm_create(agent_gvh.pid, msg_contents, agent_gvh.round_num)
+        if len(agent_gvh.round_counter) == agent_gvh.participants:
+            #print("sending message to update round", agent_gvh.round_num)
+            if len(agent_gvh.port_list) is not 0:
+                for port in agent_gvh.port_list:
+
+                    send(msg1, AgentConfig.BROADCAST_ADDR, port,2)
+            else:
+                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport,2)
+
+
+def round_update_msg_confirm_handle(msg: Message, agent_gvh: Gvh):
+    leaderid , roundnum = int(msg.content[0]), int(msg.content[1])
+    #print("got message to update round", roundnum)
+    if roundnum < agent_gvh.round_num:
+        pass
+    elif msg.sender == leaderid:
+        agent_gvh.update_round = True
+        agent_gvh.round_num = roundnum+1
+        agent_gvh.start_time = time.time()
+        agent_gvh.round_counter = []
+
+
+def stop_msg_handle(msg: Message, agent_gvh: Gvh):
+    stopping = msg.sender
+    if agent_gvh.is_leader:
+
+        if stopping in agent_gvh.stop_counter :
+            pass
+        else:
+            agent_gvh.stop_counter.append(stopping)
+        leaderid = -1
+        if agent_gvh.is_leader:
+            leaderid = agent_gvh.pid
+
+        msg1 = stop_msg_confirm_create(agent_gvh.pid, leaderid, agent_gvh.round_num)
+        if len(agent_gvh.stop_counter) == agent_gvh.participants:
+
+            if len(agent_gvh.port_list) is not 0:
+                for port in agent_gvh.port_list:
+                    send(msg1, AgentConfig.BROADCAST_ADDR, port)
+            else:
+                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport)
+
+
+def stop_msg_confirm_handle(msg: Message, agent_gvh: Gvh):
+    leaderid = int(msg.content)
+    if int(msg.sender) == leaderid:
+        agent_gvh.is_alive = False
+
+
+def init_msg_handle(msg: Message, agent_gvh: Gvh):
+    initing = msg.sender
+    if agent_gvh.is_leader:
+        if initing in agent_gvh.init_counter:
+            pass
+        else:
+            agent_gvh.init_counter.append(initing)
+        leaderid = -1
+        if agent_gvh.is_leader:
+            leaderid = agent_gvh.pid
+        msg1 = init_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
+        if len(agent_gvh.init_counter) == agent_gvh.participants:
+            if len(agent_gvh.port_list) is not 0:
+                for port in agent_gvh.port_list:
+                    send(msg1, AgentConfig.BROADCAST_ADDR, port)
+            else:
+                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport)
+
+
+def init_msg_confirm_handle(msg: Message, agent_gvh: Gvh):
+    if msg.sender == msg.content:
+        agent_gvh.init = True
+        agent_gvh.start_time = time.time()
+
+
+def base_mutex_ack_handle(msg: Message, agent_gvh: Gvh) -> None:
+    mutex_name, reqnum, grantee = msg.content
+    if grantee == agent_gvh.pid:
+        agent_gvh.ack_nums[mutex_name] = int(reqnum)
+
+    pass
+
+
+def round_update_handle(msg: Message, agent_gvh: Gvh) -> None:
     """
-    create dsm update message. cant import from message handler because of circular imports.
-    :param pid:
-    :param dsmvar_updated:
-    :param owner:
-    :param ts:
+    update number of agents reaching barrier
+    :param msg:
+    :param agent_gvh: agent gvh handling updates
     :return:
     """
+    try:
+        agent_gvh.synchronizer.handle_sync_message(msg)
+    except:
+        print("error")
 
-    return Message(pid, 4, dsmvar_updated, ts)
+
+def base_mutex_request_handle(msg: Message, agent_gvh: Gvh) -> None:
+    """
+    add request to list of requests
+    :param msg: request message
+    :param agent_gvh: my gvh
+    :return: nothing
+    """
+    mutex_id, req_num = msg.content
+    requester = msg.sender
+    if agent_gvh.is_leader:
+        agent_gvh.mutex_handler.add_request(mutex_id, requester, req_num)
+    else:
+        pass
+
+
+def base_mutex_grant_handle(msg: Message, agent_gvh: Gvh) -> None:
+    """
+    grant first request
+    :param msg: grant message
+    :param agent_gvh: my gvh
+    :return: nothing
+    """
+    mutex_id, grantee, mutexnum = msg.content
+    index = agent_gvh.mutex_handler.find_mutex_index(mutex_id)
+    agent_gvh.mutex_handler.mutexes[index].mutex_holder = grantee
+
+
+def base_mutex_release_handle(msg: Message, agent_gvh: Gvh) -> None:
+    """
+    release mutex held
+    :param msg: release message
+    :param agent_gvh: my gvh
+    :return: nothing
+    """
+    mutex_id = msg.content
+    releaser = msg.sender
+    i = agent_gvh.mutex_handler.find_mutex_index(mutex_id)
+    if agent_gvh.is_leader:
+        if agent_gvh.mutex_handler.mutexes[i].mutex_holder == releaser:
+            agent_gvh.mutex_handler.mutexes[i].mutex_holder = None
+            agent_gvh.mutex_handler.mutexes[i].mutex_request_list = agent_gvh.mutex_handler.mutexes[i].mutex_request_list[1:]
+    else:
+        pass
+
+
+def stop_comm_msg_handle(msg: Message, agent_gvh: Gvh) -> None:
+    """
+    stop comm handler on receiving this message
+    :param msg:
+    :param agent_gvh:
+    :return:
+    """
+    pass
+
+
+def message_update_handle(msg: Message, agent_gvh: Gvh):
+    var = msg.content
+    updater = msg.sender
+    for i in range(len(agent_gvh.dsm)):
+
+        if agent_gvh.dsm[i].name == var.name:
+            if var.owner == 0:
+
+                if agent_gvh.dsm[i].updated is not None and agent_gvh.dsm[i].updated > msg.timestamp:
+                    pass
+                else:
+                    agent_gvh.dsm[i] = var
+                    agent_gvh.dsm[i].updated = msg.timestamp
+
+            else:
+
+                if agent_gvh.dsm[i].get_val(updater) is None or agent_gvh.dsm[i].last_update(updater) is None:
+
+                    agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
+                    agent_gvh.dsm[i].set_update(msg.timestamp, updater)
+
+                elif (agent_gvh.dsm[i].last_update(updater)) > (msg.timestamp):
+                    pass
+                    #print("last update from", updater, "at ", agent_gvh.dsm[i].last_update(updater)," overriding", msg.timestamp)
+                else:
+
+                    agent_gvh.dsm[i].set_val(var.get_val(updater), updater)
+                    agent_gvh.dsm[i].set_update(int(msg.timestamp), updater)
+
+
+message_handler = dict()
+
+message_handler[0] = round_update_handle
+message_handler[1] = base_mutex_request_handle
+message_handler[2] = base_mutex_grant_handle
+message_handler[3] = base_mutex_release_handle
+message_handler[4] = message_update_handle
+message_handler[5] = stop_comm_msg_handle
+message_handler[6] = base_mutex_ack_handle
+message_handler[7] = init_msg_handle
+message_handler[8] = init_msg_confirm_handle
+message_handler[9] = round_update_msg_handle
+message_handler[10] = round_update_msg_confirm_handle
+message_handler[11] = stop_msg_handle
+message_handler[12] = stop_msg_confirm_handle

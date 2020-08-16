@@ -5,9 +5,7 @@ from threading import Thread, Event
 from queue import Queue
 
 from src.config.configs import AgentConfig
-from src.harness.gvh import Gvh
-from src.harness.message_handler import message_handler
-import time
+
 # TODO: move to a base config file.
 RETRY_VAL = 10
 
@@ -48,15 +46,6 @@ class CommHandler(Thread):
         """
         return self.__timeout
 
-    @timeout.setter
-    def timeout(self, timeout: float) -> None:
-        """
-        setter method for timeout
-        :param timeout: float value to be set
-        :return:
-        """
-        self.__timeout = timeout
-
     @property
     def pid(self) -> int:
         """
@@ -81,15 +70,6 @@ class CommHandler(Thread):
         """
         return self.__r_port
 
-    @r_port.setter
-    def r_port(self, r_port: int) -> None:
-        """
-        setter method for the port
-        :param r_port: port number to set
-        :return: None
-        """
-        self.__r_port = r_port
-
     @property
     def ip(self) -> str:
         """
@@ -98,14 +78,13 @@ class CommHandler(Thread):
         """
         return self.__ip
 
-    @ip.setter
-    def ip(self, ip: str) -> None:
+    @property
+    def recv_msg_queue(self) -> Queue:
         """
-        setter method for sender ip
-        :param ip: string ip
-        :return: None
+        getter method for the queue of received messages
+        :return: the queue of received messages
         """
-        self.__ip = ip
+        return self.__recv_msg_queue
 
     def stop(self) -> None:
         """
@@ -153,26 +132,3 @@ class CommHandler(Thread):
             except OSError as e:
                 print(e)
                 print("unexpected os error on agent", self.__pid)
-
-    def handle_msgs(self, agent_gvh: Gvh) -> None:
-        """
-        handle messages method to call message_handle functions. Must be outside the run so that it can be called from
-        gvh or agent thread, to avoid blocking receive messages.
-        TODO: better explanation
-        :return: none
-        """
-        curr_size = self.__recv_msg_queue.qsize()
-        # Since only AgentThread is calling this function, other threads will only increase qsize
-        for _ in range(0, curr_size):
-            msg = self.__recv_msg_queue.get()
-            if msg.message_type == 5 and msg.sender == self.__pid:
-                print("stopping commhandler on agent", self.__pid)
-                self.stop()
-            if msg.message_type in message_handler:
-                message_handler[msg.message_type](msg, agent_gvh)
-            else:
-                print("Warning: unexpected message type id", msg.message_type)
-
-
-class CommTimeoutError(Exception):
-    pass

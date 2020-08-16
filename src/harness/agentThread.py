@@ -26,9 +26,6 @@ class AgentThread(ABC, Thread):
         """
         super(AgentThread, self).__init__()
 
-        self.__agent_comm_handler = CommHandler(agent_config)
-        self.__agent_comm_handler.start()  # Start CommHandler threads that listens to UDP messages
-
         # TODO MotionAutomaton class should provide a builder function with configs as parameters
         #  and returns an optional MotionAutomaton instance
         self.__moat = None
@@ -38,6 +35,7 @@ class AgentThread(ABC, Thread):
             self.__moat.start()  # Start Motion thread that listens to ROS topics
 
         self.__agent_gvh = Gvh(agent_config)
+        self.__agent_gvh.comm_handler.start()  # Start CommHandler threads that listens to UDP messages
         self.__agent_gvh.start_mh()  # Start MutexHandler thread that sends messages to grant mutex?
         self.__stop_event = Event()
 
@@ -126,7 +124,7 @@ class AgentThread(ABC, Thread):
         getter method for agent comm handler
         :return: the communication handler of the agent thread object
         """
-        return self.__agent_comm_handler
+        return self.__agent_gvh.comm_handler
 
     def stop(self) -> None:
         """
@@ -190,7 +188,6 @@ class AgentThread(ABC, Thread):
     def msg_handle(self):
         time.sleep(0.1)
         self.agent_gvh.flush_msgs()
-        self.agent_comm_handler.handle_msgs(self.agent_gvh)
         time.sleep(0.1)
 
     @abstractmethod
