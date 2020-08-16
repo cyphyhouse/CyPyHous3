@@ -25,12 +25,21 @@ class AgentThread(ABC, Thread):
         :param moat_config:
         """
         super(AgentThread, self).__init__()
-        self.__agent_gvh = Gvh(agent_config, moat_config)
+
+        # Start CommHandler threads that listens to UDP messages
         self.__agent_comm_handler = CommHandler(agent_config)
-        self.__agent_gvh.start_moat()
-        self.__agent_gvh.start_mh()
+
+        # TODO MotionAutomaton class should provide a builder function with configs as parameters
+        #  and returns an optional MotionAutomaton instance
+        self.__moat = None
+        # Create Motion module if specified in configurations
+        if agent_config.moat_class is not None:
+            self.__moat = agent_config.moat_class(moat_config)
+            self.__moat.start()  # Start Motion thread that listens to ROS topics
+
+        self.__agent_gvh = Gvh(agent_config)
+        self.__agent_gvh.start_mh()  # Start MutexHandler thread that sends messages to grant mutex?
         self.__stop_event = Event()
-        self.__mutex_handler = self.__agent_gvh.mutex_handler
 
         self.log = lambda msg: print(msg, end="")  # TODO logging besides printing
         self.any = any
@@ -89,7 +98,11 @@ class AgentThread(ABC, Thread):
 
     @property
     def moat(self):
-        return self.__agent_gvh.moat
+        """
+        getter method for motionAutomaton
+        :return:
+        """
+        return self.__moat
 
     @property
     def locals(self):

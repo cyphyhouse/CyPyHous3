@@ -10,8 +10,7 @@ from src.objects.message import Message
 class Gvh(object):
     """
     global variable holder for the agent, this contains the worldview of each agent
-    handles distributed shared memory, motion automaton for the object, and any other
-    sensor-actuator modules used by the agent in the application.
+    handles distributed shared memory.
 
     __pid : integer indicating the unique identifier of the agent.
     __participants : number of participants in the system.
@@ -25,13 +24,10 @@ class Gvh(object):
 
     """
 
-    def __init__(self, a: AgentConfig, m: MoatConfig):
+    def __init__(self, a: AgentConfig):
         """
         init method for global variable holder object
-        :param pid: integer pid
-        :param participants: integer number of participants
-        :param mutex_handler : mutual exclusion handler
-
+        :param a: Agent configuration
         """
         self.__pid = a.pid
         self.__participants = a.bots
@@ -45,10 +41,7 @@ class Gvh(object):
         self.__synchronizer = None
         self.__mutex_handler = a.mutex_handler
         self.__window = 1
-        if a.moat_class is not None:
-            self.__moat = a.moat_class(m)
-        else:
-            self.__moat = None
+
         self.req_nums = {}
         self.ack_nums = {}
         self.init = False
@@ -62,8 +55,6 @@ class Gvh(object):
 
         self.stop_counter = []
 
-
-
     @property
     def rport(self):
         """
@@ -72,21 +63,9 @@ class Gvh(object):
         """
         return self.__rport
 
-    def start_moat(self):
-        if self.moat is not None:
-            self.moat.start()
-
     def start_mh(self):
         if self.mutex_handler is not None:
             self.mutex_handler.start()
-
-    @property
-    def moat(self):
-        """
-        getter method for motionAutomaton
-        :return:
-        """
-        return self.__moat
 
     @property
     def dsm(self) -> list:
