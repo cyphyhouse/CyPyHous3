@@ -1,7 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 from threading import Thread, Event
-from typing import Union
+from typing import Optional
 
 from src.config.configs import AgentConfig, MoatConfig
 from src.functionality.comm_funcs import send
@@ -18,7 +18,7 @@ class AgentThread(ABC, Thread):
     the methods and fields each agent application must implement.
     """
 
-    def __init__(self, agent_config: AgentConfig, moat_config: Union[MoatConfig, None]) -> None:
+    def __init__(self, agent_config: AgentConfig, moat_config: Optional[MoatConfig]) -> None:
         """
 
         :param agent_config:
@@ -26,8 +26,8 @@ class AgentThread(ABC, Thread):
         """
         super(AgentThread, self).__init__()
 
-        # Start CommHandler threads that listens to UDP messages
         self.__agent_comm_handler = CommHandler(agent_config)
+        self.__agent_comm_handler.start()  # Start CommHandler threads that listens to UDP messages
 
         # TODO MotionAutomaton class should provide a builder function with configs as parameters
         #  and returns an optional MotionAutomaton instance
@@ -127,15 +127,6 @@ class AgentThread(ABC, Thread):
         :return: the communication handler of the agent thread object
         """
         return self.__agent_comm_handler
-
-    @agent_comm_handler.setter
-    def agent_comm_handler(self, agent_comm_handler) -> None:
-        """
-        setter method for agent comm handler
-        :param agent_comm_handler: comm handler object to be set
-        :return: None
-        """
-        self.__agent_comm_handler = agent_comm_handler
 
     def stop(self) -> None:
         """

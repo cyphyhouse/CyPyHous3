@@ -40,8 +40,6 @@ class CommHandler(Thread):
         self.receiver_socket = None
         self.__recv_msg_queue = Queue()
 
-        self.start()
-
     @property
     def timeout(self) -> float:
         """
