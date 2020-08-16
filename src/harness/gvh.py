@@ -114,11 +114,7 @@ class Gvh(object):
             self.__dsm = []
         self.__dsm.append(a)
         msg = dsm_update_create(self.pid, a, a.owner, -1)
-        if not self.__port_list == []:
-            for port in self.__port_list:
-                send(msg, AgentConfig.BROADCAST_ADDR, port, self.__window)
-        else:
-            send(msg, AgentConfig.BROADCAST_ADDR, self.__rport,self.__window)
+        self._broadcast(msg)
 
     def get(self, varname: str, pid: int = -1) -> Union[int, bool, float, list, object, tuple]:
         """
@@ -158,11 +154,7 @@ class Gvh(object):
                 var.value[pid] = value
 
             msg = dsm_update_create(self.pid, var, var.owner, self.round_num)
-            if not self.__port_list == []:
-                for port in self.__port_list:
-                    send(msg, AgentConfig.BROADCAST_ADDR, port,self.__window)
-            else:
-                send(msg, AgentConfig.BROADCAST_ADDR, self.__rport,self.__window)
+            self._broadcast(msg)
 
     @property
     def port_list(self):
@@ -261,11 +253,7 @@ class Gvh(object):
         """
         # Send messages
         for msg in self.__msg_list:
-            if not self.__port_list == []:
-                for port in self.__port_list:
-                    send(msg, AgentConfig.BROADCAST_ADDR, port)
-            else:
-                send(msg, AgentConfig.BROADCAST_ADDR, self.__rport)
+            self._broadcast(msg)
         self.__msg_list = []
 
         # Process received messages
@@ -280,6 +268,9 @@ class Gvh(object):
                 message_handler[received_msg.message_type](received_msg, self)
             else:
                 print("Warning: unexpected message type id", received_msg.message_type)
+
+    def _broadcast(self, msg: Message) -> None:
+        send(msg, AgentConfig.BROADCAST_ADDR, self.__rport, self.__window)
 
 
 def round_update_msg_handle(msg: Message, agent_gvh: Gvh):
@@ -298,12 +289,7 @@ def round_update_msg_handle(msg: Message, agent_gvh: Gvh):
         msg1 = round_update_msg_confirm_create(agent_gvh.pid, msg_contents, agent_gvh.round_num)
         if len(agent_gvh.round_counter) == agent_gvh.participants:
             #print("sending message to update round", agent_gvh.round_num)
-            if len(agent_gvh.port_list) is not 0:
-                for port in agent_gvh.port_list:
-
-                    send(msg1, AgentConfig.BROADCAST_ADDR, port,2)
-            else:
-                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport,2)
+            agent_gvh._broadcast(msg1)
 
 
 def round_update_msg_confirm_handle(msg: Message, agent_gvh: Gvh):
@@ -332,12 +318,7 @@ def stop_msg_handle(msg: Message, agent_gvh: Gvh):
 
         msg1 = stop_msg_confirm_create(agent_gvh.pid, leaderid, agent_gvh.round_num)
         if len(agent_gvh.stop_counter) == agent_gvh.participants:
-
-            if len(agent_gvh.port_list) is not 0:
-                for port in agent_gvh.port_list:
-                    send(msg1, AgentConfig.BROADCAST_ADDR, port)
-            else:
-                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport)
+            agent_gvh._broadcast(msg1)
 
 
 def stop_msg_confirm_handle(msg: Message, agent_gvh: Gvh):
@@ -358,11 +339,7 @@ def init_msg_handle(msg: Message, agent_gvh: Gvh):
             leaderid = agent_gvh.pid
         msg1 = init_msg_confirm_create(agent_gvh.pid, leaderid, time.time())
         if len(agent_gvh.init_counter) == agent_gvh.participants:
-            if len(agent_gvh.port_list) is not 0:
-                for port in agent_gvh.port_list:
-                    send(msg1, AgentConfig.BROADCAST_ADDR, port)
-            else:
-                send(msg1, AgentConfig.BROADCAST_ADDR, agent_gvh.rport)
+            agent_gvh._broadcast(msg1)
 
 
 def init_msg_confirm_handle(msg: Message, agent_gvh: Gvh):

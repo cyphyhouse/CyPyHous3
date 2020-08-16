@@ -1,3 +1,5 @@
+from socketserver import DatagramRequestHandler, ThreadingUDPServer
+from threading import Thread
 import time
 import unittest
 
@@ -53,14 +55,26 @@ class AllReadTest(unittest.TestCase):
     """
 
     def setUp(self):
-        plist = [2000, 2001, 2002, 2003, 2004]
+        plist = None
+        port = 2002
         bots = 5
-        ip = AgentConfig.BROADCAST_ADDR
-        c1 = AgentConfig(2, bots, ip, 2001, plist, BaseMutexHandler, mhargs=[False, 2])
-        c2 = AgentConfig(1, bots, ip, 2002, plist, BaseMutexHandler, mhargs=[False, 1])
-        c4 = AgentConfig(4, bots, ip, 2004, plist, BaseMutexHandler, mhargs=[False, 4])
-        c5 = AgentConfig(3, bots, ip, 2000, plist, BaseMutexHandler, mhargs=[False, 3])
-        c3 = AgentConfig(0, bots, ip, 2003, plist, BaseMutexHandler, mhargs=[True, 0], is_leader=True)
+
+        c1 = AgentConfig(2, bots, "127.0.1.2", port, plist, BaseMutexHandler, mhargs=[False, 2])
+        c2 = AgentConfig(1, bots, "127.0.1.1", port, plist, BaseMutexHandler, mhargs=[False, 1])
+        c4 = AgentConfig(4, bots, "127.0.1.4", port, plist, BaseMutexHandler, mhargs=[False, 4])
+        c5 = AgentConfig(3, bots, "127.0.1.3", port, plist, BaseMutexHandler, mhargs=[False, 3])
+        c3 = AgentConfig(0, bots, "127.0.1.0", port, plist, BaseMutexHandler, mhargs=[True, 0], is_leader=True)
+
+        class SimUDPBCastHandler(DatagramRequestHandler):
+            def handle(self):
+                data = self.request[0].strip()
+                socket = self.request[1]
+                for addr in ["127.0.1.0", "127.0.1.1", "127.0.1.2", "127.0.1.3", "127.0.1.4"]:
+                    socket.sendto(data, (addr, port))
+
+        self.server = ThreadingUDPServer((AgentConfig.BROADCAST_ADDR, port), SimUDPBCastHandler)
+        self.server_thread = Thread(target=self.server.serve_forever)
+        self.server_thread.start()
 
         self.b, self.c, self.d, self.e, self.f = TestAR(c1), TestAR(c2), TestAR(c3), TestAR(c4), TestAR(c5)
 
@@ -70,6 +84,17 @@ class AllReadTest(unittest.TestCase):
         # self.numvoted = self.b.read_from_shared('numvoted', None)
         print(self.b.agent_gvh.dsm)
         self.assertEqual(self.finalsum, 10)
+
+    def tearDown(self):
+        self.b.agent_comm_handler.receiver_socket.close()
+        self.c.agent_comm_handler.receiver_socket.close()
+        self.d.agent_comm_handler.receiver_socket.close()
+        self.e.agent_comm_handler.receiver_socket.close()
+        self.f.agent_comm_handler.receiver_socket.close()
+
+        self.server.shutdown()
+        self.server_thread.join()
+        self.server.server_close()
 
 
 if __name__ == '__main__':

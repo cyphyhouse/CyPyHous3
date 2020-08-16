@@ -140,7 +140,7 @@ class AgentThread(ABC, Thread):
             if not self.agent_gvh.mutex_handler.stopped():
                 self.agent_gvh.mutex_handler.stop()
         if self.agent_comm_handler is not None:
-            send(stop_comm_msg_create(self.pid(), time.time()), AgentConfig.BROADCAST_ADDR, self.receiver_port())
+            self._broadcast(stop_comm_msg_create(self.pid(), time.time()))
             self.msg_handle()  # Let comm_handler try to stop itself first
             if not self.agent_comm_handler.stopped():
                 self.agent_comm_handler.stop()
@@ -243,11 +243,7 @@ class AgentThread(ABC, Thread):
 
     def trystop(self):
         stop_msg = stop_msg_create(self.pid(), self.agent_gvh.round_num, self.agent_gvh.round_num)
-        if len(self.agent_gvh.port_list) is not 0:
-            for port in self.agent_gvh.port_list:
-                send(stop_msg, AgentConfig.BROADCAST_ADDR, port)
-        else:
-            send(stop_msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
+        self._broadcast(stop_msg)
 
     def run(self) -> None:
         """
@@ -262,11 +258,7 @@ class AgentThread(ABC, Thread):
             # print("sending init", self.pid())
             self.initialize_vars()
             self.msg_handle()
-            if len(self.agent_gvh.port_list) is not 0:
-                for port in self.agent_gvh.port_list:
-                    send(init_msg, AgentConfig.BROADCAST_ADDR, port)
-            else:
-                send(init_msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
+            self._broadcast(init_msg)
             time.sleep(0.05)
 
         while not self.stopped():
@@ -281,11 +273,7 @@ class AgentThread(ABC, Thread):
             if not self.agent_gvh.update_round:
                 round_update_msg = round_update_msg_create(self.pid(), self.agent_gvh.round_num,
                                                            time.time())
-                if len(self.agent_gvh.port_list) is not 0:
-                    for port in self.agent_gvh.port_list:
-                        send(round_update_msg, AgentConfig.BROADCAST_ADDR, port)
-                else:
-                    send(round_update_msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
+                self._broadcast(round_update_msg)
                 continue
             # else:
             # print("Agent", self.pid(), "executing round", self.agent_gvh.round_num)
@@ -303,3 +291,6 @@ class AgentThread(ABC, Thread):
 
             if self.agent_comm_handler.stopped():
                 self.trystop()
+
+    def _broadcast(self, msg) -> None:
+        send(msg, AgentConfig.BROADCAST_ADDR, self.receiver_port())
