@@ -9,12 +9,12 @@ class LineForm(AgentThread):
         super(LineForm, self).__init__(agent_config, moat_config)
 
     def initialize_vars(self):
-        self.agent_gvh.create_ar_var('mypos', type(pos3d), self.agent_gvh.moat.position)
+        self.agent_gvh.create_ar_var('mypos', type(pos3d), self.moat.position)
 
     def loop_body(self):
-        self.write_to_shared('mypos', self.pid(), self.agent_gvh.moat.position)
+        self.write_to_shared('mypos', self.pid(), self.moat.position)
         if (self.pid() != 0 and self.pid() != self.num_agents() - 1):
-            self.agent_gvh.moat.goTo(
+            self.moat.goTo(
                 mid_pt(self.read_from_shared('mypos', self.pid() - 1),
                        self.read_from_shared('mypos', self.pid() + 1)))
 

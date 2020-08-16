@@ -88,6 +88,10 @@ class AgentThread(ABC, Thread):
         time.sleep(0.1)
 
     @property
+    def moat(self):
+        return self.__agent_gvh.moat
+
+    @property
     def locals(self):
         return self.__locals
 
@@ -102,15 +106,6 @@ class AgentThread(ABC, Thread):
         :return: gvh of the current agent thread object
         """
         return self.__agent_gvh
-
-    @agent_gvh.setter
-    def agent_gvh(self, agent_gvh: Gvh) -> None:
-        """
-        setter method for gvh for the current agent thread object
-        :param agent_gvh: new Gvh object to be set
-        :return: None
-        """
-        self.__agent_gvh = agent_gvh
 
     @property
     def agent_comm_handler(self) -> CommHandler:
@@ -134,9 +129,9 @@ class AgentThread(ABC, Thread):
          a flag to set to to safely exit the thread
         :return: None
         """
-        if self.agent_gvh.moat is not None:
-            self.agent_gvh.moat.moat_exit_action()
-            self.agent_gvh.moat.join()
+        if self.moat is not None:
+            self.moat.moat_exit_action()
+            self.moat.join()
             # todo: msg = tERMINATE_MSG() best termination message
             # TODO: send(msg,"",best_post,time.time()) best termination message.
         if self.agent_gvh.mutex_handler is not None:
@@ -225,17 +220,17 @@ class AgentThread(ABC, Thread):
 
     def read_from_sensor(self, var_name: str):
         if var_name == 'Motion.position':
-            return self.agent_gvh.moat.position
+            return self.moat.position
         if var_name == 'Motion.reached':
-            return self.agent_gvh.moat.reached
+            return self.moat.reached
         else:
             raise KeyError("Cannot find module sensor '" + var_name + "'")
 
     def write_to_actuator(self, var_name: str, value) -> None:
         if var_name == 'Motion.target':
-            self.agent_gvh.moat.goTo(value)
+            self.moat.goTo(value)
         elif var_name == 'Motion.path':
-            self.agent_gvh.moat.follow_path(value)
+            self.moat.follow_path(value)
         else:
             raise KeyError("Cannot find module actuator '" + var_name + "'")
 
@@ -296,8 +291,8 @@ class AgentThread(ABC, Thread):
             try:
                 self.loop_body()
                 # resetting motion automaton
-                if self.agent_gvh.moat is not None:
-                    self.agent_gvh.moat.reset()
+                if self.moat is not None:
+                    self.moat.reset()
 
                 self.agent_gvh.update_round = False
 

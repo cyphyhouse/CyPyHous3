@@ -18,15 +18,15 @@ class BasicFollowApp(AgentThread):
     def loop_body(self):
         while (self.locals['i'] < 5):
             if self.locals['tries'] == 1:
-                self.agent_gvh.moat.goTo(self.locals['dest1'])
+                self.moat.goTo(self.locals['dest1'])
                 self.locals['tries'] = 2
                 return
-            if self.locals['tries'] == 2 and self.agent_gvh.moat.reached:
-                self.agent_gvh.moat.goTo(self.locals['dest2'])
+            if self.locals['tries'] == 2 and self.moat.reached:
+                self.moat.goTo(self.locals['dest2'])
                 self.locals['tries'] = 3
                 return
-            if self.locals['tries'] == 3 and self.agent_gvh.moat.reached:
-                self.agent_gvh.moat.goTo(self.locals['dest3'])
+            if self.locals['tries'] == 3 and self.moat.reached:
+                self.moat.goTo(self.locals['dest3'])
                 self.locals['tries'] = 2
                 self.locals['i'] += 1
                 return

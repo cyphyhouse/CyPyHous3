@@ -16,7 +16,7 @@ class MapApp(AgentThread):
 
     def loop_body(self):
         rospy.sleep(0.1)
-        pscan = tsync(self.agent_gvh.moat.tpos, self.agent_gvh.moat.tscan)
+        pscan = tsync(self.moat.tpos, self.moat.tscan)
         print("|pscan|", len(pscan))        
         for pt in pscan:
             ipos, iscan = pscan[pt]

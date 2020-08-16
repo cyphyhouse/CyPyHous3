@@ -15,7 +15,7 @@ class TaskApp(AgentThread):
         self.initialize_lock('pick_route')
         self.locals['tasklist'] = get_tasks(taskfile='src/apps/tasks.txt')
         self.agent_gvh.create_aw_var('tasks', list, [0 for i in range(len(self.locals['tasklist']))])
-        self.agent_gvh.create_ar_var('route', list, [self.agent_gvh.moat.position])
+        self.agent_gvh.create_ar_var('route', list, [self.moat.position])
         self.locals['my_task'] = None
         self.locals['test_route'] = None
         self.locals['doing'] = False
@@ -37,7 +37,7 @@ class TaskApp(AgentThread):
                     if not self.locals['tasks'][i] == 1:
                         self.locals['my_task'] = self.locals['tasklist'][i]
 
-                        self.locals['test_route'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
+                        self.locals['test_route'] = self.moat.planner.find_path(self.moat.position,
                                                                                           self.locals[
                                                                                               'my_task'].location,
                                                                                           self.locals['obstacles'])
@@ -50,7 +50,7 @@ class TaskApp(AgentThread):
                             self.locals['tasks'][i] = 1
                             self.agent_gvh.put('tasks', self.locals['tasks'])
                             self.agent_gvh.put('route', self.locals['test_route'], self.pid())
-                            # self.agent_gvh.moat.follow_path(self.locals['test_route'])
+                            # self.moat.follow_path(self.locals['test_route'])
                             break
                 self.unlock('pick_route')
 

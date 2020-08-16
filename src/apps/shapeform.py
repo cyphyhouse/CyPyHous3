@@ -11,17 +11,17 @@ class ShapeForm(AgentThread):
         super(ShapeForm, self).__init__(agent_config, moat_config)
 
     def initialize_vars(self):
-        self.agent_gvh.create_ar_var('mypos', type(pos3d), self.agent_gvh.moat.position)
+        self.agent_gvh.create_ar_var('mypos', type(pos3d), self.moat.position)
 
     def loop_body(self):
         if self.num_agents() not in [x**2 for x in range(1, 6)]:
             self.trystop()  # Avoid non square number of agents
             return
-        self.write_to_shared('mypos', self.pid(), self.agent_gvh.moat.position)
+        self.write_to_shared('mypos', self.pid(), self.moat.position)
         if self.pid() in get_corners(self.num_agents()):
-            self.agent_gvh.moat.goTo(get_corner_pos(self.pid(), self.num_agents()))
+            self.moat.goTo(get_corner_pos(self.pid(), self.num_agents()))
         else:
-            self.agent_gvh.moat.goTo(
+            self.moat.goTo(
                 mid_pt_of_list(
                     [self.read_from_shared('mypos', i) for i in get_nbrs(self.pid(), self.num_agents())]
                 ))

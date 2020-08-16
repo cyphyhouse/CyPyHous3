@@ -160,20 +160,20 @@ class BasicFollowApp(AgentThread):
             self.locals['map'] = self.locals['map'] + self.read_from_shared('global_map', None)
             self.dump("NewPoint")
             self.locals['path'] = pick_path_to_frontier(self.locals['map'],
-                                                        self.agent_gvh.moat.position,
-                                                        self.agent_gvh.moat.planner,
+                                                        self.moat.position,
+                                                        self.moat.planner,
                                                         self.locals['obstacle'])
             if len(self.locals['path']) > 0:
                 rospy.loginfo("Target position: " + str(self.locals['path'][-1]))
-                self.agent_gvh.moat.follow_path(self.locals['path'])
+                self.moat.follow_path(self.locals['path'])
                 self.locals['newpoint'] = False
             else:
-                rospy.logwarn("Cannot find any path to frontier from " + str(self.agent_gvh.moat.position))
+                rospy.logwarn("Cannot find any path to frontier from " + str(self.moat.position))
                 self.trystop()
             return
 
         # LUpdate event
-        if not self.locals['newpoint'] and not self.agent_gvh.moat.reached:
+        if not self.locals['newpoint'] and not self.moat.reached:
             rospy.loginfo("LUpdate")
             self.locals['newpoint'] = False
             self.update_local_map()
@@ -181,7 +181,7 @@ class BasicFollowApp(AgentThread):
             return
 
         # GUpdate event
-        if self.agent_gvh.moat.reached:
+        if self.moat.reached:
             rospy.loginfo("GUpdate")
             self.update_local_map()
             if self.lock('GUpdate'):
@@ -193,9 +193,9 @@ class BasicFollowApp(AgentThread):
                 return
 
     def update_local_map(self):
-        for _ in range(self.agent_gvh.moat.tsync.qsize()):
+        for _ in range(self.moat.tsync.qsize()):
             try:
-                ipos, iscan = self.agent_gvh.moat.tsync.get_nowait()
+                ipos, iscan = self.moat.tsync.get_nowait()
                 empty_map = get_empty_map(ipos, iscan)
                 obs_map = get_obstacle_map(ipos, iscan)
                 self.locals['map'] = self.locals['map'] + empty_map + obs_map

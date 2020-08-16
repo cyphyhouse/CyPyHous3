@@ -11,7 +11,7 @@ class BasicFollowApp(AgentThread):
         self.start()
 
     def initialize_vars(self):
-        self.create_ar_var('pos', Pos, self.agent_gvh.moat.position)
+        self.create_ar_var('pos', Pos, self.moat.position)
         self.initialize_lock('singlelock')
         self.locals['current_dest'] = -1
         self.locals['obstacles'] = []
@@ -34,7 +34,7 @@ class BasicFollowApp(AgentThread):
                 pass
             else:
                 self.locals['obstacles'].append(
-                    self.read_from_shared('pos', vehicle).to_obs(0.5, self.agent_gvh.moat.position.z))
+                    self.read_from_shared('pos', vehicle).to_obs(0.5, self.moat.position.z))
         # print("my obstacle list is", [i.to_pos() for i in self.locals['obstacles']])
 
         if sum(self.read_from_shared('pointnum', None)) == len(self.locals['dest']):
@@ -52,7 +52,7 @@ class BasicFollowApp(AgentThread):
                 else:
                     continue
 
-                self.locals['path'] = self.agent_gvh.moat.planner.find_path(self.agent_gvh.moat.position,
+                self.locals['path'] = self.moat.planner.find_path(self.moat.position,
                                                                             self.locals['dest'][
                                                                                 self.locals['current_dest']],
                                                                             self.locals['obstacles'])
@@ -70,14 +70,14 @@ class BasicFollowApp(AgentThread):
             self.locals['pointnum'] = self.read_from_shared('pointnum', None)
             self.locals['pointnum'][self.locals['current_dest']] = 1
             self.write_to_shared('pointnum', None, self.locals['pointnum'])
-            self.agent_gvh.moat.follow_path(self.locals['path'])
+            self.moat.follow_path(self.locals['path'])
 
-            # self.agent_gvh.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
+            # self.moat.goTo(self.locals['dest'][self.read_from_shared('pointnum', None)])
             self.locals['going'] = True
 
-        if self.agent_gvh.moat.reached:
+        if self.moat.reached:
             print("here, next point")
-            self.write_to_shared('pos', self.pid(), self.agent_gvh.moat.position)
+            self.write_to_shared('pos', self.pid(), self.moat.position)
 
             time.sleep(0.1)
             self.locals['going'] = False
