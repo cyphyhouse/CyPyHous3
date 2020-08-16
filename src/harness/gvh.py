@@ -36,7 +36,6 @@ class Gvh(object):
         self.__pid = a.pid
         self.__participants = a.bots
         self.__msg_list = []
-        self.__recv_msg_list = []
         self.__port_list = a.plist
         self.__rport = a.rport
         self.__is_leader = a.is_leader
@@ -208,14 +207,6 @@ class Gvh(object):
         self.__is_alive = liveness
 
     @property
-    def msg_list(self) -> list:
-        """
-
-        :return:
-        """
-        return self.__msg_list
-
-    @property
     def synchronizer(self) -> Synchronizer:
         """
         getter method for synchronizer
@@ -239,14 +230,6 @@ class Gvh(object):
         """
         return self.__participants
 
-    def add_msg(self, msg: Message) -> None:
-        """
-        add message to list
-        :param msg:
-        :return:
-        """
-        self.__msg_list.append(msg)
-
     def flush_msgs(self) -> None:
         """
         Send all messages to be sent; then process all received messages in queue
@@ -261,16 +244,14 @@ class Gvh(object):
         # Since only AgentThread is calling this function, other threads will only increase qsize
         for _ in range(0, curr_size):
             received_msg = self.__comm_handler.recv_msg_queue.get()
-            if received_msg.message_type == 5 and received_msg.sender == self.__comm_handler.pid:
-                print("stopping comm_handler on agent", self.__comm_handler.pid)
-                self.__comm_handler.stop()
             if received_msg.message_type in message_handler:
                 message_handler[received_msg.message_type](received_msg, self)
             else:
                 print("Warning: unexpected message type id", received_msg.message_type)
 
     def _broadcast(self, msg: Message) -> None:
-        send(msg, AgentConfig.BROADCAST_ADDR, self.__rport, self.__window)
+        for i in range(self.__window):
+            send(msg, AgentConfig.BROADCAST_ADDR, self.__rport, self.__window)
 
 
 def round_update_msg_handle(msg: Message, agent_gvh: Gvh):
@@ -421,7 +402,9 @@ def stop_comm_msg_handle(msg: Message, agent_gvh: Gvh) -> None:
     :param agent_gvh:
     :return:
     """
-    pass
+    if msg.sender == agent_gvh.comm_handler.pid:
+        print("stopping comm_handler on agent", agent_gvh.comm_handler.pid)
+        agent_gvh.comm_handler.stop()
 
 
 def message_update_handle(msg: Message, agent_gvh: Gvh):
