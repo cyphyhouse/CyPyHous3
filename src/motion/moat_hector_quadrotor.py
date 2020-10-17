@@ -19,16 +19,16 @@ class MoatHectorQuadrotor(MotionAutomaton):
 
     def __init__(self, config):
         act_prefix = config.bot_name + "/action/"  # FIXME better way to find namespace for actions
-        # XXX Takeoff has to be assigned before super().__init__
+        # XXX Takeoff and Pose has to be assigned before super().__init__
         #  because moat_init_action is called and uses it
         self.__takeoff_act = act_prefix + "takeoff"
+        # __pose_client should only be used in MotionAutomaton thread to avoid concurrency bugs
+        self.__pose_client = SimpleActionClient(act_prefix + "pose", hq_msg.PoseAction)
 
         super(MoatHectorQuadrotor, self).__init__(config)
 
         self.__landing_act = act_prefix + "landing"
 
-        # __pose_client should only be used in MotionAutomaton thread to avoid concurrency bugs
-        self.__pose_client = SimpleActionClient(act_prefix + "pose", hq_msg.PoseAction)
         self.__path = None
         self.__path_lock = RLock()
 
@@ -44,13 +44,20 @@ class MoatHectorQuadrotor(MotionAutomaton):
     def moat_init_action(self):
         super().moat_init_action()
 
-        client = SimpleActionClient(self.__takeoff_act, hq_msg.TakeoffAction)
-        client.wait_for_server()  # TODO Set Timeout?
-        goal = hq_msg.TakeoffGoal()
+        goal_pose = PoseStamped()
+        goal_pose.header.stamp = rospy.Time.now()
+        goal_pose.header.frame_id = "world"  # Frame ID must be "world"
+        goal_pose.pose = (self.position + Pos(np.array([0, 0, 0.5]))).to_pose()
+
+        self.__pose_client.wait_for_server()  # TODO Set Timeout?
+        goal = hq_msg.PoseGoal(goal_pose)
         print("taking off")
-        result = client.send_goal_and_wait(goal)  # TODO Set Timeout?
+        result = self.__pose_client.send_goal_and_wait(goal)  # TODO Set Timeout?
         # TODO Check result
-        print("take off successful")
+        if result == GoalStatus.SUCCEEDED:
+            print("take off succeeded")
+        else:
+            print("take off failed")
 
     def moat_exit_action(self):
         client = SimpleActionClient(self.__landing_act, hq_msg.LandingAction)
@@ -60,7 +67,10 @@ class MoatHectorQuadrotor(MotionAutomaton):
         print("landing")
         result = client.send_goal_and_wait(goal)  # TODO Set Timeout?
         # TODO check result
-        print("landing successful")
+        if result == GoalStatus.SUCCEEDED:
+            print("landing succeeded")
+        else:
+            print("landing failed")
         super().moat_exit_action()
 
     def goTo(self, dest: Pos, wp_type: int = 1) -> None:
