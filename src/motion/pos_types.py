@@ -27,10 +27,10 @@ class Pos(object):
 
         except IndexError:
             print("initializing an empty position")
-            self.x = None
-            self.y = None
-            self.z = None
-            self.yaw = None
+            self.x = float('nan')
+            self.y = float('nan')
+            self.z = float('nan')
+            self.yaw = float('nan')
 
     def __repr__(self) -> str:
         """
