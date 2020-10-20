@@ -2,8 +2,10 @@
 # use numpy arrays
 
 from abc import ABC, abstractmethod
+from typing import Sequence
 
 from src.motion.pos_types import Pos
+from src.motion.cylobs import Obstacle
 
 
 class Planner(ABC):
@@ -18,7 +20,7 @@ class Planner(ABC):
         pass
 
     @abstractmethod
-    def find_path(self, start_point: Pos, end_point: Pos, obstacles: list) -> list:
+    def find_path(self, start_point: Pos, end_point: Pos, obstacles: Sequence[Obstacle]) -> Sequence[Pos]:
         """
         find a path from the start point to an end point given a list of obstacles.
         :param start_point: starting point as a vector [x,y,z]
@@ -26,4 +28,4 @@ class Planner(ABC):
         :param obstacles: list of obstacles.
         :return: path as a list of vectors
         """
-        pass
+        raise NotImplementedError
