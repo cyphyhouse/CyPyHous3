@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import queue
 import numpy as np
 import rospy
@@ -10,14 +12,22 @@ import message_filters
 import itertools
 
 
+LaserScanPara = NamedTuple("LaserScanPara", [('angle_min', float),
+                                             ('angle_max', float),
+                                             ('angle_increment', float),
+                                             ('time_increment', float),
+                                             ('scan_time', float),
+                                             ('range_min', float),
+                                             ('range_max', float)])
+
+
 class MoatWithLidar(MoatTestCar):
 
     def __init__(self, config):
         super(MoatWithLidar, self).__init__(config)
         self.tsync = queue.Queue()
-
-        sub_scan = message_filters.Subscriber(config.rospy_node.strip("/waypoint_node") + '/racecar/laser/scan',
-                                              LaserScan)
+        scan_topic = config.rospy_node.replace("/waypoint_node", '/racecar/laser/scan')
+        sub_scan = message_filters.Subscriber(scan_topic, LaserScan)
         sub_pose = message_filters.Subscriber(self._sub_positioning.name,
                                               self._sub_positioning.data_class)
 
@@ -45,8 +55,16 @@ class MoatWithLidar(MoatTestCar):
         for distance in scan.ranges:
             cur_angle += scan.angle_increment
             tmp_list.append((distance, cur_angle))
+
+        scan_para = LaserScanPara(angle_min=scan.angle_min,
+                                  angle_max=scan.angle_max,
+                                  angle_increment=scan.angle_increment,
+                                  time_increment=scan.time_increment,
+                                  scan_time=scan.scan_time,
+                                  range_min=scan.range_min,
+                                  range_max=scan.range_max)
         try:
-            self.tsync.put_nowait((position, tmp_list))
+            self.tsync.put_nowait((position, tmp_list, scan_para))
         except queue.Full:
             pass
 
