@@ -1,6 +1,5 @@
 import numpy as np
 import math
-import copy
 
 from src.motion.obstacle import Obstacle
 from src.motion.pos_types import Pos, Seg
@@ -19,59 +18,63 @@ class RectObs(Obstacle):
         return "RectObs(point=%s, size=%s)" % (repr(self.position), repr(self.size))
 
     def _isdisjoint_point(self, point: Pos) -> bool:
-        d = point - self.position
-        return math.fabs(d.x) > self.size[0]/2 or math.fabs(d.y) > self.size[1]/2 or math.fabs(d.z) > self.size[2]/2
+        assert all(self.size >= 0)
+        obs_maxes = self.position.mk_arr() + (self.size/2)
+        obs_mins = self.position.mk_arr() - (self.size/2)
+        p = point.mk_arr()
+        # Check that p is not inside the obstacle, i.e., out side the interval at any dimension
+        return np.any(p < obs_mins) or np.any(obs_maxes < p)
 
     def _isdisjoint_seg(self, orig_path: Seg) -> bool:
-        # TODO
-        # Check whether the path intersects with any of the 4 edges of the obstacle (Only apply to cars)
-        # Referred this algorithm from stackoverflow:
-        #   https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+        """ The path has some points inside the rectangle rect iff there exists eps <= 1 s.t.
+                for all dimensions. rect.mins <= start + vector * eps <= rect.maxes.
 
-        path = copy.deepcopy(orig_path)
-        path.start.z = 0
-        path.end.z = 0
-        path.vector.z = 0
+        The negation which is the return result becomes
+            For all eps. not (0 <= eps <= 1) or not (for all dims. rect.mins <= start + vector * eps <= rect.maxes)
+        <=> For all eps. (for all dims. rect.mins <= vector * eps + start <= rect.maxes) ==> (eps<0 or 1<eps)
+        We therefore collect the constraints from all dimensions and check following cases
+        + the constraints implies eps < 0 or 1 < eps, i.e, the bounding box of path is disjoint with rect
+        + no solution to eps, i.e., vacuously true
 
-        p = path.start.mk_arr()
-        r = path.vector.mk_arr() 
+        Notes
+        -----
+        Rewrite the formula to prefer relational operators to arithmetic operators
+        because arithmetic operators may cause precision loss
+        """
+        assert all(self.size >= 0)
+        if not self._isdisjoint_point(orig_path.start) or \
+                not self._isdisjoint_point(orig_path.end):
+            # Early return because one of two ends is inside the obstacle
+            return False
 
-        # Find 4 Points
-        a = Pos(np.array([self.position.x - self.size[0]/2, self.position.y - self.size[1]/2, 0]))
-        b = Pos(np.array([self.position.x - self.size[0]/2, self.position.y + self.size[1]/2, 0]))
-        c = Pos(np.array([self.position.x + self.size[0]/2, self.position.y - self.size[1]/2, 0]))
-        d = Pos(np.array([self.position.x + self.size[0]/2, self.position.y + self.size[1]/2, 0]))
+        obs_maxes = self.position.mk_arr() + (self.size/2)
+        obs_mins = self.position.mk_arr() - (self.size/2)
 
-        # Find 4 edges 
-        edges = [Seg(a, b), Seg(b, c), Seg(c, d), Seg(d, a)]
-
-        # Check collision
-        for edge in edges:
-            q = edge.start.mk_arr() 
-            s = edge.vector.mk_arr() 
-
-            r_x_s = cross_product(r, s)
-            if r_x_s == 0.0:
-                continue 
-            
-            t = cross_product((q-p), s)/r_x_s
-            u = cross_product((q-p), r)/r_x_s
-
-            if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
+        start = orig_path.start.mk_arr()
+        end = orig_path.end.mk_arr()
+        bbox_mins = np.minimum(start, end)
+        bbox_maxes = np.maximum(start, end)
+        # Below directly implies eps < 0 or 1 < eps
+        if np.any(obs_maxes < bbox_mins) or np.any(bbox_maxes < obs_mins):
+            return True
+        # else: eps has no solution, vacuously true
+        # Collect currently tightest min and max for eps separately while avoid division
+        # FIXME avoid division if possible
+        curr_eps_lo, curr_eps_hi = -np.inf, np.inf
+        for vec_i, min_i, max_i in zip(end - start, obs_mins - start, obs_maxes - start):
+            if vec_i > 0:
+                curr_eps_lo = max(curr_eps_lo, min_i / vec_i)
+                curr_eps_hi = min(curr_eps_hi, max_i / vec_i)
+            elif vec_i < 0:
+                curr_eps_lo = max(curr_eps_lo, max_i / vec_i)
+                curr_eps_hi = min(curr_eps_hi, min_i / vec_i)
+            elif not (min_i <= 0 <= max_i):  # vec_i == 0
                 return True
 
+            if curr_eps_lo > curr_eps_hi:  # no solution to eps
+                return True
         return False
 
 
 def cross_product(v: np.ndarray, w: np.ndarray) -> float:
     return v[0]*w[1] - v[1]*w[0]
-
-
-# p1 = Pos(np.array([1.5, 0, 1]))
-# p2 = Pos(np.array([1.1, 1, 1]))
-# path = Seg(p1, p2)
-
-# o1 = RectObs(Pos(np.array([0.5, 0.5, 0])), np.array([1, 1, 1]))
-
-# b = o1.collision_check(path)
-# print(b)
