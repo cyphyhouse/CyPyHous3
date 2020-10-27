@@ -121,7 +121,7 @@ class RRT(Planner):
         :return:
         """
         for obs in obstacle_list:
-            if not obs.collision_check(dir_seg):
+            if not obs.isdisjoint(dir_seg):
                 return False
 
         return True

@@ -10,17 +10,21 @@ class RoundObs(Obstacle):
     def __init__(self, point, radius):
         super(RoundObs, self).__init__(point, np.array([radius]))
 
-    def _collision_point(self, point: Pos) -> bool:
+    @property
+    def radius(self) -> float:
+        return self.size[0]
+
+    def _isdisjoint_point(self, point: Pos) -> bool:
         d = (self.position.x - point.x) ** 2 + (self.position.y - point.y) ** 2 + (self.position.z - point.z) ** 2
 
-        return math.sqrt(d) > self.size[0]
+        return math.sqrt(d) > self.radius
 
-    def _collision_path(self, path: Seg) -> bool:
+    def _isdisjoint_seg(self, path: Seg) -> bool:
         o = np.array([path.start.x, path.start.y, path.start.z])
         path_uvec = path.direction().mk_arr()
         d = path.length()
         c = self.position.mk_arr()
-        r = self.size[0]
+        r = self.radius
 
         s = np.dot(path_uvec, o - c) ** 2 - ( np.linalg.norm(o - c) ** 2 - r ** 2 )
 

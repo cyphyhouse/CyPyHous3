@@ -48,30 +48,30 @@ class Obstacle(ABC):
         """
         self.__size = size
 
-    def collision_check(self, obj) -> bool:
+    def isdisjoint(self, obj) -> bool:
         """
-        Collision check method
-        return true if safe, false if there is a collision
+        Use to check collision
+        return true if disjoint, false if there is a collision
         """
         if isinstance(obj, Pos):
-            return self._collision_point(obj)
+            return self._isdisjoint_point(obj)
         elif isinstance(obj, Seg):
-            return self._collision_path(obj)
-        return True
+            return self._isdisjoint_seg(obj)
+        raise ValueError("Unsupported type %s for checking disjointness" % type(obj))
 
     @abstractmethod
-    def _collision_point(self, point: Pos) -> bool:
+    def _isdisjoint_point(self, point: Pos) -> bool:
         """
         Collision check method for points
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
-    def _collision_path(self, path: Seg) -> bool:
+    def _isdisjoint_seg(self, path: Seg) -> bool:
         """
         Collision check method for paths
         """
-        pass
+        raise NotImplementedError
 
     def __eq__(self, other):
         return self.position == other.position and self.size == other.size()

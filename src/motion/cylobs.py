@@ -16,12 +16,12 @@ class CylObs(Obstacle):
     def radius(self) -> float:
         return self.size[0]
 
-    def _collision_point(self, point: Pos) -> bool:
+    def _isdisjoint_point(self, point: Pos) -> bool:
         d = (self.position.x - point.x) ** 2 + (self.position.y - point.y) ** 2
 
         return math.sqrt(d) > self.radius
 
-    def _collision_path(self, orig_path: Seg) -> bool:
+    def _isdisjoint_seg(self, orig_path: Seg) -> bool:
         path = copy.deepcopy(orig_path)
         path.start.z = 0
         path.end.z = 0

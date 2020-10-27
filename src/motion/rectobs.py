@@ -15,14 +15,17 @@ class RectObs(Obstacle):
         """
         super(RectObs, self).__init__(point, size)
 
-    def _collision_point(self, point: Pos) -> bool:
+    def __repr__(self) -> str:
+        return "RectObs(point=%s, size=%s)" % (repr(self.position), repr(self.size))
+
+    def _isdisjoint_point(self, point: Pos) -> bool:
         d = point - self.position
         return math.fabs(d.x) > self.size[0]/2 or math.fabs(d.y) > self.size[1]/2 or math.fabs(d.z) > self.size[2]/2
 
-    def _collision_path(self, orig_path: Seg) -> bool:
+    def _isdisjoint_seg(self, orig_path: Seg) -> bool:
         # TODO
         # Check whether the path intersects with any of the 4 edges of the obstacle (Only apply to cars)
-        # Refered this algorithm from stackoverflow:
+        # Referred this algorithm from stackoverflow:
         #   https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 
         path = copy.deepcopy(orig_path)
@@ -40,11 +43,7 @@ class RectObs(Obstacle):
         d = Pos(np.array([self.position.x + self.size[0]/2, self.position.y + self.size[1]/2, 0]))
 
         # Find 4 edges 
-        edges = []
-        edges.append(Seg(a, b))
-        edges.append(Seg(b, c))
-        edges.append(Seg(c, d))
-        edges.append(Seg(d, a))
+        edges = [Seg(a, b), Seg(b, c), Seg(c, d), Seg(d, a)]
 
         # Check collision
         for edge in edges:
@@ -58,15 +57,14 @@ class RectObs(Obstacle):
             t = cross_product((q-p), s)/r_x_s
             u = cross_product((q-p), r)/r_x_s
 
-            if t <= 1.0 and t >= 0.0 and u <= 1.0 and u >= 0.0:
+            if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
                 return True
-
 
         return False
 
+
 def cross_product(v: np.ndarray, w: np.ndarray) -> float:
     return v[0]*w[1] - v[1]*w[0]
-
 
 
 # p1 = Pos(np.array([1.5, 0, 1]))

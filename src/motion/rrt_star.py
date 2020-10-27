@@ -71,7 +71,7 @@ class RRT(Planner):
                     #path = path[::2]
                     return path[::-1]
 
-        print("Reached max iteration")
+        print("RRT* reached max iteration")
 
         last_index = self.get_best_last_index(node_list, end)
         if last_index:
@@ -231,18 +231,7 @@ class RRT(Planner):
         :param obstacle_list:
         :return:
         """
-
-        for obs in obstacle_list:
-            try:
-                dx = obs.position.x - node.x
-                dy = obs.position.y - node.y
-                d = dx * dx + dy * dy
-                if d <= obs.size[0][0] ** 2:
-                    return False  # collision
-            except AttributeError:
-                print("obstacle might not be correctly formatted")
-
-        return True  # safe
+        return all(obs.isdisjoint(node) for obs in obstacle_list)
 
 
 def get_nearest_list_index(node_list: Sequence[Node], rnd: Tuple[float, float, float]) -> int:

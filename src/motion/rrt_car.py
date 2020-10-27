@@ -163,11 +163,7 @@ class RRT(Planner):
         :param dir_seg:
         :return:
         """
-        for obs in obstacle_list:
-            if not obs.collision_check(dir_seg):
-                return False
-
-        return True
+        return all(obs.isdisjoint(dir_seg) for obs in obstacle_list)
 
     def get_nearest_list_index(self, rnd: list) -> int:
         """

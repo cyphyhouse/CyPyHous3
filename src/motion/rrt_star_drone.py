@@ -209,24 +209,7 @@ class RRT(Planner):
         :param d:
         :return:
         """
-        """
-        tmp_node = copy.deepcopy(near_node)
-        
-        d = dir_seg.length()
-        for i in range(int(d / self.expand_dis)):
-            dir_uvec = dir_seg.direction()
-            tmp_node.x += self.expand_dis * dir_uvec.x
-            tmp_node.y += self.expand_dis * dir_uvec.y
-            tmp_node.z += self.expand_dis * dir_uvec.z
-            if not self.__collision_check(tmp_node, obstacle_list):
-                return False
-        return True
-        """
-        for obs in obstacle_list:
-            if not obs.collision_check(dir_seg):
-                return False
-
-        return True
+        return all(obs.isdisjoint(dir_seg) for obs in obstacle_list)
 
     def __collision_check(self, node: Node, obstacle_list: list) -> bool:
         """
@@ -237,7 +220,7 @@ class RRT(Planner):
         """
         for obs in obstacle_list:
             try:
-                if not obs.collision_check(node.to_pos()):
+                if not obs.isdisjoint(node.to_pos()):
                     return False  # collision
             except AttributeError:
                 print("obstacle might not be correctly formatted")
