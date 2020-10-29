@@ -2,7 +2,7 @@
 # use numpy arrays
 
 from abc import ABC, abstractmethod
-from typing import Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 from scipy.spatial import Rectangle
 
@@ -95,9 +95,10 @@ class Planner(ABC):
     def find_path(self, start_point: Pos, end_point: Pos, obstacles: Sequence[Obstacle]) -> Sequence[Pos]:
         """
         find a path from the start point to an end point given a list of obstacles.
-        :param start_point: starting point as a vector [x,y,z]
-        :param end_point: ending point as a vector
-        :param obstacles: list of obstacles.
-        :return: path as a list of vectors
+        :param start_point: starting point as a Pos [x,y,z]
+        :param end_point: ending point as a Pos
+        :param obstacles: as sequence of obstacles.
+        :return: path as a sequence of Pos.
+                 Empty sequence if no path is found.
         """
         raise NotImplementedError

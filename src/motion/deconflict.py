@@ -1,6 +1,6 @@
 # File contains all the functions used in de-conflicting paths
 
-from typing import Union
+from typing import Sequence, Union
 
 import numpy as np
 
@@ -135,7 +135,7 @@ def is_close(l1: Union[pos.Seg, pos.Pos], l2: Union[pos.Pos, pos.Seg], tolerance
     return False
 
 
-def get_path_segs(p: list) -> list:
+def get_path_segs(p: Sequence[pos.Pos]) -> list:
     """
     return segments of a path formed by points
     :param p: list of points
@@ -150,24 +150,25 @@ def get_path_segs(p: list) -> list:
     return path_segs
 
 
-def path_is_close(l1: list, l2: list, tolerance=0.5) -> bool:
+def path_is_close(path1: Sequence[pos.Pos], path2: Sequence[pos.Pos], tolerance: float = 0.5) -> bool:
     """
     function to check whether any two segments of given paths are close.
-    :param l1:
-    :param l2:
+    :param path1:
+    :param path2:
     :param tolerance:
     :return:
     """
-    l1 = get_path_segs(l1)
-    l2 = get_path_segs(l2)
-    for path_seg_1 in l1:
-        for path_seg_2 in l2:
+    seg_l1 = get_path_segs(path1)
+    seg_l2 = get_path_segs(path2)
+    for path_seg_1 in seg_l1:
+        for path_seg_2 in seg_l2:
             if is_close(path_seg_1, path_seg_2, tolerance):
                 return True
     return False
 
 
-def clear_path(paths: list, proposed_path: list, ignore=None, tolerance=0.5) -> bool:
+def clear_path(paths: Sequence[Sequence[pos.Pos]],
+               proposed_path: Sequence[pos.Pos], ignore=None, tolerance=0.5) -> bool:
     """
     function to determine if a list of paths doesn't conflict with a proposed path
     :param paths: list of existing paths
@@ -176,13 +177,11 @@ def clear_path(paths: list, proposed_path: list, ignore=None, tolerance=0.5) -> 
     :param tolerance: closeness parameter
     :return: true if clear, false otherwise
     """
-    # print("ignoring", ignore)
-    if proposed_path is None:
+    if not proposed_path:
         return False
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:
             if path_is_close(paths[i], proposed_path, tolerance):
-                # print(paths[i], proposed_path, "are the conflicting paths")
                 return False
     return True
 

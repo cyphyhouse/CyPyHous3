@@ -10,12 +10,13 @@ Modifications for use in CyPhyHouse made by Joao
 import copy
 import math
 import random
-from typing import Union
+from typing import Union, Sequence
 
 import numpy as np
 
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node, Seg
+from src.motion.obstacle import Obstacle
 
 
 class RRT(Planner):
@@ -38,22 +39,18 @@ class RRT(Planner):
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
 
-    def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
+    def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
                   search_until_max_iter: bool = False) -> \
-            Union[list, None]:
+            Sequence[Pos]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
         """
-        if obstacle_list is None:
-            obstacle_list = []
         start = to_node(start)
         end = to_node(end)
-        # print("Start ", start)
-        # print("End", end)
         if end.z == 0:
             print("z = 0, point not valid for drone")
-            return None
+            return ()
 
         self.node_list = [start]
         for i in range(self.max_iter):
@@ -72,7 +69,7 @@ class RRT(Planner):
 
         print("Reached max iteration")
 
-        return None
+        return ()
 
     def steer(self, rnd: list, nind: int) -> Node:
         """
@@ -113,7 +110,7 @@ class RRT(Planner):
 
         return rnd
 
-    def check_collision(self, obstacle_list: list, dir_seg: Seg):
+    def check_collision(self, obstacle_list: Sequence[Obstacle], dir_seg: Seg):
         """
         extended check collision
         :param obstacle_list:
@@ -136,7 +133,7 @@ class RRT(Planner):
         minind = dlist.index(min(dlist))
         return minind
 
-    def gen_final_course(self, start: Node, end: Node, last_node) -> list:
+    def gen_final_course(self, start: Node, end: Node, last_node: Node) -> list:
         """
         generate the final path
         :param start:
@@ -164,10 +161,12 @@ class RRT(Planner):
         """
         return np.linalg.norm([x - end.x, y - end.y, z - end.z])
 
-    def path_smoothing(self, obstacle_list: list, path: list, max_iter: int):
+    def path_smoothing(self, obstacle_list: Sequence[Obstacle], path: Sequence[Pos], max_iter: int):
         """
         smooth path
+        :param obstacle_list:
         :param path:
+        :param max_iter:
         :return:
         """
 

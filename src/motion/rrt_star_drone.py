@@ -7,13 +7,13 @@ Modifications for use in CyPhyHouse made by Joao
 """
 
 # TODO: revisit documentation.
-import copy
 import math
 import random
-from typing import Union
+from typing import Optional, Sequence
 
 import numpy as np
 
+from src.motion.obstacle import Obstacle
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node, Seg
 
@@ -23,10 +23,10 @@ class RRT(Planner):
     Class for RRT* Planning
     """
 
-    def __init__(self, rand_area: list = None, expand_dis: float = 0.5, goal_sample_rate: int = 15,
+    def __init__(self, rand_area: Sequence[float] = (), expand_dis: float = 0.5, goal_sample_rate: int = 15,
                  max_iter: int = 200):
         super(RRT, self).__init__()
-        if rand_area is None:
+        if not rand_area:
             rand_area = [-2.5, 2.5, -2.5, 2.5, 0.5, 2.5]
         self.min_xrand = rand_area[0]
         self.max_xrand = rand_area[1]
@@ -38,22 +38,18 @@ class RRT(Planner):
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
 
-    def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
+    def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
                   search_until_max_iter: bool = False) -> \
-            Union[list, None]:
+            Sequence[Pos]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
         """
-        if obstacle_list is None:
-            obstacle_list = []
         start = to_node(start)
         end = to_node(end)
-        #print("Start ", start)
-        #print("End", end)
         if end.z == 0:
             print("z = 0, point not valid for drone")
-            return None
+            return ()
 
         node_list = [start]
         for i in range(self.max_iter):
@@ -82,9 +78,10 @@ class RRT(Planner):
             path = gen_final_course(node_list, start, end, last_index)
             return path[::-1]
 
-        return None
+        return ()
 
-    def choose_parent(self, node_list: list, obstacle_list: list, new_node: Node, nearinds: list) -> Node:
+    def choose_parent(self, node_list: Sequence[Node], obstacle_list: Sequence[Obstacle],
+                      new_node: Node, nearinds: Sequence[int]) -> Node:
         """
         choose the parent for each node.
         :param node_list:
@@ -117,7 +114,7 @@ class RRT(Planner):
 
         return new_node
 
-    def steer(self, node_list: list, rnd: list, nind: int) -> Node:
+    def steer(self, node_list: Sequence[Node], rnd: list, nind: int) -> Node:
         """
         steer vehicle.
         :param node_list:
@@ -158,7 +155,7 @@ class RRT(Planner):
 
         return rnd
 
-    def get_best_last_index(self, node_list: list, end: Node) -> Union[int, None]:
+    def get_best_last_index(self, node_list: Sequence[Node], end: Node) -> Optional[int]:
         """
         function to get best last index.
         :param node_list:
@@ -179,7 +176,8 @@ class RRT(Planner):
 
         return None
 
-    def rewire(self, node_list: list, obstacle_list: list, new_node: Node, nearinds: list) -> None:
+    def rewire(self, node_list: Sequence[Node], obstacle_list: Sequence[Obstacle],
+               new_node: Node, nearinds: Sequence[int]) -> None:
         """
         rewiring function.
         :param node_list:
@@ -200,18 +198,16 @@ class RRT(Planner):
                     near_node.parent = nnode - 1
                     near_node.cost = scost
 
-    def check_collision_extend(self, obstacle_list: list, dir_seg: Seg):
+    def check_collision_extend(self, obstacle_list: Sequence[Obstacle], dir_seg: Seg):
         """
         extended check collision
         :param obstacle_list:
-        :param near_node:
-        :param theta:
-        :param d:
+        :param dir_seg:
         :return:
         """
         return all(obs.isdisjoint(dir_seg) for obs in obstacle_list)
 
-    def __collision_check(self, node: Node, obstacle_list: list) -> bool:
+    def __collision_check(self, node: Node, obstacle_list: Sequence[Obstacle]) -> bool:
         """
         check collision callback
         :param node:
@@ -228,7 +224,7 @@ class RRT(Planner):
         return True  # safe
 
 
-def get_nearest_list_index(node_list: list, rnd: list) -> int:
+def get_nearest_list_index(node_list: Sequence[Node], rnd: list) -> int:
     """
     function for returning the list index of the nearest point
     :param node_list:
@@ -240,7 +236,7 @@ def get_nearest_list_index(node_list: list, rnd: list) -> int:
     return minind
 
 
-def find_near_nodes(node_list: list, new_node: Node) -> list:
+def find_near_nodes(node_list: Sequence[Node], new_node: Node) -> Sequence[int]:
     """
     TODO: add documentation for find_near_nodes
     :param node_list:
@@ -256,7 +252,7 @@ def find_near_nodes(node_list: list, new_node: Node) -> list:
     return nearinds
 
 
-def gen_final_course(node_list: list, start: Node, end: Node, goal_ind: int) -> list:
+def gen_final_course(node_list: Sequence[Node], start: Node, end: Node, goal_ind: int) -> Sequence[Pos]:
     """
     generate the final path
     :param node_list:
@@ -286,6 +282,7 @@ def calc_dist_to_goal(end: Node, x: float, y: float, z: float) -> float:
     :param end:
     :param x:
     :param y:
+    :param z:
     :return:
     """
     return np.linalg.norm([x - end.x, y - end.y, z - end.z])

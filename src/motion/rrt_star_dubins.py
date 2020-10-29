@@ -10,11 +10,12 @@ Modifications for use in CyPhyHouse made by Ritwika Ghosh and Amelia Gosse
 import copy
 import math
 import random
-from typing import Union
+from typing import Optional, Sequence, MutableSequence
 import numpy as np
 
 import src.motion.dubins_path_planning as dubins_path_planning
-from src.motion.pos_types import Node, to_node, Pos, RoundObs
+from src.motion.obstacle import Obstacle
+from src.motion.pos_types import Node, to_node, Pos
 
 
 class RRT_DUBINS():
@@ -22,10 +23,10 @@ class RRT_DUBINS():
     Class for RRT* Planning with Dubins Car Dynamics
     """
 
-    def __init__(self, rand_area: list = None, expand_dis: float = 0.1, goal_sample_rate: int = 15,
+    def __init__(self, rand_area: Sequence[float] = (), expand_dis: float = 0.1, goal_sample_rate: int = 15,
                  max_iter: int = 100):
         super(RRT_DUBINS, self).__init__()
-        if rand_area is None:
+        if not rand_area:
             rand_area = [-2.5, 2.5]
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
@@ -33,7 +34,7 @@ class RRT_DUBINS():
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
 
-    def find_path(self, start_point: Pos, end_point: Pos, obstacle_list: list) -> list:
+    def find_path(self, start_point: Pos, end_point: Pos, obstacle_list: Sequence[Obstacle]) -> Sequence[Pos]:
         """
         Path Planning
         :param start_point: initial position of vehicle
@@ -47,28 +48,29 @@ class RRT_DUBINS():
         node_list = [start_point]
         for i in range(self.max_iter):
             rnd = self.get_random_point(end_point)
-            nind = self.GetNearestListIndex(node_list, rnd)
+            nind = self.get_nearest_list_index(node_list, rnd)
 
-            newNode = self.steer(rnd, nind, node_list)
-            #  print(newNode.cost)
+            new_node = self.steer(rnd, nind, node_list)
+            #  print(new_node.cost)
 
-            if self.CollisionCheck(newNode, obstacle_list):
-                nearinds = self.find_near_nodes(newNode, node_list)
-                newNode = self.choose_parent(newNode, nearinds, node_list, obstacle_list)
-                node_list.append(newNode)
-                self.rewire(newNode, nearinds, node_list, obstacle_list)
+            if self.collision_check(new_node, obstacle_list):
+                nearinds = self.find_near_nodes(new_node, node_list)
+                new_node = self.choose_parent(new_node, nearinds, node_list, obstacle_list)
+                node_list.append(new_node)
+                self.rewire(nearinds, node_list, obstacle_list)
 
         # generate course
         lastIndex = self.get_best_last_index(end_point, node_list)
         #  print(lastIndex)
 
         if lastIndex is None:
-            return None
+            return ()
 
         path = self.gen_final_course(start_point, end_point, lastIndex, node_list)
         return path
 
-    def choose_parent(self, newNode: Node, nearinds: list, node_list: list, obstacle_list: list) -> Node:
+    def choose_parent(self, newNode: Node, nearinds: Sequence[int],
+                      node_list: Sequence[Node], obstacle_list: Sequence[Obstacle]) -> Node:
         """
 
         :param newNode:
@@ -83,7 +85,7 @@ class RRT_DUBINS():
         dlist = []
         for i in nearinds:
             tNode = self.steer(newNode, i, node_list)
-            if self.CollisionCheck(tNode, obstacle_list):
+            if self.collision_check(tNode, obstacle_list):
                 dlist.append(tNode.cost)
             else:
                 dlist.append(float("inf"))
@@ -107,7 +109,7 @@ class RRT_DUBINS():
         """
         return (angle + math.pi) % (2 * math.pi) - math.pi
 
-    def steer(self, rnd: Node, nind: int, node_list: list) -> Node:
+    def steer(self, rnd: Node, nind: int, node_list: Sequence[Node]) -> Node:
         """
 
         :param rnd:
@@ -154,7 +156,7 @@ class RRT_DUBINS():
 
         return node
 
-    def get_best_last_index(self, end_point: Node, node_list: list) -> Union[int, None]:
+    def get_best_last_index(self, end_point: Node, node_list: Sequence[Node]) -> Optional[int]:
         """
 
         :param end_point:
@@ -185,7 +187,7 @@ class RRT_DUBINS():
 
         return None
 
-    def gen_final_course(self, start_point: Node, end_point: Node, goalind: int, node_list: list) -> list:
+    def gen_final_course(self, start_point: Node, end_point: Node, goalind: int, node_list: Sequence[Node]) -> list:
         """
 
         :param start_point:
@@ -214,7 +216,7 @@ class RRT_DUBINS():
         """
         return np.linalg.norm([x - end_point.x, y - end_point.y])
 
-    def find_near_nodes(self, newNode: Node, node_list: list) -> list:
+    def find_near_nodes(self, newNode: Node, node_list: Sequence[Node]) -> Sequence[int]:
         """
 
         :param newNode:
@@ -231,7 +233,8 @@ class RRT_DUBINS():
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
 
-    def rewire(self, nearinds: list, node_list: list, obstacle_list: list) -> None:
+    def rewire(self, nearinds: Sequence[int], node_list: MutableSequence[Node],
+               obstacle_list: Sequence[Obstacle]) -> None:
         """
 
         :param nearinds:
@@ -244,14 +247,14 @@ class RRT_DUBINS():
             nearNode = node_list[i]
             tNode = self.steer(nearNode, nnode - 1, node_list)
 
-            obstacleOK = self.CollisionCheck(tNode, obstacle_list)
+            obstacleOK = self.collision_check(tNode, obstacle_list)
             imporveCost = nearNode.cost > tNode.cost
 
             if obstacleOK and imporveCost:
                 #  print("rewire")
                 node_list[i] = tNode
 
-    def GetNearestListIndex(self, node_list: list, rnd: Node) -> int:
+    def get_nearest_list_index(self, node_list: Sequence[Node], rnd: Node) -> int:
         """
 
         :param node_list:
@@ -268,7 +271,7 @@ class RRT_DUBINS():
 
         return minind
 
-    def CollisionCheck(self, node: Node, obstacle_list: list) -> bool:
+    def collision_check(self, node: Node, obstacle_list: Sequence[Obstacle]) -> bool:
         """
 
         :param node:
@@ -277,6 +280,8 @@ class RRT_DUBINS():
         """
         for obstacle in obstacle_list:
             for (ix, iy) in zip(node.path_x, node.path_y):
+                # FIXME checking collision against other types of obstacles
+                # The check below is only for cylindrical obstacles
                 dx = obstacle.x - ix
                 dy = obstacle.y - iy
                 d = dx * dx + dy * dy

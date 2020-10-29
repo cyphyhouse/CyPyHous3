@@ -7,15 +7,15 @@ Modifications for use in CyPhyHouse made by Joao
 """
 
 # TODO: revisit documentation.
-import copy
 import math
 import random
-from typing import Union
+from typing import Sequence
 
 import numpy as np
 
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node, Seg
+from src.motion.obstacle import Obstacle
 
 
 class RRT(Planner):
@@ -43,22 +43,18 @@ class RRT(Planner):
         self.steer_configs = [0, 0.1, 0.2]
         self.vel_configs = [1, 2, 3]
 
-    def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None,
+    def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
                   search_until_max_iter: bool = False) -> \
-            Union[list, None]:
+            Sequence[Pos]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
         """
-        if obstacle_list is None:
-            obstacle_list = []
         start = to_node(start)
         end = to_node(end)
-        # print("Start ", start)
-        # print("End", end)
         if end.z != 0:
             #print("z != 0, point not valid for car")
-            return None
+            return ()  # Empty sequence to represent no path is found
 
         self.node_list = [start]
         for i in range(self.max_iter):
@@ -79,7 +75,7 @@ class RRT(Planner):
                     return path[::-1] #self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
-        return None
+        return ()
 
     def steer(self, rnd: list, nind: int) -> Node:
         """
@@ -156,7 +152,7 @@ class RRT(Planner):
 
         return rnd
 
-    def check_collision(self, obstacle_list: list, dir_seg: Seg):
+    def check_collision(self, obstacle_list: Sequence[Obstacle], dir_seg: Seg):
         """
         extended check collision
         :param obstacle_list:
@@ -224,7 +220,8 @@ class RRT(Planner):
         else:
             return False
 
-    def path_smoothing(self, obstacle_list: list, path: list, max_iter: int) -> list:
+    def path_smoothing(self, obstacle_list: Sequence[Obstacle],
+                       path: Sequence[Pos], max_iter: int) -> list:
         """
         smooth path
         :param obstacle_list:
@@ -232,7 +229,6 @@ class RRT(Planner):
         :param max_iter:
         :return:
         """
-
         for _ in range(max_iter):
             path_len = len(path)
             pickPoints = [random.randint(0, path_len-1), random.randint(0, path_len-1)]

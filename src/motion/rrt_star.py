@@ -48,7 +48,7 @@ class RRT(Planner):
         end = to_node(end)
         if end.z != 0:
             print("z != 0, point not valid for car")
-            return []
+            return ()
 
         node_list = [start]
         for i in range(self.max_iter):
@@ -79,7 +79,7 @@ class RRT(Planner):
             #path = path[::2]
             return path[::-1]
 
-        return []
+        return ()
 
     def choose_parent(self, node_list: Sequence[Node], obstacle_list: Sequence[Obstacle],
                       new_node: Node, nearinds: Sequence[int]) -> Node:
