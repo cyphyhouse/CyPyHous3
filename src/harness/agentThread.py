@@ -250,6 +250,8 @@ class AgentThread(ABC, Thread):
         needs to be implemented for any agentThread
         :return:
         """
+        self.moat.moat_init_action()
+
         # create init messages, and keep sending until leader acks, then start app thread.
         # leader only starts once everyone has received an ack.
         from src.harness.message_handler import init_msg_create

@@ -18,6 +18,7 @@ class MotionAutomaton(threading.Thread, ABC):
         self.__reached = False
         self.__position = None
         self.__path = []
+        self.__rospy_node = config.rospy_node
         self.__planner = config.planner
         self.__bot_type = config.bot_type
 
@@ -29,15 +30,11 @@ class MotionAutomaton(threading.Thread, ABC):
                                                   queue_size=config.queue_size)
             self._sub_positioning = rospy.Subscriber(*gen_positioning_params(config), self._getPositioning,
                                                      queue_size=config.queue_size)
-
         except ImportError:
             self.__pub = None
             self.__sub_reached = None
             self._sub_positioning = None
             print("maybe issue with ros installation")
-
-        time.sleep(1)
-        self.moat_init_action()
 
     def reset(self) -> None:
         pass
@@ -53,7 +50,7 @@ class MotionAutomaton(threading.Thread, ABC):
             return
         # else wait for messages to initialize position
         rospy.loginfo("Waiting for the initial position")
-        timeout=10
+        timeout = 10
         try:
             rospy.wait_for_message(
                 self._sub_positioning.name,
@@ -67,7 +64,6 @@ class MotionAutomaton(threading.Thread, ABC):
             rospy.logerr("Unable to initialize position after %d sec. Shutdown ROS node for motion automaton.", timeout)
             rospy.signal_shutdown("Unable to intialize position.")
             raise NotImplementedError("TODO handle initialization failure")
-
 
     @abstractmethod
     def moat_exit_action(self):
@@ -163,6 +159,10 @@ class MotionAutomaton(threading.Thread, ABC):
         :return:
         """
         return self.__bot_type
+
+    @property
+    def rospy_node(self):
+        return self.__rospy_node
 
     @bot_type.setter
     def bot_type(self, bot_type):
