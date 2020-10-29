@@ -15,7 +15,7 @@ from src.motion.rrt_star_drone import RRT as RRT_STAR_DRONE
 from src.motion.rrt_star_dubins import RRT_DUBINS as RRT_DUB_CAR
 from src.motion.rrt_car import RRT as RRT_CAR
 from src.motion.simpleplanner import SimplePlanner
-from src.motion.moat_test_drone_mydrone import MoatTestDrone as MoatTestDroneBad
+from src.motion.moat_hector_quadrotor_simplified import MoatHectorQuadrotorSimplified as MoatTestDroneBad
 
 planner_dict = dict()
 planner_dict['SimplePlanner'] = SimplePlanner
