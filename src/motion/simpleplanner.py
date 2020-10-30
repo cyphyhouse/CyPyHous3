@@ -1,3 +1,6 @@
+from typing import Sequence
+
+from src.motion.obstacle import Obstacle
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Seg, distance
 
@@ -34,7 +37,8 @@ class SimplePlanner(Planner):
         """
         self.__num_segs = num_segs
 
-    def find_path(self, start_point: Pos, end_point: Pos, obstacles: list = None) -> list:
+    def find_path(self, start_point: Pos, end_point: Pos, obstacles: Sequence[Obstacle] = ()) \
+            -> Sequence[Pos]:
         """
         find path of length num_segs between start and end point
         :param start_point: vector starting point

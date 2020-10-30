@@ -9,7 +9,7 @@ Modifications for use in CyPhyHouse made by Joao
 # TODO: revisit documentation.
 import math
 import random
-from typing import Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 
@@ -45,7 +45,7 @@ class RRT(Planner):
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
                   search_until_max_iter: bool = False) -> \
-            Sequence[Pos]:
+            Optional[Sequence[Pos]]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
@@ -54,7 +54,7 @@ class RRT(Planner):
         end = to_node(end)
         if end.z != 0:
             #print("z != 0, point not valid for car")
-            return ()  # Empty sequence to represent no path is found
+            return None  # no path is found
 
         self.node_list = [start]
         for i in range(self.max_iter):
@@ -75,7 +75,7 @@ class RRT(Planner):
                     return path[::-1] #self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
-        return ()
+        return None
 
     def steer(self, rnd: list, nind: int) -> Node:
         """

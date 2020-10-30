@@ -34,7 +34,8 @@ class RRT_DUBINS():
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
 
-    def find_path(self, start_point: Pos, end_point: Pos, obstacle_list: Sequence[Obstacle]) -> Sequence[Pos]:
+    def find_path(self, start_point: Pos, end_point: Pos, obstacle_list: Sequence[Obstacle]) \
+            -> Optional[Sequence[Pos]]:
         """
         Path Planning
         :param start_point: initial position of vehicle
@@ -64,7 +65,7 @@ class RRT_DUBINS():
         #  print(lastIndex)
 
         if lastIndex is None:
-            return ()
+            return None
 
         path = self.gen_final_course(start_point, end_point, lastIndex, node_list)
         return path

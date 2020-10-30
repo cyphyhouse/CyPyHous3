@@ -38,7 +38,7 @@ class RRT(Planner):
         self.max_iter = max_iter
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
-                  search_until_max_iter: bool = False) -> Sequence[Pos]:
+                  search_until_max_iter: bool = False) -> Optional[Sequence[Pos]]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
@@ -48,14 +48,16 @@ class RRT(Planner):
         end = to_node(end)
         if end.z != 0:
             print("z != 0, point not valid for car")
-            return ()
+            return None
 
         node_list = [start]
         for i in range(self.max_iter):
-            rnd = self.get_random_point(end)
-            nind = get_nearest_list_index(node_list, rnd)
+            target_pos = self.get_random_point(end)
+            nind = get_nearest_list_index(node_list, target_pos)
 
-            new_node = self.steer(node_list, rnd, nind)
+            # expand tree
+            nearest_node = node_list[nind]
+            new_node = self.steer(nearest_node, target_pos)
 
             if self.__collision_check(new_node, obstacle_list):
                 nearinds = find_near_nodes(node_list, new_node)
@@ -79,7 +81,7 @@ class RRT(Planner):
             #path = path[::2]
             return path[::-1]
 
-        return ()
+        return None
 
     def choose_parent(self, node_list: Sequence[Node], obstacle_list: Sequence[Obstacle],
                       new_node: Node, nearinds: Sequence[int]) -> Node:
@@ -118,21 +120,17 @@ class RRT(Planner):
 
         return new_node
 
-    def steer(self, node_list: Sequence[Node], rnd: Tuple[float, float, float], nind: int) -> Node:
+    def steer(self, nearest_node: Node, target_pos: Pos) -> Node:
         """
         steer vehicle.
-        :param node_list:
-        :param rnd:
-        :param nind:
+        :param nearest_node:
+        :param target_pos:
         :return:
         """
-
-        # expand tree
-        nearest_node = node_list[nind]
-        theta = math.atan2(rnd[1] - nearest_node.y, rnd[0] - nearest_node.x)
-        new_node = Node(rnd[0], rnd[1], 0)
+        theta = math.atan2(target_pos.y - nearest_node.y, target_pos.x - nearest_node.x)
+        new_node = Node(target_pos.x, target_pos.y, 0)
         current_distance = math.sqrt(
-            (rnd[1] - nearest_node.y) ** 2 + (rnd[0] - nearest_node.x) ** 2)
+            (target_pos.y - nearest_node.y) ** 2 + (target_pos.x - nearest_node.x) ** 2)
         # Find a point within expand_dis of nind, and closest to rnd
         if current_distance <= self.expand_dis:
             pass
@@ -143,7 +141,7 @@ class RRT(Planner):
         new_node.parent = None
         return new_node
 
-    def get_random_point(self, end: Pos) -> Tuple[float, float, float]:
+    def get_random_point(self, end: Pos) -> Pos:
         """
         function to get a random point near the end
         :param end:
@@ -156,7 +154,7 @@ class RRT(Planner):
         else:  # goal point sampling
             rnd = [end.x, end.y, 0]
 
-        return tuple(rnd)
+        return Pos(np.array(rnd))
 
     def get_best_last_index(self, node_list: Sequence[Node], end: Node) -> Optional[int]:
         """
@@ -234,14 +232,14 @@ class RRT(Planner):
         return all(obs.isdisjoint(node) for obs in obstacle_list)
 
 
-def get_nearest_list_index(node_list: Sequence[Node], rnd: Tuple[float, float, float]) -> int:
+def get_nearest_list_index(node_list: Sequence[Node], target_pos: Pos) -> int:
     """
     function for returning the list index of the nearest point
     :param node_list:
-    :param rnd:
+    :param target_pos:
     :return:
     """
-    dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 for node in node_list]
+    dlist = [(node.x - target_pos.x) ** 2 + (node.y - target_pos.y) ** 2 for node in node_list]
     minind = dlist.index(min(dlist))
     return minind
 

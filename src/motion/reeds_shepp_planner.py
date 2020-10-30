@@ -1,10 +1,13 @@
-from typing import Union
+from typing import Optional, Sequence
 import reeds_shepp
 import numpy as np
+
+from src.motion.obstacle import Obstacle
 from src.motion.planner import Planner
 from src.motion.pos_types import Pos, Node, to_node
 
 # TODO: Implement obstacle avoidance
+
 
 class Reeds_Shepp_Planner(Planner):
     '''
@@ -16,7 +19,8 @@ class Reeds_Shepp_Planner(Planner):
         self.rho = rho
         self.step_size = step_size
 
-    def find_path(self, start: Pos, end: Pos, obstacle_list: Union[list, None] = None) -> Union[list, None]:
+    def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = ()) \
+            -> Optional[Sequence[Pos]]:
         """
         Find a route from start to end with intermediate points
         :param start: starting vehicle position
@@ -24,8 +28,6 @@ class Reeds_Shepp_Planner(Planner):
         :param obstacle_list: list of obstacles (currently no functionality)
         :return:
         """
-        if obstacle_list is None:
-            obstacle_list = []
         start = to_node(start)
         end = to_node(end)
         if end.z != 0:

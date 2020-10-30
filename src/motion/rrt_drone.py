@@ -7,10 +7,8 @@ Modifications for use in CyPhyHouse made by Joao
 """
 
 # TODO: revisit documentation.
-import copy
-import math
 import random
-from typing import Union, Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 
@@ -41,7 +39,7 @@ class RRT(Planner):
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
                   search_until_max_iter: bool = False) -> \
-            Sequence[Pos]:
+            Optional[Sequence[Pos]]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
@@ -50,7 +48,7 @@ class RRT(Planner):
         end = to_node(end)
         if end.z == 0:
             print("z = 0, point not valid for drone")
-            return ()
+            return None
 
         self.node_list = [start]
         for i in range(self.max_iter):
@@ -68,8 +66,7 @@ class RRT(Planner):
                     return self.path_smoothing(obstacle_list, path[::-1], 100)
 
         print("Reached max iteration")
-
-        return ()
+        return None
 
     def steer(self, rnd: list, nind: int) -> Node:
         """
@@ -110,7 +107,7 @@ class RRT(Planner):
 
         return rnd
 
-    def check_collision(self, obstacle_list: Sequence[Obstacle], dir_seg: Seg):
+    def check_collision(self, obstacle_list: Sequence[Obstacle], dir_seg: Seg) -> bool:
         """
         extended check collision
         :param obstacle_list:
@@ -133,7 +130,7 @@ class RRT(Planner):
         minind = dlist.index(min(dlist))
         return minind
 
-    def gen_final_course(self, start: Node, end: Node, last_node: Node) -> list:
+    def gen_final_course(self, start: Node, end: Node, last_node: Node) -> Sequence[Pos]:
         """
         generate the final path
         :param start:

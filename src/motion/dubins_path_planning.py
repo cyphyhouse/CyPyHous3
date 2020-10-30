@@ -10,7 +10,6 @@ modified by ritwika ghosh for cyphyhouse
 
 import math
 
-#import matplotlib.pyplot as plt
 import numpy as np
 
 from src.motion.pos_types import Pos
@@ -221,15 +220,6 @@ def dubins_path_planning(sx: float, sy: float, syaw: float, ex: float, ey: float
     pyaw = [pi_2_pi(iyaw + syaw) for iyaw in lpyaw]
     path2 = [Pos(np.array([px[i], py[i], 0.0])) for i in range(len(px))]
 
-    #  print(syaw)
-    #  pyaw = lpyaw
-
-    #  plt.plot(pyaw, "-r")
-    #  plt.plot(lpyaw, "-b")
-    #  plt.plot(eyaw, "*r")
-    #  plt.plot(syaw, "*b")
-    #  plt.show()
-
     return px, py, pyaw, path2, mode, clen
 
 
@@ -277,8 +267,9 @@ def generate_course(length: list, mode: str, c: float):
 
 
 '''
-
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+
     print("Dubins path planner sample start!!")
 
     start_x = 1.0  # [m]
