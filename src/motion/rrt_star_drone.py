@@ -9,18 +9,65 @@ Modifications for use in CyPhyHouse made by Joao
 # TODO: revisit documentation.
 import math
 import random
-from typing import Optional, Sequence
+from typing import Optional, Sequence, MutableSequence
 
 import numpy as np
 
 from src.motion.obstacle import Obstacle
 from src.motion.planner import Planner
-from src.motion.pos_types import Pos, Node, to_node, Seg
+from src.motion.pos_types import Pos, Node, to_node, Seg, distance
+
+
+def _collision_check(pos: Pos, obstacle_list: Sequence[Obstacle]) -> bool:
+    """
+    check collision callback
+    :param pos:
+    :param obstacle_list:
+    :return:
+    """
+    return all(obs.isdisjoint(pos) for obs in obstacle_list)
+
+
+def check_collision_extend(obstacle_list: Sequence[Obstacle], dir_seg: Seg) -> bool:
+    """
+    extended check collision
+    :param obstacle_list:
+    :param dir_seg:
+    :return:
+    """
+    return all(obs.isdisjoint(dir_seg) for obs in obstacle_list)
+
+
+def node_selection(node_list: Sequence[Node], target_pos: Pos, obstacle_list: Sequence[Obstacle]) \
+        -> Optional[Node]:
+    def dist_sq(n: Node) -> float:
+        return (n.x - target_pos.x) ** 2 + (n.y - target_pos.y) ** 2 + (n.z - target_pos.z) ** 2
+
+    for node in sorted(node_list, key=dist_sq):  # Start from nearest
+        # Feasibility condition
+        if check_collision_extend(obstacle_list, Seg(node, target_pos)):
+            return node
+    return None
+
+
+def get_best_last_node(node_list: Sequence[Node], end: Pos, tolerance: float = 0.1) -> Optional[Node]:
+    """
+    function to get best last index.
+    :param node_list:
+    :param end:
+    :param tolerance:
+    :return:
+    """
+    last_node_list = [node for node in node_list if distance(end, node) <= tolerance]
+    if not last_node_list:
+        return None
+
+    return min(last_node_list, key=lambda node: node.cost)
 
 
 class RRT(Planner):
     """
-    Class for RRT* Planning
+    Class for RRT* Planning with Spline for Drones
     """
 
     def __init__(self, rand_area: Sequence[float] = (), expand_dis: float = 0.5, goal_sample_rate: int = 15,
@@ -39,46 +86,62 @@ class RRT(Planner):
         self.max_iter = max_iter
 
     def find_path(self, start: Pos, end: Pos, obstacle_list: Sequence[Obstacle] = (),
-                  search_until_max_iter: bool = False) -> \
-            Sequence[Pos]:
+                  search_until_max_iter: bool = False, tolerance: float = 0.1) -> \
+            Optional[Sequence[Pos]]:
         """
         RRT* Path Planning
         search_until_max_iter: Search until max iteration for path improving or not
         """
-        start = to_node(start)
-        end = to_node(end)
         if end.z == 0:
             print("z = 0, point not valid for drone")
-            return ()
+            return None
+        if not _collision_check(end, obstacle_list):
+            print("End position %s is inside obstacles." % str(end))
+            return None
+        if np.any(start.mk_arr() < self._rand_area.mins) or \
+                np.any(self._rand_area.maxes < start.mk_arr()):
+            print("Start position %s is out of sampling range %s" % (str(start), str(self._rand_area)))
+            return None
+        if np.any(end.mk_arr() < self._rand_area.mins) or \
+                np.any(self._rand_area.maxes < end.mk_arr()):
+            print("End position %s is out of sampling range %s" % (str(start), str(self._rand_area)))
+            return None
+        assert _collision_check(start, obstacle_list)
 
-        node_list = [start]
+        start_node = to_node(start)
+        node_list = [start_node]
         for i in range(self.max_iter):
-            rnd = self.get_random_point(end)
-            nind = get_nearest_list_index(node_list, rnd)
+            target_pos = self.get_random_point(end, obstacle_list)  # Randomly pick a target position
 
-            new_node = self.steer(node_list, rnd, nind)
+            nearest_feasible_node = node_selection(node_list, target_pos, obstacle_list)
+            if not nearest_feasible_node:
+                continue  # Resample
 
-            if self.__collision_check(new_node, obstacle_list):
-                nearinds = find_near_nodes(node_list, new_node)
-                new_node = self.choose_parent(node_list, obstacle_list, new_node, nearinds)
-                node_list.append(new_node)
-                self.rewire(node_list, obstacle_list, new_node, nearinds)
+            # At least one node is feasible
+            new_node = self.node_expansion(node_list, target_pos, nearest_feasible_node, obstacle_list)
+            assert new_node.parent is not None
 
             # generate course
-            if not search_until_max_iter:
-                last_index = self.get_best_last_index(node_list, end)
-                if last_index:
-                    path = gen_final_course(node_list, start, end, last_index)
-                    return path[::-1]
+            if not search_until_max_iter and distance(new_node, end) <= tolerance:
+                return gen_final_path(node_list, start_node, new_node)  # Return first path found
 
         print("Reached max iteration")
+        last_node = get_best_last_node(node_list, end, tolerance)
+        if last_node:
+            return gen_final_path(node_list, start_node, last_node)
 
-        last_index = self.get_best_last_index(node_list, end)
-        if last_index:
-            path = gen_final_course(node_list, start, end, last_index)
-            return path[::-1]
+        return None
 
-        return ()
+    def node_expansion(self, node_list: MutableSequence[Node], target_pos: Pos, nearest_node: Node,
+                       obstacle_list: Sequence[Obstacle]) -> Node:
+        new_node = self.steer(nearest_node, target_pos)
+        nearinds = self.find_near_nodes(node_list, new_node)
+        # expand tree
+        new_node = self.choose_parent(node_list, obstacle_list, new_node, nearinds)
+        assert new_node.parent is not None
+        node_list.append(new_node)
+        self.rewire(node_list, obstacle_list, new_node, nearinds)
+        return new_node
 
     def choose_parent(self, node_list: Sequence[Node], obstacle_list: Sequence[Obstacle],
                       new_node: Node, nearinds: Sequence[int]) -> Node:
@@ -90,46 +153,34 @@ class RRT(Planner):
         :param nearinds:
         :return:
         """
-        if not nearinds:
-            return new_node
-
-        dlist = []
-        for i in nearinds:
-            d_seg = Seg(node_list[i], new_node)
-            if self.check_collision_extend(obstacle_list, d_seg):
-                d = d_seg.length()
-                dlist.append(node_list[i].cost + d)
-            else:
-                dlist.append(float("inf"))
-
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            #print("mincost is inf")
-            return new_node
+        assert nearinds
+        mincost = float("inf")
+        minind = -1
+        for ind in nearinds:
+            d_seg = Seg(node_list[ind], new_node)
+            if check_collision_extend(obstacle_list, d_seg):
+                cost = node_list[ind].cost + d_seg.length()
+                if cost < mincost:
+                    mincost = cost
+                    minind = ind
+        assert np.isfinite(mincost) and 0 <= minind < len(node_list)
 
         new_node.cost = mincost
         new_node.parent = minind
-
         return new_node
 
-    def steer(self, node_list: Sequence[Node], rnd: list, nind: int) -> Node:
+    def steer(self, nearest_node: Node, target_pos: Pos) -> Node:
         """
         steer vehicle.
-        :param node_list:
-        :param rnd:
-        :param nind:
+        :param nearest_node:
+        :param target_pos:
         :return:
         """
-        # expand tree
-        nearest_node = node_list[nind]
-
-        seg_nn_to_rnd = Seg(nearest_node, Pos(np.array(rnd)))
+        seg_nn_to_rnd = Seg(nearest_node, target_pos)
         nn_to_rnd_uvec = seg_nn_to_rnd.direction()
-        new_node = Node(rnd[0], rnd[1], rnd[2])
+        new_node = to_node(target_pos)
 
-        # Find a point within expand_dis of nind, and closest to rnd
+        # Find a point within expand_dis of nearest_node, and closest to rnd
         if seg_nn_to_rnd.length() <= self.expand_dis:
             pass
         else:
@@ -140,46 +191,31 @@ class RRT(Planner):
         new_node.parent = None
         return new_node
 
-    def get_random_point(self, end: Pos) -> list:
+    def get_random_point(self, end: Pos, obstacle_list: Sequence[Obstacle] = ()) -> Pos:
         """
-        function to get a random point near the end
+        function to get a random point near the end, and not inside obstacles
         :param end:
+        :param obstacle_list:
         :return:
         """
+        rnd = Pos(np.array([end.x, end.y, end.z]))
         if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = [random.uniform(self.min_xrand, self.max_xrand),
-                   random.uniform(self.min_yrand, self.max_yrand),
-                   random.uniform(self.min_zrand, self.max_zrand)]
+            for i in range(self.max_iter):
+                rnd = [random.uniform(self.min_xrand, self.max_xrand),
+                       random.uniform(self.min_yrand, self.max_yrand),
+                       random.uniform(self.min_zrand, self.max_zrand)]
+                rnd = Pos(np.array(rnd))
+                if _collision_check(rnd, obstacle_list):
+                    return rnd
         else:  # goal point sampling
-            rnd = [end.x, end.y, end.z]
-
+            pass
+        assert _collision_check(rnd, obstacle_list)
         return rnd
-
-    def get_best_last_index(self, node_list: Sequence[Node], end: Node) -> Optional[int]:
-        """
-        function to get best last index.
-        :param node_list:
-        :param end:
-        :return:
-        """
-        disglist = [calc_dist_to_goal(end,
-                                      node.x, node.y, node.z) for node in node_list]
-        goal_inds = [disglist.index(i) for i in disglist if i <= self.expand_dis]
-
-        if not goal_inds:
-            return None
-
-        mincost = min([node_list[i].cost for i in goal_inds])
-        for i in goal_inds:
-            if node_list[i].cost == mincost:
-                return i
-
-        return None
 
     def rewire(self, node_list: Sequence[Node], obstacle_list: Sequence[Obstacle],
                new_node: Node, nearinds: Sequence[int]) -> None:
         """
-        rewiring function.
+        rewire nearby nodes to set the new node as parent if the cost is reduced.
         :param node_list:
         :param obstacle_list:
         :param new_node:
@@ -194,98 +230,54 @@ class RRT(Planner):
             scost = new_node.cost + d_seg.length()
 
             if near_node.cost > scost:
-                if self.check_collision_extend(obstacle_list, d_seg):
+                if check_collision_extend(obstacle_list, d_seg):
                     near_node.parent = nnode - 1
                     near_node.cost = scost
 
-    def check_collision_extend(self, obstacle_list: Sequence[Obstacle], dir_seg: Seg):
+    def find_near_nodes(self, node_list: Sequence[Node], new_node: Node) -> Sequence[int]:
         """
-        extended check collision
-        :param obstacle_list:
-        :param dir_seg:
+        TODO: add documentation for find_near_nodes
+        :param node_list:
+        :param new_node:
         :return:
         """
-        return all(obs.isdisjoint(dir_seg) for obs in obstacle_list)
-
-    def __collision_check(self, node: Node, obstacle_list: Sequence[Obstacle]) -> bool:
-        """
-        check collision callback
-        :param node:
-        :param obstacle_list:
-        :return:
-        """
-        for obs in obstacle_list:
-            try:
-                if not obs.isdisjoint(node.to_pos()):
-                    return False  # collision
-            except AttributeError:
-                print("obstacle might not be correctly formatted")
-
-        return True  # safe
+        r = self.expand_dis
+        nearinds = [
+            idx for idx, node in enumerate(node_list) if
+            distance(new_node, node) <= 2*r  # At least the nearest feasible node will be included
+        ]
+        assert nearinds
+        return nearinds
 
 
-def get_nearest_list_index(node_list: Sequence[Node], rnd: list) -> int:
+def get_nearest_list_index(node_list: Sequence[Node], target_pos: Pos) -> int:
     """
-    function for returning the list index of the nearest point
+    function for returning the list index of the nearest node
     :param node_list:
-    :param rnd:
+    :param target_pos:
     :return:
     """
-    dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 + (node.z - rnd[2]) ** 2 for node in node_list]
+    dlist = [(node.x - target_pos.x) ** 2 + (node.y - target_pos.y) ** 2 + (node.z - target_pos.z) ** 2
+             for node in node_list]
     minind = dlist.index(min(dlist))
     return minind
 
 
-def find_near_nodes(node_list: Sequence[Node], new_node: Node) -> Sequence[int]:
-    """
-    TODO: add documentation for find_near_nodes
+def gen_final_path(node_list: Sequence[Node], start_node: Node, last: Node) -> Sequence[Pos]:
+    """ generate the final path excluding start node
     :param node_list:
-    :param new_node:
+    :param start_node:
+    :param last:
     :return:
     """
-    nnode = len(node_list)
-    r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-    dlist = [(node.x - new_node.x) ** 2 +
-             (node.y - new_node.y) ** 2 +
-             (node.z - new_node.z) ** 2 for node in node_list]
-    nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
-    return nearinds
-
-
-def gen_final_course(node_list: Sequence[Node], start: Node, end: Node, goal_ind: int) -> Sequence[Pos]:
-    """
-    generate the final path
-    :param node_list:
-    :param start:
-    :param end:
-    :param goal_ind:
-    :return:
-    """
-    path = [Pos(np.array([end.x, end.y, end.z]))]
-
-    node = node_list[goal_ind]
-    seg_last_two_points = Seg(Pos(np.array([node.x, node.y, node.z])), Pos(np.array([end.x, end.y, end.z])))
-    if seg_last_two_points.length() <= 0.1:  # magic number (change to something better later)
-        goal_ind = node.parent  # skip last point because it is very close to end point
-
-    while node_list[goal_ind].parent is not None:
-        node = node_list[goal_ind]
-        path.append(Pos(np.array([node.x, node.y, node.z])))
-        goal_ind = node.parent
-    path.append(Pos(np.array([start.x, start.y, start.z])))
+    path = []
+    curr_node = last
+    while curr_node.parent is not None:
+        path.append(curr_node)
+        curr_node = node_list[curr_node.parent]
+    assert curr_node == start_node
+    path.reverse()
     return path
-
-
-def calc_dist_to_goal(end: Node, x: float, y: float, z: float) -> float:
-    """
-    calculate the distance to goal
-    :param end:
-    :param x:
-    :param y:
-    :param z:
-    :return:
-    """
-    return np.linalg.norm([x - end.x, y - end.y, z - end.z])
 
 
 '''

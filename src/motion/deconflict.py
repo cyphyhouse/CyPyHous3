@@ -177,7 +177,7 @@ def clear_path(paths: Sequence[Sequence[pos.Pos]],
     :param tolerance: closeness parameter
     :return: true if clear, false otherwise
     """
-    if not proposed_path:
+    if proposed_path is None:
         return False
     for i in range(len(paths)):
         if paths[i] is not None and ignore is not i:

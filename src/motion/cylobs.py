@@ -8,13 +8,22 @@ from src.motion.pos_types import Pos, Seg
 
 class CylObs(Obstacle):
 
-    def __init__(self, point: Pos, radius: float):
+    def __init__(self, point: Pos, radius: float, height: float = 1.0):
         point.z = 0
-        super(CylObs, self).__init__(point, np.array([[radius]]))
+        super(CylObs, self).__init__(point, np.array([2*radius, 2*radius, height]))
+
+    @property
+    def diameter(self) -> float:
+        assert self.size[0] == self.size[1]
+        return self.size[0]
 
     @property
     def radius(self) -> float:
-        return self.size[0]
+        return self.diameter/ 2
+
+    @property
+    def height(self) -> float:
+        return self.size[2]
 
     def _isdisjoint_point(self, point: Pos) -> bool:
         d = (self.position.x - point.x) ** 2 + (self.position.y - point.y) ** 2

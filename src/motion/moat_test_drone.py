@@ -1,4 +1,4 @@
-import time
+import rospy
 
 import numpy as np
 
@@ -33,7 +33,7 @@ class MoatTestDrone(MotionAutomaton):
         super().moat_init_action()
         self.takeoff()
         while not self.reached:
-            time.sleep(0.1)
+            rospy.sleep(0.1)
         print("take off successful")
         pass
 

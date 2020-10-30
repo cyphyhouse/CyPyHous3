@@ -31,8 +31,8 @@ class Planner(ABC):
 
     @min_rand.setter
     def min_rand(self, value: float) -> None:
-        self._rand_area.min_xrand = value
-        self._rand_area.min_yrand = value
+        self.min_xrand = value
+        self.min_yrand = value
 
     @property
     def max_rand(self) -> float:
@@ -40,8 +40,8 @@ class Planner(ABC):
 
     @max_rand.setter
     def max_rand(self, value: float) -> None:
-        self._rand_area.max_xrand = value
-        self._rand_area.max_yrand = value
+        self.max_xrand = value
+        self.max_yrand = value
 
     @property
     def min_xrand(self) -> float:
@@ -92,13 +92,14 @@ class Planner(ABC):
         self._rand_area.maxes[2] = value
 
     @abstractmethod
-    def find_path(self, start_point: Pos, end_point: Pos, obstacles: Sequence[Obstacle]) -> Sequence[Pos]:
+    def find_path(self, start_point: Pos, end_point: Pos, obstacles: Sequence[Obstacle]) \
+            -> Optional[Sequence[Pos]]:
         """
         find a path from the start point to an end point given a list of obstacles.
         :param start_point: starting point as a Pos [x,y,z]
         :param end_point: ending point as a Pos
         :param obstacles: as sequence of obstacles.
         :return: path as a sequence of Pos.
-                 Empty sequence if no path is found.
+                 None if no path is found.
         """
         raise NotImplementedError
