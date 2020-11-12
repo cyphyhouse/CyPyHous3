@@ -18,6 +18,7 @@ import src.tests.base.test_msg_create as test_msg_create
 import src.tests.base.test_dsm as test_dsm
 import src.tests.base.test_dsm_allread as test_dsm_allread
 import src.tests.base.test_dsm_allwrite as test_dsm_allwrite
+import src.tests.base.test_gvh as test_gvh
 
 
 def main():
@@ -37,7 +38,8 @@ def main():
         test_msg_create,
         test_dsm,
         test_dsm_allread,
-        test_dsm_allwrite
+        test_dsm_allwrite,
+        test_gvh
     ]
     suite.addTests(loader.loadTestsFromModule(m) for m in modules)
     runner = unittest.TextTestRunner(verbosity=3)
