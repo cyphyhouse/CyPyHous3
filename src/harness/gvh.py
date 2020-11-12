@@ -130,18 +130,6 @@ class gvh(object):
     def n_sys(self) -> int:
         return self.__n_sys
 
-    @send_ips.setter
-    def send_ips(self, send_ips: tp.List[tp.Tuple[str, int]]) -> None:
-        self.__send_ips = send_ips
-
-    @is_leader.setter
-    def is_leader(self, leader: bool) -> None:
-        self.__is_leader = leader
-
-    @is_alive.setter
-    def is_alive(self, live: bool) -> None:
-        self.__is_alive = live
-
     @msg_list.setter
     def msg_list(self, msg_list: tp.List[message.Message]) -> None:
         self.__msg_list = msg_list
@@ -150,33 +138,13 @@ class gvh(object):
     def recv_msg_list(self, recv_msg_list: tp.List[message.Message]) -> None:
         self.__recv_msg_list = recv_msg_list
 
-    @r_port.setter
-    def r_port(self, r_port: int) -> None:
-        self.__r_port = r_port
-
-    @moat.setter
-    def moat(self, moat) -> None:
-        self.__moat = moat
-
     @dsm.setter
     def dsm(self, my_dsm: tp.Dict) -> None:
         self.__dsm = my_dsm
 
-    @mutex_handler.setter
-    def mutex_handler(self, mutex_handler: mh.MutexHandler) -> None:
-        self.__mutex_handler = mutex_handler
-
     @port_list.setter
     def port_list(self, port_list: tp.List[int]) -> None:
         self.__port_list = port_list
-
-    @pid.setter
-    def pid(self, pid: int) -> None:
-        self.__pid = pid
-
-    @n_sys.setter
-    def n_sys(self, n_sys: int) -> None:
-        self.__n_sys = n_sys
 
     # ------------ SEND RELATED METHODS --------------
 
