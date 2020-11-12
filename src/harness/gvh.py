@@ -130,6 +130,10 @@ class gvh(object):
     def n_sys(self) -> int:
         return self.__n_sys
 
+    @is_alive.setter
+    def is_alive(self, is_alive: bool) -> None:
+        self.__is_alive = is_alive
+
     @msg_list.setter
     def msg_list(self, msg_list: tp.List[message.Message]) -> None:
         self.__msg_list = msg_list
