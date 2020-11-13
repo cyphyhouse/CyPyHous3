@@ -24,5 +24,5 @@ install:
   - pip install ${PIP_USER_FLAG} .
 
 script:
-  - pycodestyle --first --ignore=E501 .  # Check for coding style
+  - pycodestyle --first --ignore=E226,E501 .  # Check for coding style
   - python3 -m unittest discover  # Run unit tests
