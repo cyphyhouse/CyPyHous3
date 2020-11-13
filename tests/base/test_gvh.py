@@ -5,7 +5,7 @@ import unittest
 from src.config.configs import AgentConfig, MoatConfig
 from src.datatypes.message_types import MsgType
 from src.datatypes.robot import BotType
-from src.harness.gvh import gvh
+from src.harness.global_variable_holder import GlobalVariableHolder
 from src.objects.message import Message
 
 
@@ -17,7 +17,7 @@ class TestGvh(unittest.TestCase):
     def setUp(self):
         self.mc = MoatConfig("wpt", "rct", "rpn", "bn", 2, BotType.CAR, "pn", 5, 6)
         self.ac = AgentConfig(0, 3, "127.1.1.1", 2000, [2000], None, True, None, None)
-        self.tgvh = gvh(self.ac, self.mc)
+        self.tgvh = GlobalVariableHolder(self.ac, self.mc)
 
     def test_is_leader(self):
         self.assertEqual(self.tgvh.is_leader, self.ac.is_leader, "testing is leader")

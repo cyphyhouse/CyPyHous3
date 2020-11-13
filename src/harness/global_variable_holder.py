@@ -11,7 +11,7 @@ import src.objects.dsm_allwrite as dsm_aw
 import src.objects.message as message
 
 
-class gvh(object):
+class GlobalVariableHolder(object):
     """
     global variable holder for the agent, this contains the worldview of each agent
     handles distributed shared memory, motion automaton for the object, and any other
