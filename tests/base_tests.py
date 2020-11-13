@@ -5,6 +5,7 @@
 import unittest
 
 import tests.base.test_agent_config as test_agent_config
+import tests.base.test_agent_thread as test_agent_thread
 import tests.base.test_cylobs as test_cylobs
 import tests.base.test_message as test_message
 import tests.base.test_moat_config as test_moat_config
@@ -26,6 +27,7 @@ def main():
     loader = unittest.TestLoader()
     modules = [
         test_agent_config,
+        test_agent_thread,
         test_moat_config,
         test_mutex_handler,
         test_obstacle,
