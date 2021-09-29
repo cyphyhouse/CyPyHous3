@@ -20,8 +20,8 @@ jobs:
 
 install:
   - pip3 install ${PIP_USER_FLAG} --upgrade pip
-  - pip install ${PIP_USER_FLAG} setuptools pycodestyle
-  - pip install ${PIP_USER_FLAG} .
+  - pip3 install ${PIP_USER_FLAG} setuptools pycodestyle
+  - pip3 install ${PIP_USER_FLAG} .
 
 script:
   - pycodestyle --first --ignore=E226,E501 .  # Check for coding style
