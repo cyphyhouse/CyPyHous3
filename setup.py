@@ -13,5 +13,6 @@ setup(name='src',
           'numpy',
           'scipy',
           'pyyaml',
+          'yamale'
       ],
       )
