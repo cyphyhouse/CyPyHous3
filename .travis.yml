@@ -5,10 +5,10 @@ notifications:
 
 jobs:
   include:
-    - name: "Python 3 on Ubuntu 16.04 LTS" # Default versions used in our field testing
-      dist: xenial
+    - name: "Python 3 on Ubuntu 20.04 LTS" # Default versions used with our simulator
+      dist: focal
       language: shell
-      env: PIP_USER_FLAG=--user
+      env: PIP_USER_FLAG="--user
       addons:
         apt:
           packages:
